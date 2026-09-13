@@ -1,6 +1,18 @@
 # Changelog
 
-## 0.9.0 - Unreleased
+## 1.0.0-rc.1 - Unreleased
+
+- Derive progress from evidence type, support level, outcome, task identity, and time instead of accepting caller-selected mastery states.
+- Require a fresh unsupported retrieval at least 24 hours after distinct independent evidence before recording retention, and downgrade retained state after later failure.
+- Add locked, optimistic, crash-recoverable session updates plus consent, retention, renewal, and deletion enforcement for learner profiles.
+- Add closed-book zero-knowledge teacher/learner simulations with baseline-to-transfer gain, provider-neutral adapters, thresholds, and critical-failure blocking.
+- Add a validated Arabic/English HTML-to-tagged-PDF reference path with PDF/UA output, title/text checks, and rendered visual review.
+- Add evidence-bounded PDF, text, transcript, and sampled-frame intake that refuses to treat opaque video bytes as understood.
+- Document the pedagogy-to-implementation mapping and its limits; prevent unbounded always-loaded skill growth.
+- Pin direct Python dependencies and GitHub Actions, add Dependabot, and exercise portable core validation on macOS and Windows.
+- Add a machine-readable stable-release receipt; fixture adapters and schema fixtures cannot authorize a stable release.
+
+## 0.9.0 - 2026-09-13
 
 - Resolve the explain-first versus continuous-testing contradictions across the teaching engine, handoff, integration, and accessibility contracts.
 - Pin and meta-validate ten JSON Schemas with connected positive fixtures and negative rejection tests.

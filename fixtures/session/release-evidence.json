@@ -1,0 +1,33 @@
+{
+  "version": "1.0.0",
+  "evidence_kind": "fixture",
+  "candidate_commit": "0000000000000000000000000000000000000000",
+  "previous_release": "fixture-only",
+  "evaluated_at": "2026-09-13T19:00:00Z",
+  "behavioral": {
+    "response_model": "fixture-response",
+    "grader_model": "fixture-grader",
+    "cases": 1,
+    "pass_rate": 1.0,
+    "critical_failures": 0,
+    "report_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "simulations": {
+    "teacher_model": "fixture-teacher",
+    "learner_model": "fixture-learner",
+    "grader_model": "fixture-grader",
+    "count": 1,
+    "pass_rate": 1.0,
+    "minimum_observed_gain": 1.0,
+    "critical_failures": 0,
+    "report_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "human_reviews": [
+    {"locale": "ar-EG", "reviewer_role": "fixture", "reviewed_at": "2026-09-13T19:00:00Z", "verdict": "pass"},
+    {"locale": "en", "reviewer_role": "fixture", "reviewed_at": "2026-09-13T19:00:00Z", "verdict": "pass"}
+  ],
+  "journeys": {"learner_complete": true, "educator_source_grounded_complete": true},
+  "artifact_review": {"bidi_html": true, "pdf_pages": true, "links": true, "code_readability": true},
+  "cost_usd": 0,
+  "limitations": ["Schema fixture only; not release evidence."]
+}

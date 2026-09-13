@@ -4,7 +4,7 @@ description: Provide adaptive, evidence-backed teaching from goals or user-chose
 license: MIT
 metadata:
   author: ahmed3bead
-  version: "0.9.0"
+  version: "1.0.0-rc.1"
   compatibility: "Agent Skills host; optional capabilities are documented in docs/compatibility.md; validators require Python 3.10+."
 ---
 
@@ -42,7 +42,7 @@ Preserve the established teaching language across turns. A code-switch, English 
 7. If learning failed, diagnose whether the cause is missing prerequisite, terminology, example, pace, misconception, accessibility, or motivation. Change strategy rather than paraphrasing the same explanation.
 8. Record only useful progress when persistent workspace files are available. Never claim memory that does not exist.
 
-If a relevant teaching pack exists in `domain-packs/`, read its `PACK.md` after diagnosing the learner. A pack may specialize prerequisite maps, practice types, mastery evidence, common misconceptions, and source standards. It must not override this skill's evidence, privacy, safety, or learner-control rules.
+If a relevant teaching pack exists in `domain-packs/`, read its `PACK.md` after diagnosing the learner. A pack may specialize prerequisite maps, practice types, mastery evidence, common misconceptions, and source standards. It must not override this skill's evidence, privacy, safety, or learner-control rules. Treat a pack marked `needs-qualified-review` as experimental guidance, verify consequential domain claims independently, and never present it as expert-reviewed.
 
 For detailed instructional decisions, read [references/teaching-contract.md](references/teaching-contract.md). For a multi-session learner, also read [references/learner-model.md](references/learner-model.md).
 
@@ -57,6 +57,8 @@ When external tools or skills could improve source access or specialist executio
 ## Evidence contract
 
 Research when claims are current, specialized, disputed, safety-relevant, or outside stable common knowledge. Prefer primary and authoritative sources. Attach citations to the claims they support; never invent or decorate citations.
+
+The teaching behavior is evidence-informed but bounded; see [docs/pedagogy-basis.md](docs/pedagogy-basis.md) for the research mapping and limitations. Do not turn a general finding into a diagnosis, fixed learning style, or guaranteed outcome.
 
 When the learner names a book, field, course, tool, framework, or other defined subject as the basis of learning, perform a broad research sweep before substantial instruction. Build a source-diverse knowledge base rather than relying on the first source or one medium. Read [references/research-sweep.md](references/research-sweep.md). If research access is unavailable, say so and narrow the promised scope instead of presenting prior knowledge as a completed sweep.
 
@@ -85,11 +87,17 @@ When the environment supports files and the learner wants continuity, maintain:
 
 Use the schemas in `schemas/`. Ask before creating persistent personal records. Keep them local unless the learner explicitly authorizes sharing. Do not store full transcripts or unnecessary sensitive data.
 
+When execution is available, use `scripts/session_manager.py` to create or update evidence-bearing session files instead of assigning mastery states manually. Use `scripts/profile_lifecycle.py status` before reading a persistent learner profile; never use an expired or deletion-requested profile.
+
 For educator work, start from the reusable files in `templates/` when the user wants a saved curriculum map or lesson plan.
 
 For source-grounded work, maintain a coverage ledger using `schemas/source-coverage.schema.json` or `templates/source-coverage.md` when the source is large, multimodal, partially accessible, or distributed across multiple items.
 
+When local execution is available, use `scripts/inspect_source.py` for supplied text/PDF evidence and transcript/frame manifests. Its output records only inspected components. Raw video bytes are not evidence of transcript or visual understanding unless a capable host actually inspects them.
+
 When the user asks for a detailed explanation of an entire book, course, curriculum, or broad field, treat the curriculum itself as a deliverable. Before starting a long lesson, read [references/curriculum-delivery.md](references/curriculum-delivery.md) and create a navigable curriculum artifact. For Arabic or other right-to-left content that mixes left-to-right terms, read [references/bidirectional-output.md](references/bidirectional-output.md) and prefer HTML as the learner-facing source. Create a polished PDF from that source when the user asks for fixed-layout or print-ready output. Keep the chat response to a short orientation and the next learning choice instead of pasting the whole course into the conversation.
+
+When execution supports the pinned PDF dependencies, render mixed-direction packs with `scripts/render_learning_pack.py`; inspect the rendered pages before delivery. Keep the validated HTML as the editable and accessible source of truth.
 
 For a beginner, a whole-subject journey, a new learning pack, or any environment where file and continuity capabilities affect delivery, read [references/guided-learning-pack.md](references/guided-learning-pack.md). Detect available capabilities without interrogating the learner about the platform. Always explain what will happen, why it helps, where to start, how to study, how to recover when stuck, and exactly how to continue. Validate portable resume codes with `scripts/validate_resume.py` when execution is available; never recover mastery from malformed or partial codes.
 

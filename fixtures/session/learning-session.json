@@ -1,6 +1,8 @@
 {
   "version": "1.0.0",
+  "revision": 1,
   "session_id": "S001",
+  "subject_slug": "prompt-writing",
   "audience": "learner",
   "input_mode": "source-grounded",
   "language": "ar-EG",

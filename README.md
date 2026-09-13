@@ -30,6 +30,8 @@ For a detailed whole-book, course, curriculum, or broad-subject request, Teach M
 
 `v0.8.3` defines those boundaries precisely. Routine questions are offered only after a complete lesson, topic, module objective, or practical skill—not after a page or paragraph—and begin only when the learner opts in. Accepted checks use a few diagnostic questions to adapt the next teaching step rather than manufacture a score.
 
+`v1.0.0-rc.1` turns the contract into a release candidate with evidence-derived progress, crash-safe sessions, profile lifecycle enforcement, closed-book teacher/learner simulations, checked HTML-to-PDF output, evidence-bounded source intake, pinned automation dependencies, and a stable-release evidence receipt.
+
 > Teach for demonstrated progress, not information volume.
 
 ## Languages
@@ -139,10 +141,18 @@ python3 scripts/validate.py
 python3 scripts/validate_schemas.py
 python3 scripts/validate_evals.py
 python3 scripts/validate_domain_packs.py
+python3 scripts/validate_simulations.py
+python3 scripts/check_dependency_pins.py
+python3 scripts/check_context_budget.py
 python3 scripts/test_validate_session.py
 python3 scripts/test_validate_resume.py
 python3 scripts/test_behavioral_eval_runner.py
+python3 scripts/test_agent_simulations.py
+python3 scripts/test_render_learning_pack.py
+python3 scripts/test_inspect_source.py
 ```
+
+Fixture model adapters prove runner plumbing only. See [`docs/model-evaluation.md`](docs/model-evaluation.md) before making model-quality or release claims.
 
 For saved connected artifacts, validate cross-file identifiers with:
 
@@ -165,7 +175,7 @@ python3 scripts/validate_session.py learning-session.json \
 
 ## Status
 
-`v0.9.0` candidate — hardened schemas, evidence-safe resume codes, executable behavioral evals, and tested installation/release tooling. Real model evaluation is required before `v1.0.0`.
+`v1.0.0-rc.1` technical candidate. Repository tests, simulated runner plumbing, connected artifacts, and Arabic/English PDF rendering are executable. Stable `v1.0.0` remains blocked until real named-model evaluation and recorded Arabic/English human review satisfy the release receipt.
 
 ## License
 

@@ -11,13 +11,17 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["record_id", "objective_id", "objective", "state", "evidence", "observed_at", "next_action"],
+        "required": ["record_id", "objective_id", "objective", "evidence_type", "support_level", "outcome", "task_fingerprint", "state", "evidence", "observed_at", "next_action"],
         "properties": {
           "record_id": {"type": "string", "minLength": 1},
           "objective_id": {"type": "string", "minLength": 1},
           "objective": {"type": "string", "minLength": 1},
           "lesson_id": {"type": ["string", "null"]},
           "assessment_id": {"type": ["string", "null"]},
+          "evidence_type": {"enum": ["recognition", "explanation", "prediction", "application", "transfer", "delayed-retrieval"]},
+          "support_level": {"enum": ["modelled", "scaffolded", "hint", "none"]},
+          "outcome": {"enum": ["successful", "partial", "unsuccessful"]},
+          "task_fingerprint": {"type": "string", "minLength": 1},
           "state": {"enum": ["introduced", "practised-with-help", "applied-independently", "transferred", "retained"]},
           "evidence": {"type": "string", "minLength": 1},
           "help_level": {"type": ["integer", "null"], "minimum": 0, "maximum": 6},

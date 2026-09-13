@@ -11,9 +11,9 @@
 
 ## Coverage
 
-| Source ID | Source | Media | Access | Actually inspected | Coverage | Confidence | Limitations |
-|---|---|---|---|---|---|---|---|
-| | | | | | | | |
+| Source ID | Source | Media | Access | Actually inspected | Units | Inspected at | SHA-256 | Coverage | Confidence | Limitations |
+|---|---|---|---|---|---|---|---|---|---|---|
+| | | | | | | | | | | |
 
 ## Understanding gate
 
