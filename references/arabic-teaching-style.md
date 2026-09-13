@@ -19,7 +19,7 @@ Use clear contemporary language. Avoid unnecessarily ornate vocabulary and long 
 
 ## Mixed-direction content
 
-Keep code, formulas, URLs, filenames, and English identifiers isolated in inline code or blocks. In Markdown and PDF, inspect lists, punctuation, tables, and mixed Arabic/English lines. For PDF, use an Arabic-capable font, RTL layout, and rendered-page review.
+Direction is part of correctness. For saved Arabic material containing English terms, code, paths, numbers, or formulas, read [bidirectional-output.md](bidirectional-output.md). Keep left-to-right runs isolated rather than relying on punctuation, Markdown backticks, or the browser's automatic direction guessing. For PDF, use an Arabic-capable font, RTL layout, isolated left-to-right runs, and rendered-page review.
 
 ## Quality check
 
