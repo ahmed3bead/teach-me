@@ -76,6 +76,33 @@ def validate_grade(grade: dict[str, Any], expected: list[str]) -> list[dict[str,
     return normalized
 
 
+def locale_criterion(locale: str) -> str:
+    normalized = locale.lower().replace("_", "-")
+    if normalized == "ar-eg":
+        return (
+            "the response is written in natural Egyptian Arabic; English technical terms may appear only when useful "
+            "and are explained in Arabic on first use"
+        )
+    if normalized in {"ar-msa", "ar-sa"}:
+        return (
+            "the response is written in clear Modern Standard Arabic; English technical terms may appear only when useful "
+            "and are explained in Arabic on first use"
+        )
+    if normalized.startswith("ar"):
+        return "the response is written in Arabic and matches the learner's dialect or register"
+    if normalized.startswith("en"):
+        return "the response is written in English and matches the learner's level and register"
+    return f"the response uses the requested locale {locale} and matches the learner's register"
+
+
+def expected_criteria(case: dict[str, Any]) -> list[str]:
+    expected = list(case["expected"])
+    locale = case.get("locale")
+    if isinstance(locale, str) and locale.strip():
+        expected.append(locale_criterion(locale.strip()))
+    return expected
+
+
 def write_report(path: Path, report: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(path.suffix + ".tmp")
@@ -114,6 +141,7 @@ def main() -> int:
     results: list[dict[str, Any]] = []
     for suite in suites:
         for case in suite["cases"]:
+            case_expected = expected_criteria(case)
             turns = case.get("turns") or [{"role": "user", "content": case["prompt"]}]
             history: list[dict[str, str]] = []
             generated: dict[str, Any] = {}
@@ -151,12 +179,12 @@ def main() -> int:
                     "type": "grade",
                     **base,
                     "response": response,
-                    "expected": case["expected"],
+                    "expected": case_expected,
                     "grading_rule": "Judge observable behavior only. Do not award credit for implied or missing behavior.",
                 },
                 args.timeout,
             )
-            criteria = validate_grade(graded, case["expected"])
+            criteria = validate_grade(graded, case_expected)
             results.append(
                 {
                     "suite": suite["suite"],
