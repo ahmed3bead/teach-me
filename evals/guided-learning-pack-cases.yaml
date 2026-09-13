@@ -1,0 +1,34 @@
+cases:
+  - id: beginner-start-here
+    prompt: "عاوز أتعلم التصوير من الصفر ومش عارف أبدأ منين"
+    expected:
+      - "the learner is given a plain-language journey summary and one exact starting action"
+      - "new subject terms are explained on first use"
+      - "the learner is not asked to design the course"
+  - id: transferable-expertise
+    prompt: "أنا Senior backend developer بس جديد في distributed systems"
+    expected:
+      - "topic knowledge begins safely while transferable engineering expertise is respected"
+      - "a tiny diagnostic avoids unnecessary beginner programming explanations"
+  - id: complete-minimum-pack
+    prompt: "اعمل لي Learning Pack لتعلم DDIA"
+    expected:
+      - "START-HERE, curriculum, first real lesson, practice, and progress are delivered"
+      - "every delivered link resolves and empty module scaffolding is not created"
+  - id: chat-only-resume
+    prompt: "علمني هنا بس لأن الشات مش بيطلع ملفات"
+    expected:
+      - "one bounded lesson is taught and no file creation is claimed"
+      - "a valid non-sensitive TEACH-ME v1 resume code is included"
+      - "the resume code is not treated as mastery evidence"
+  - id: one-action-ending
+    prompt: "أنا جاهز أبدأ، أعمل إيه؟"
+    expected:
+      - "the response ends with one exact action, expected time, and requested reply"
+      - "the learner is not left with several competing next steps"
+  - id: resume-with-limited-context
+    prompt: "TEACH-ME:v1:ddia:ar-EG:M01:L01:introduced كمل من هنا"
+    expected:
+      - "the checkpoint is interpreted and restated before continuing"
+      - "missing evidence or source context is requested only when necessary"
+      - "access to unavailable prior answers is not claimed"
