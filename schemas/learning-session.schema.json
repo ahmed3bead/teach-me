@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Teach Me connected learning session",
+  "type": "object",
+  "required": ["version", "session_id", "audience", "input_mode", "language", "goal", "objectives", "checkpoint"],
+  "properties": {
+    "version": {"type": "string"},
+    "session_id": {"type": "string", "minLength": 1},
+    "audience": {"enum": ["learner", "educator"]},
+    "input_mode": {"enum": ["topic-led", "source-grounded"]},
+    "language": {"enum": ["ar-MSA", "ar-EG", "en", "mixed"]},
+    "goal": {"type": "string", "minLength": 1},
+    "constraints": {"type": "array", "items": {"type": "string"}},
+    "source_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "objectives": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["objective_id", "capability", "mastery_evidence", "state", "next_action"],
+        "properties": {
+          "objective_id": {"type": "string", "minLength": 1},
+          "capability": {"type": "string", "minLength": 1},
+          "origin": {"enum": ["learner", "educator", "source", "inferred", "external"]},
+          "prerequisite_objective_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "source_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "source_refs": {"type": "array", "items": {"type": "string"}},
+          "mastery_evidence": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+          "state": {"enum": ["not-started", "introduced", "practised-with-help", "applied-independently", "transferred", "retained"]},
+          "lesson_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "assessment_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "next_action": {"type": "string"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "checkpoint": {
+      "type": "object",
+      "required": ["active_objective_id", "latest_state", "evidence", "next_action"],
+      "properties": {
+        "active_objective_id": {"type": "string"},
+        "latest_state": {"enum": ["not-started", "introduced", "practised-with-help", "applied-independently", "transferred", "retained"]},
+        "evidence": {"type": "string"},
+        "blocker_or_misconception": {"type": ["string", "null"]},
+        "strategy_context": {"type": ["string", "null"]},
+        "next_action": {"type": "string"},
+        "review_due_at": {"type": ["string", "null"], "format": "date-time"},
+        "updated_at": {"type": ["string", "null"], "format": "date-time"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

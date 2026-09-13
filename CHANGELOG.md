@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0 - Unreleased
+
+- Reframe audience and source handling as independent routing axes.
+- Add a connected learning-session contract and stable artifact identifiers.
+- Add objective contracts, resumable checkpoints, capability routing, and artifact-authority rules.
+- Add a claim evidence ledger with correction propagation.
+- Add integration evaluations for combined educator/source use, resume, mastery evidence, and inaccessible media.
+
 ## 0.3.0 - Unreleased
 
 - Add Source-Grounded Mode for books, documents, audio, video, playlists, courses, and websites.

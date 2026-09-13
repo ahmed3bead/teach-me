@@ -8,6 +8,8 @@ It also includes an **Educator Mode** for teachers, trainers, and parents who wa
 
 **Source-Grounded Mode** lets a learner study from a book, video, playlist, course, website, or recording. The agent records what it actually inspected, tests its understanding before teaching, and clearly separates the source's claims from verification and added explanation.
 
+The **Integration Core** treats audience and source as independent choices, so source-grounded learning also works for educators. Connected session, objective, lesson, assessment, evidence, and checkpoint identifiers let the agent resume from demonstrated learning instead of repeating onboarding or confusing content completion with mastery.
+
 > Teach for demonstrated progress, not information volume.
 
 ## Languages
@@ -83,6 +85,16 @@ Read [`CONTRIBUTING.md`](CONTRIBUTING.md). Run the repository checks with:
 
 ```bash
 python3 scripts/validate.py
+```
+
+For saved connected artifacts, validate cross-file identifiers with:
+
+```bash
+python3 scripts/validate_session.py learning-session.json \
+  --coverage source-coverage.json \
+  --claims claim-ledger.json \
+  --lesson lesson-plan.json \
+  --progress progress.json
 ```
 
 ## العربية

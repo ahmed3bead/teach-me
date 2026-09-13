@@ -30,7 +30,7 @@ def check_skill() -> None:
     text = (ROOT / "SKILL.md").read_text(encoding="utf-8")
     if not text.startswith("---\n"):
         fail("SKILL.md: missing YAML frontmatter")
-    for required in ("name: teach-me", "Educator Mode", "Source-Grounded Mode", "references/educator-mode.md", "references/source-grounded-mode.md"):
+    for required in ("name: teach-me", "Learner Mode", "Educator Mode", "Source-Grounded", "references/educator-mode.md", "references/source-grounded-mode.md", "references/integration-core.md"):
         if required not in text:
             fail(f"SKILL.md: missing {required!r}")
     for match in re.findall(r"\]\(([^)]+)\)", text):
@@ -64,6 +64,31 @@ def check_templates() -> None:
     for word in ("Actually inspected", "Understanding gate", "Safe teaching scope"):
         if word not in coverage:
             fail(f"source-coverage.md: missing {word}")
+    session = (ROOT / "templates" / "learning-session.md").read_text(encoding="utf-8")
+    for word in ("Session ID", "Active objective", "Mastery evidence", "Resume checkpoint"):
+        if word not in session:
+            fail(f"learning-session.md: missing {word}")
+
+
+def check_integration() -> None:
+    session = json.loads((ROOT / "schemas" / "learning-session.schema.json").read_text(encoding="utf-8"))
+    claim = json.loads((ROOT / "schemas" / "claim-ledger.schema.json").read_text(encoding="utf-8"))
+    for field in ("session_id", "audience", "input_mode", "objectives", "checkpoint"):
+        if field not in session["required"]:
+            fail(f"learning-session.schema.json: {field} must be required")
+    objective = session["properties"]["objectives"]["items"]
+    for field in ("objective_id", "mastery_evidence", "state", "next_action"):
+        if field not in objective["required"]:
+            fail(f"learning-session.schema.json: objective {field} must be required")
+    if "session_id" not in claim["required"] or "claims" not in claim["required"]:
+        fail("claim-ledger.schema.json: missing connected required fields")
+    integration_eval = (ROOT / "evals" / "integration-cases.yaml").read_text(encoding="utf-8")
+    for invariant in ("reading or lesson completion is not recorded as mastery", "educator and source-grounded handling are combined", "dependent objectives and lessons are identified"):
+        if invariant not in integration_eval:
+            fail(f"integration-cases.yaml: missing invariant {invariant!r}")
+    validator = ROOT / "scripts" / "validate_session.py"
+    if not validator.exists():
+        fail("missing session referential-integrity validator")
 
 
 def main() -> int:
@@ -71,6 +96,7 @@ def main() -> int:
     check_skill()
     check_evals()
     check_templates()
+    check_integration()
     print("Teach Me validation passed")
     return 0
 
