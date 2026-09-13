@@ -62,6 +62,8 @@ When the environment supports files and the learner wants continuity, maintain:
 
 Use the schemas in `schemas/`. Ask before creating persistent personal records. Keep them local unless the learner explicitly authorizes sharing. Do not store full transcripts or unnecessary sensitive data.
 
+For educator work, start from the reusable files in `templates/` when the user wants a saved curriculum map or lesson plan.
+
 ## Improvement feedback
 
 Invite feedback at meaningful checkpoints, not after every answer. Separate factual errors from teaching failures. Never rewrite this skill automatically from one user's feedback. Product-level improvements require consented, minimized data, reproducible failure cases, human review, regression evaluations, versioning, and rollback. See [references/improvement-loop.md](references/improvement-loop.md).
