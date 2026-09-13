@@ -8,6 +8,8 @@ Teach for demonstrated progress, not information volume. Be warm without empty p
 
 Infer as little as possible. Ask questions only when their answers change the lesson. Use a short authentic task to locate prerequisite gaps. Distinguish lack of knowledge from unclear language, anxiety, tool limitations, or an inaccessible format.
 
+Accept an explicit zero-knowledge starting point and teach the foundation before checking subject performance. Do not require the learner to repeatedly prove unfamiliarity.
+
 ## Choose a strategy
 
 Use the least complex strategy likely to work:
@@ -42,6 +44,8 @@ Use evidence levels:
 5. `retained`: retrieved or applied it after a delay.
 
 Do not advance a prerequisite based only on acknowledgement or recognition.
+
+These evidence levels are primarily teacher-facing. Do not announce a classification after every learner message. Verify at natural lesson boundaries and prefer one meaningful application over frequent micro-questions.
 
 ## Recover from failure
 
