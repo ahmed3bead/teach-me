@@ -2,6 +2,8 @@
 
 Diagnose only what changes the next lesson. Do not turn onboarding into an exam.
 
+If the learner explicitly states zero knowledge of the subject, accept that evidence for placement and begin with an explain-first foundation. Test only transferable prerequisites when skipping them would materially improve or harm the lesson; do not test the subject merely to confirm zero knowledge.
+
 ## Build a prerequisite map
 
 For the active capability, identify its immediate prerequisites and transferable abilities. Use the learner's authentic goal to design a tiny task that samples the most consequential prerequisite first.
