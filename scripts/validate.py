@@ -30,7 +30,7 @@ def check_skill() -> None:
     text = (ROOT / "SKILL.md").read_text(encoding="utf-8")
     if not text.startswith("---\n"):
         fail("SKILL.md: missing YAML frontmatter")
-    for required in ("name: teach-me", "Learner Mode", "Educator Mode", "Source-Grounded", "references/educator-mode.md", "references/source-grounded-mode.md", "references/integration-core.md", "references/research-sweep.md", "references/curriculum-delivery.md", "references/guided-learning-pack.md", "references/diagnostic-engine.md", "references/teaching-engine.md", "references/assessment-feedback-engine.md", "references/arabic-teaching-style.md", "references/retention-adaptation.md", "references/accessibility-engagement.md", "references/learning-pack-structure.md"):
+    for required in ("name: teach-me", "Learner Mode", "Educator Mode", "Source-Grounded", "references/educator-mode.md", "references/source-grounded-mode.md", "references/integration-core.md", "references/research-sweep.md", "references/curriculum-delivery.md", "references/guided-learning-pack.md", "references/diagnostic-engine.md", "references/teaching-engine.md", "references/assessment-feedback-engine.md", "references/arabic-teaching-style.md", "references/retention-adaptation.md", "references/accessibility-engagement.md", "references/learning-pack-structure.md", "references/integration-foundation.md", "references/multimodal-video.md"):
         if required not in text:
             fail(f"SKILL.md: missing {required!r}")
     for match in re.findall(r"\]\(([^)]+)\)", text):
@@ -162,6 +162,15 @@ def check_retention_accessibility() -> None:
             fail(f"retention-accessibility-cases.yaml: missing invariant {invariant!r}")
 
 
+def check_integration_foundation() -> None:
+    cases = (ROOT / "evals" / "integration-foundation-cases.yaml").read_text(encoding="utf-8")
+    for invariant in ("inspection is labeled transcript rather than fully watched", "the catalog license is not assumed to cover every linked skill", "the simplicity ladder avoids generating a full learning pack", "source count alone is not treated as research readiness"):
+        if invariant not in cases:
+            fail(f"integration-foundation-cases.yaml: missing invariant {invariant!r}")
+    if not (ROOT / "ACKNOWLEDGEMENTS.md").exists():
+        fail("missing ecosystem acknowledgements")
+
+
 def main() -> int:
     check_json()
     check_skill()
@@ -173,6 +182,7 @@ def main() -> int:
     check_guided_learning_pack()
     check_teaching_engine()
     check_retention_accessibility()
+    check_integration_foundation()
     print("Teach Me validation passed")
     return 0
 

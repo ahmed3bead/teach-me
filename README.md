@@ -20,6 +20,8 @@ For a detailed whole-book, course, curriculum, or broad-subject request, Teach M
 
 `v0.7.0` extends teaching across time: adaptive retrieval and spacing, contextual learner-model updates, accessible equivalents, ethical recovery from disengagement, and a simpler learner-facing pack separated from internal evidence files.
 
+`v0.7.1` adds an optional integration foundation for multimodal video inspection, capability providers, external-skill adoption, research rigor review, and reuse-first simplicity. Teach Me remains functional without external tools.
+
 > Teach for demonstrated progress, not information volume.
 
 ## Languages
@@ -121,7 +123,7 @@ python3 scripts/validate_session.py learning-session.json \
 
 ## Status
 
-`v0.7.0` — adaptive teaching, retention, accessibility, and learner-safe continuity. Feedback and real-world evaluation are welcome.
+`v0.7.1` — adaptive teaching with safe, optional source and skill integrations. Feedback and real-world evaluation are welcome.
 
 ## License
 
