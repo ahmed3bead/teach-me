@@ -11,24 +11,34 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
           cache: pip
           cache-dependency-path: requirements-dev.txt
       - run: python3 -m pip install -r requirements-dev.txt
+      - run: python3 -m pip check
+      - run: python3 scripts/check_dependency_pins.py
+      - run: python3 scripts/check_context_budget.py
       - run: python3 scripts/validate.py
       - run: python3 scripts/validate_schemas.py
       - run: python3 scripts/validate_evals.py
       - run: python3 scripts/validate_domain_packs.py
+      - run: python3 scripts/validate_simulations.py
       - run: python3 scripts/run_behavioral_evals.py --validate-only
+      - run: python3 scripts/run_agent_simulations.py --validate-only
       - run: python3 scripts/test_behavioral_eval_runner.py
+      - run: python3 scripts/test_agent_simulations.py
       - run: python3 scripts/test_package_release.py
       - run: python3 scripts/test_feedback_pipeline.py
       - run: python3 scripts/test_validate_bidi_html.py
       - run: python3 scripts/test_validate_session.py
       - run: python3 scripts/test_validate_resume.py
+      - run: python3 scripts/test_session_manager.py
+      - run: python3 scripts/test_profile_lifecycle.py
+      - run: python3 scripts/test_render_learning_pack.py
+      - run: python3 scripts/test_inspect_source.py
       - run: >-
           python3 scripts/validate_session.py
           fixtures/session/learning-session.json
@@ -39,3 +49,28 @@ jobs:
           --claims fixtures/session/claim-ledger.json
           --lesson fixtures/session/lesson-plan.json
           --progress fixtures/session/progress.json
+
+  portable-core:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+      - run: python -m pip install -r requirements-dev.txt
+      - run: python -m pip check
+      - run: python scripts/validate.py
+      - run: python scripts/validate_schemas.py
+      - run: python scripts/validate_evals.py
+      - run: python scripts/validate_simulations.py
+      - run: python scripts/test_validate_session.py
+      - run: python scripts/test_validate_resume.py
+      - run: python scripts/test_session_manager.py
+      - run: python scripts/test_profile_lifecycle.py
+      - run: python scripts/test_package_release.py

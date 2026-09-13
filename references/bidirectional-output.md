@@ -49,3 +49,5 @@ Open or render representative pages before delivery. Check at least:
 Fix the source and re-render when terms, punctuation, or numbers appear reordered. Do not declare success based only on valid HTML or a successful PDF conversion.
 
 Start from `templates/bidi-learning-pack.html` when no project-specific HTML template exists. Run `scripts/validate_bidi_html.py` on every learner-facing HTML file to catch missing direction declarations, unisolated left-to-right text, minimum CSS failures, and broken relative links. This structural check complements—but never replaces—the rendered-page inspection above.
+
+When the pinned PDF dependencies are installed, `scripts/render_learning_pack.py INPUT.html OUTPUT.pdf` validates the HTML, renders tagged PDF/UA, and checks its title, pages, and requested text. PDF/UA generation improves structure but is not a substitute for assistive-technology testing or visual page review.

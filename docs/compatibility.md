@@ -21,3 +21,5 @@ The repository and local validators are free. A host, model provider, web search
 ## Behavioral eval adapter protocol
 
 `scripts/run_behavioral_evals.py` is provider-neutral. The response command receives a JSON object containing the suite, case, prompt, locale, and skill root, then returns `{"response": "...", "model": "..."}`. The grader command receives that response and the observable criteria, then returns one boolean result per criterion. A release run fails below the configured case threshold or when any case marked `critical` fails.
+
+The repository's reference PDF path uses the exact versions in `requirements-dev.txt` and may additionally need the platform libraries required by WeasyPrint. The HTML remains the accessible source of truth if the renderer is unavailable. Dynamic teacher/learner evaluation uses the separate protocol in [`model-evaluation.md`](model-evaluation.md).

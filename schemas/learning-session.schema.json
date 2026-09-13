@@ -3,10 +3,12 @@
   "$id": "https://github.com/ahmed3bead/teach-me/schemas/learning-session.schema.json",
   "title": "Teach Me connected learning session",
   "type": "object",
-  "required": ["version", "session_id", "audience", "input_mode", "language", "goal", "objectives", "checkpoint"],
+  "required": ["version", "revision", "session_id", "subject_slug", "audience", "input_mode", "language", "goal", "objectives", "checkpoint"],
   "properties": {
     "version": {"const": "1.0.0"},
+    "revision": {"type": "integer", "minimum": 0},
     "session_id": {"type": "string", "minLength": 1},
+    "subject_slug": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"},
     "audience": {"enum": ["learner", "educator"]},
     "input_mode": {"enum": ["topic-led", "source-grounded"]},
     "language": {"enum": ["ar-MSA", "ar-EG", "en", "mixed"]},

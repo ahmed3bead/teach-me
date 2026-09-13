@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ahmed3bead/teach-me/schemas/release-evidence.schema.json",
+  "title": "Teach Me stable release evidence",
+  "type": "object",
+  "required": ["version", "evidence_kind", "candidate_commit", "previous_release", "evaluated_at", "behavioral", "simulations", "human_reviews", "journeys", "artifact_review"],
+  "properties": {
+    "version": {"const": "1.0.0"},
+    "evidence_kind": {"enum": ["fixture", "real-release"]},
+    "candidate_commit": {"type": "string", "pattern": "^[a-f0-9]{40}$"},
+    "previous_release": {"type": "string", "minLength": 1},
+    "evaluated_at": {"type": "string", "format": "date-time"},
+    "behavioral": {
+      "type": "object",
+      "required": ["response_model", "grader_model", "cases", "pass_rate", "critical_failures", "report_sha256"],
+      "properties": {
+        "response_model": {"type": "string", "minLength": 1},
+        "grader_model": {"type": "string", "minLength": 1},
+        "cases": {"type": "integer", "minimum": 1},
+        "pass_rate": {"type": "number", "minimum": 0, "maximum": 1},
+        "critical_failures": {"type": "integer", "minimum": 0},
+        "report_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      },
+      "additionalProperties": false
+    },
+    "simulations": {
+      "type": "object",
+      "required": ["teacher_model", "learner_model", "grader_model", "count", "pass_rate", "minimum_observed_gain", "critical_failures", "report_sha256"],
+      "properties": {
+        "teacher_model": {"type": "string", "minLength": 1},
+        "learner_model": {"type": "string", "minLength": 1},
+        "grader_model": {"type": "string", "minLength": 1},
+        "count": {"type": "integer", "minimum": 1},
+        "pass_rate": {"type": "number", "minimum": 0, "maximum": 1},
+        "minimum_observed_gain": {"type": "number", "minimum": -1, "maximum": 1},
+        "critical_failures": {"type": "integer", "minimum": 0},
+        "report_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      },
+      "additionalProperties": false
+    },
+    "human_reviews": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["locale", "reviewer_role", "reviewed_at", "verdict"],
+        "properties": {
+          "locale": {"enum": ["ar-MSA", "ar-EG", "en"]},
+          "reviewer_role": {"type": "string", "minLength": 1},
+          "reviewed_at": {"type": "string", "format": "date-time"},
+          "verdict": {"enum": ["pass", "fail"]},
+          "notes": {"type": "string"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "journeys": {
+      "type": "object",
+      "required": ["learner_complete", "educator_source_grounded_complete"],
+      "properties": {
+        "learner_complete": {"type": "boolean"},
+        "educator_source_grounded_complete": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "artifact_review": {
+      "type": "object",
+      "required": ["bidi_html", "pdf_pages", "links", "code_readability"],
+      "properties": {
+        "bidi_html": {"type": "boolean"},
+        "pdf_pages": {"type": "boolean"},
+        "links": {"type": "boolean"},
+        "code_readability": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "cost_usd": {"type": "number", "minimum": 0},
+    "limitations": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": false
+}

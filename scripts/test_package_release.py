@@ -9,6 +9,7 @@ import zipfile
 from pathlib import Path
 
 from package_release import build, version
+from verify_release_evidence import verify
 
 
 def main() -> int:
@@ -30,6 +31,16 @@ def main() -> int:
             raise AssertionError("archive contains a nested duplicate skill")
         if any("__pycache__" in name or name.startswith("teach-me/dist/") for name in names):
             raise AssertionError("archive includes local build artifacts")
+        fixture = __import__("json").loads(
+            (Path(__file__).resolve().parents[1] / "fixtures/session/release-evidence.json").read_text(encoding="utf-8")
+        )
+        try:
+            verify(fixture)
+        except ValueError as exc:
+            if "fixture evidence" not in str(exc):
+                raise
+        else:
+            raise AssertionError("fixture evidence authorized a stable release")
 
     print("Teach Me package tests passed (determinism, checksum, install root)")
     return 0

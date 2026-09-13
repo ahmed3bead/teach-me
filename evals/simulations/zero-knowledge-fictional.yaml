@@ -1,0 +1,56 @@
+suite: zero-knowledge-fictional
+version: 1.0.0
+simulations:
+  - id: luma-routing-ar-eg
+    locale: ar-EG
+    critical: true
+    max_turns: 7
+    learner_persona: "متعلم بالغ يبدأ بصفر معرفة عن نظام Luma الخيالي. لا تستخدم أي معرفة غير موجودة في كلام المدرس. اتكلم مصري طبيعي."
+    learner_behaviors:
+      - "بعد أول شرح حقيقي، عبّر مرة واحدة إن الفرق بين القاعدة والاستثناء مش واضح."
+      - "لو المدرس سألك أسئلة قبل ما يشرح وحدة كاملة، ارفض بلطف واطلب استكمال الشرح."
+      - "بعد شرح القواعد والأمثلة كوحدة كاملة، وافق على فحص فهم قصير."
+      - "جاوب من المعلومات التي شرحها المدرس فقط، واظهر أي نقطة ما زالت غير واضحة."
+    initial_request: "أنا معرفش أي حاجة عن نظام Luma. علّمني من الصفر بالمصري عشان أعرف أوجّه الصناديق صح."
+    teaching_material: |
+      نظام Luma خيالي ولا توجد عنه معرفة خارج هذا السيناريو.
+      القاعدة 1: الصندوق ذو الملصق الأزرق يذهب إلى البوابة N.
+      الاستثناء 1: إذا كان وزن الصندوق الأزرق أكبر من 4 كجم، يذهب إلى H بدل N.
+      القاعدة 2: الصندوق ذو الملصق الأصفر يذهب إلى Y مهما كان وزنه.
+      الاستثناء 2: إذا كان على الصندوق الأصفر رمز مثلث، يذهب إلى Q بدل Y.
+      عند اجتماع اللون والرمز، يطبّق الاستثناء الخاص باللون قبل القاعدة العامة.
+    baseline_task: "قبل أي شرح: أين يذهب صندوق أزرق وزنه 6 كجم، وصندوق أصفر عليه مثلث؟ اشرح السبب."
+    transfer_task: "حالة جديدة: صندوق أزرق 3 كجم، صندوق أزرق 8 كجم، صندوق أصفر 9 كجم، وصندوق أصفر عليه مثلث. وجّه الأربعة واشرح ترتيب قرارك."
+    expected:
+      - "the baseline shows no invented Luma knowledge"
+      - "the teacher explains purpose, rules, exceptions, and a worked example before routine assessment"
+      - "the teacher changes representation when the learner reports confusion"
+      - "the learner is not pressured when declining an early check"
+      - "the transfer answer correctly routes all four unseen cases and explains exception priority"
+      - "the interaction remains natural Egyptian Arabic without fabricated mastery"
+    minimum_gain: 0.6
+    minimum_transfer: 0.8
+  - id: vela-constraints-en
+    locale: en
+    critical: true
+    max_turns: 6
+    learner_persona: "An adult learner with zero knowledge of the fictional Vela notation. Use only information exposed by the teacher and admit uncertainty."
+    learner_behaviors:
+      - "Ask for a concrete example if the teacher gives only definitions."
+      - "Make one plausible confusion between scope and priority, then respond to the repair."
+      - "Accept a short check only after the complete notation rule is explained."
+    initial_request: "Teach me the fictional Vela notation from zero so I can validate a rule correctly."
+    teaching_material: |
+      Vela is fictional. A rule is written NAME | SCOPE | PRIORITY.
+      NAME is a non-empty identifier. SCOPE is local or global. PRIORITY is an integer from 1 to 5.
+      Local rules apply before global rules. Within the same scope, the higher integer applies first.
+      A missing field makes the rule invalid; an unknown scope or priority outside 1..5 also makes it invalid.
+    baseline_task: "Before teaching, validate `cache | local | 6` and explain how it competes with a global priority-5 rule."
+    transfer_task: "Validate and order these fresh rules: `audit | global | 3`, `cache | local | 2`, `sync | local | 5`, and `backup | | 4`. Explain validity and execution order."
+    expected:
+      - "the learner does not use fictional rules before they are taught"
+      - "the teacher provides a causal model and worked example rather than a definition dump"
+      - "scope versus priority confusion is diagnosed and repaired with a different representation"
+      - "the transfer answer rejects the missing scope and orders valid rules by scope then priority"
+    minimum_gain: 0.6
+    minimum_transfer: 0.8
