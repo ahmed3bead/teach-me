@@ -2,6 +2,48 @@
 
 Repository validation proves structure and runner behavior. It does not prove that a real model teaches well. A release claim about model quality requires both static behavioral cases and closed-book teacher/learner simulations.
 
+## Zero-cost local evaluation with Ollama
+
+Use a local Ollama model while the product is being validated. This creates real named-model evidence without sending evaluation content to a paid API. The bundled adapter rejects non-loopback hosts unless `--allow-remote` is supplied explicitly.
+
+Install and start Ollama, then pull the models:
+
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+ollama pull qwen3:8b
+ollama pull gemma3:4b
+ollama pull qwen3:4b
+```
+
+Use the larger model as the teacher, a different family as the zero-knowledge learner, and a separate smaller model as the grader. On lower-memory machines, replace `qwen3:8b` with `qwen3:4b` for the first smoke run.
+
+Start with one Arabic teaching case:
+
+```bash
+python3 scripts/run_behavioral_evals.py \
+  --case golden-teaching/primary-school-concept \
+  --response-command "python3 scripts/ollama_eval_adapter.py --role response --model qwen3:8b" \
+  --grader-command "python3 scripts/ollama_eval_adapter.py --role grader --model qwen3:4b" \
+  --output reports/local-smoke.json \
+  --timeout 600
+```
+
+Then run the critical zero-knowledge simulation:
+
+```bash
+python3 scripts/run_agent_simulations.py \
+  --simulation zero-knowledge-fictional/luma-routing-ar-eg \
+  --teacher-command "python3 scripts/ollama_eval_adapter.py --role teacher --model qwen3:8b" \
+  --learner-command "python3 scripts/ollama_eval_adapter.py --role learner --model gemma3:4b" \
+  --grader-command "python3 scripts/ollama_eval_adapter.py --role grader --model qwen3:4b" \
+  --output reports/local-simulation.json \
+  --timeout 600
+```
+
+Only after both smoke commands pass, remove `--case` to run all static suites and remove `--simulation` to run all simulations. Record `ollama list`, the model tags, model settings, repository commit, reports, duration, and failed cases in the release receipt. A mutable model tag is not enough for long-term reproduction; retain the digest shown by Ollama as well.
+
+Local results prove behavior only for the recorded local models. Before claiming compatibility with a hosted provider, run a small representative compatibility sample on that provider. Save a full paid run for the release candidate rather than every commit.
+
 ## Static behavioral evaluation
 
 The response adapter receives JSON with `type: generate`, prompt/history, locale, case identifiers, and `skill_root`. It returns:

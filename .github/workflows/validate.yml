@@ -30,6 +30,7 @@ jobs:
       - run: python3 scripts/run_agent_simulations.py --validate-only
       - run: python3 scripts/test_behavioral_eval_runner.py
       - run: python3 scripts/test_agent_simulations.py
+      - run: python3 scripts/test_ollama_eval_adapter.py
       - run: python3 scripts/test_package_release.py
       - run: python3 scripts/test_feedback_pipeline.py
       - run: python3 scripts/test_validate_bidi_html.py
