@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Teach Me minimized feedback event",
+  "type": "object",
+  "required": ["version", "skill_version", "consent", "mode", "failure_category", "outcome"],
+  "properties": {
+    "version": {"type": "string"},
+    "skill_version": {"type": "string"},
+    "consent": {"const": true},
+    "mode": {"enum": ["learner", "educator"]},
+    "locale": {"enum": ["ar-MSA", "ar-EG", "en", "mixed"]},
+    "subject_category": {"type": "string"},
+    "failure_category": {"enum": ["none", "knowledge-error", "missing-context", "bad-source", "level-mismatch", "teaching-failure", "assessment-failure", "language-failure", "memory-failure", "unsafe-advice", "tool-failure"]},
+    "outcome": {"enum": ["helped", "partly-helped", "did-not-help", "not-assessed"]},
+    "reproducible_summary": {"type": "string", "maxLength": 1000},
+    "contains_personal_data": {"type": "boolean"}
+  },
+  "additionalProperties": false
+}
