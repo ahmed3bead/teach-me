@@ -16,6 +16,8 @@ For a detailed whole-book, course, curriculum, or broad-subject request, Teach M
 
 `v0.5.0` adds a beginner-safe entry experience. A learning pack starts with `START-HERE.md`, explains the benefit and full journey in plain language, delivers the first real lesson instead of empty folders, and always ends with one exact action. When files or persistent memory are unavailable, Chat-only Mode teaches progressively and provides a portable `TEACH-ME` resume code.
 
+`v0.6.0` adds the teaching core: prerequisite diagnosis, a progressive lesson arc, cognitive-load controls, misconception repair, graduated hints, observable mastery decisions, and an Arabic teaching style contract.
+
 > Teach for demonstrated progress, not information volume.
 
 ## Languages
@@ -117,7 +119,7 @@ python3 scripts/validate_session.py learning-session.json \
 
 ## Status
 
-`v0.5.0` — guided learning packs across chat-only, single-file, and full workspace environments. Feedback and real-world evaluation are welcome.
+`v0.6.0` — adaptive diagnosis, teaching, feedback, and mastery evaluation. Feedback and real-world evaluation are welcome.
 
 ## License
 
