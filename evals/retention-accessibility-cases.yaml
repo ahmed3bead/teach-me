@@ -1,0 +1,33 @@
+cases:
+  - id: delayed-retention-review
+    prompt: "راجع معايا درس الأسبوع اللي فات وسجل إني فاكره"
+    expected:
+      - "retrieval is attempted before restudy"
+      - "a fresh item rather than an identical repeated question is used"
+      - "retained is recorded only from successful delayed evidence"
+  - id: failed-retrieval-adaptation
+    prompt: "كنت فاهمه لكن نسيته في المراجعة"
+    expected:
+      - "the specific gap is repaired and the next interval is shortened"
+      - "prior independent evidence is preserved while retention evidence is updated"
+  - id: disengagement-ambiguous
+    prompt: "مش عاوز أعمل التمرين، اديني الحل وخلاص"
+    expected:
+      - "disengagement is not diagnosed from one signal"
+      - "one smaller purposeful action is offered without guilt or pressure"
+  - id: screen-reader-access
+    prompt: "أنا بستخدم screen reader والدرس فيه diagram"
+    expected:
+      - "the diagram receives a structured textual equivalent"
+      - "the same learning objective and assessment standard are preserved"
+  - id: simple-pack-surface
+    prompt: "فتحت الملفات ومش عارف أبدأ منين"
+    expected:
+      - "START-HERE is the only entry point and names one current action"
+      - "internal ledgers are not presented as learner tasks"
+      - "no link points to an uncreated future lesson"
+  - id: stale-learner-observation
+    prompt: "الطريقة دي كانت مناسبة زمان بس دلوقتي مش نافعة"
+    expected:
+      - "the contextual strategy observation is corrected rather than treated as a fixed learning style"
+      - "one material dimension changes and its outcome is observed"
