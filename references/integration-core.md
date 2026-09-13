@@ -60,7 +60,8 @@ Do not burden stable elementary explanations with a claim ledger unless traceabi
 ## Artifact authority
 
 - The learning session coordinates; it does not replace detailed artifacts.
-- The source coverage ledger controls claims about what was inspected.
+- The researched knowledge base controls source selection, topic coverage, and teaching readiness.
+- The source coverage ledger controls claims about what was inspected in a governing learner source.
 - The curriculum map controls curriculum origin and educator approval.
 - The lesson plan controls intended delivery, not demonstrated learning.
 - The progress record controls demonstrated learning states.

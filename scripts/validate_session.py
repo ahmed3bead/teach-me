@@ -18,6 +18,7 @@ def validate(
     session: dict[str, Any],
     *,
     coverage: dict[str, Any] | None = None,
+    knowledge_base: dict[str, Any] | None = None,
     claims: dict[str, Any] | None = None,
     lesson: dict[str, Any] | None = None,
     progress: dict[str, Any] | None = None,
@@ -51,6 +52,7 @@ def validate(
 
     artifacts = [
         ("coverage", coverage),
+        ("knowledge-base", knowledge_base),
         ("claims", claims),
         ("lesson", lesson),
         ("progress", progress),
@@ -66,6 +68,14 @@ def validate(
         missing = known_sources.difference(coverage_ids)
         if missing:
             errors.append(f"session source_ids missing from coverage: {sorted(missing)}")
+
+    if knowledge_base is not None:
+        research_ids = [item.get("source_id") for item in knowledge_base.get("sources", [])]
+        if len(research_ids) != len(set(research_ids)):
+            errors.append("knowledge-base source IDs must be unique")
+        missing = known_sources.difference(research_ids)
+        if missing:
+            errors.append(f"session source_ids missing from knowledge-base: {sorted(missing)}")
 
     if claims is not None:
         for claim in claims.get("claims", []):
@@ -97,6 +107,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("session", type=Path)
     parser.add_argument("--coverage", type=Path)
+    parser.add_argument("--knowledge-base", type=Path)
     parser.add_argument("--claims", type=Path)
     parser.add_argument("--lesson", type=Path)
     parser.add_argument("--progress", type=Path)
@@ -105,6 +116,7 @@ def main() -> int:
     errors = validate(
         load(args.session),
         coverage=load(args.coverage) if args.coverage else None,
+        knowledge_base=load(args.knowledge_base) if args.knowledge_base else None,
         claims=load(args.claims) if args.claims else None,
         lesson=load(args.lesson) if args.lesson else None,
         progress=load(args.progress) if args.progress else None,

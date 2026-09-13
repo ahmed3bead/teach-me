@@ -10,6 +10,8 @@ It also includes an **Educator Mode** for teachers, trainers, and parents who wa
 
 The **Integration Core** treats audience and source as independent choices, so source-grounded learning also works for educators. Connected session, objective, lesson, assessment, evidence, and checkpoint identifiers let the agent resume from demonstrated learning instead of repeating onboarding or confusing content completion with mastery.
 
+For any named book, field, course, tool, framework, or standard, Teach Me performs a broad research sweep before substantial instruction. It builds a role-based knowledge base across relevant official, academic, audiovisual, practical, community, paid, and free sources while clearly recording what was actually accessible and inspected.
+
 > Teach for demonstrated progress, not information volume.
 
 ## Languages
@@ -91,6 +93,7 @@ For saved connected artifacts, validate cross-file identifiers with:
 
 ```bash
 python3 scripts/validate_session.py learning-session.json \
+  --knowledge-base knowledge-base.json \
   --coverage source-coverage.json \
   --claims claim-ledger.json \
   --lesson lesson-plan.json \

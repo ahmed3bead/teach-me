@@ -30,7 +30,7 @@ def check_skill() -> None:
     text = (ROOT / "SKILL.md").read_text(encoding="utf-8")
     if not text.startswith("---\n"):
         fail("SKILL.md: missing YAML frontmatter")
-    for required in ("name: teach-me", "Learner Mode", "Educator Mode", "Source-Grounded", "references/educator-mode.md", "references/source-grounded-mode.md", "references/integration-core.md"):
+    for required in ("name: teach-me", "Learner Mode", "Educator Mode", "Source-Grounded", "references/educator-mode.md", "references/source-grounded-mode.md", "references/integration-core.md", "references/research-sweep.md"):
         if required not in text:
             fail(f"SKILL.md: missing {required!r}")
     for match in re.findall(r"\]\(([^)]+)\)", text):
@@ -68,6 +68,10 @@ def check_templates() -> None:
     for word in ("Session ID", "Active objective", "Mastery evidence", "Resume checkpoint"):
         if word not in session:
             fail(f"learning-session.md: missing {word}")
+    knowledge = (ROOT / "templates" / "knowledge-base.md").read_text(encoding="utf-8")
+    for word in ("Source matrix", "Actually inspected", "Topic map", "Teaching readiness"):
+        if word not in knowledge:
+            fail(f"knowledge-base.md: missing {word}")
 
 
 def check_integration() -> None:
@@ -91,12 +95,28 @@ def check_integration() -> None:
         fail("missing session referential-integrity validator")
 
 
+def check_research_sweep() -> None:
+    schema = json.loads((ROOT / "schemas" / "knowledge-base.schema.json").read_text(encoding="utf-8"))
+    for field in ("session_id", "subject", "researched_at", "sources", "topic_map", "teaching_readiness"):
+        if field not in schema["required"]:
+            fail(f"knowledge-base.schema.json: {field} must be required")
+    source = schema["properties"]["sources"]["items"]
+    for field in ("source_id", "source_family", "access", "inspected", "role", "limitations"):
+        if field not in source["required"]:
+            fail(f"knowledge-base.schema.json: source {field} must be required")
+    cases = (ROOT / "evals" / "research-sweep-cases.yaml").read_text(encoding="utf-8")
+    for invariant in ("access controls are not bypassed", "popularity is not treated as an accuracy signal", "prior knowledge is not presented as a completed sweep"):
+        if invariant not in cases:
+            fail(f"research-sweep-cases.yaml: missing invariant {invariant!r}")
+
+
 def main() -> int:
     check_json()
     check_skill()
     check_evals()
     check_templates()
     check_integration()
+    check_research_sweep()
     print("Teach Me validation passed")
     return 0
 

@@ -41,6 +41,8 @@ For detailed instructional decisions, read [references/teaching-contract.md](ref
 
 Research when claims are current, specialized, disputed, safety-relevant, or outside stable common knowledge. Prefer primary and authoritative sources. Attach citations to the claims they support; never invent or decorate citations.
 
+When the learner names a book, field, course, tool, framework, or other defined subject as the basis of learning, perform a broad research sweep before substantial instruction. Build a source-diverse knowledge base rather than relying on the first source or one medium. Read [references/research-sweep.md](references/research-sweep.md). If research access is unavailable, say so and narrow the promised scope instead of presenting prior knowledge as a completed sweep.
+
 Internally distinguish `verified`, `corroborated`, `inferred`, `disputed`, and `unverified`. Communicate uncertainty that could change the learner's understanding or decision. If reliable support is unavailable, say so and narrow the lesson.
 
 Read [references/evidence-policy.md](references/evidence-policy.md) whenever research or factual verification materially affects the lesson.

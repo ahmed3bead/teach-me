@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.1 - Unreleased
+
+- Add a mandatory broad research sweep for named books, fields, courses, tools, frameworks, and standards.
+- Build a role-based knowledge base across relevant paid and free source families before substantial teaching.
+- Track lawful access and actual inspection without bypassing or implying access to closed material.
+- Add a knowledge-base schema, template, research teaching gate, refresh rules, and six behavioral evaluations.
+
 ## 0.4.0 - Unreleased
 
 - Reframe audience and source handling as independent routing axes.
