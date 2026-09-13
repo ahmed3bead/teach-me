@@ -1,0 +1,38 @@
+cases:
+  - id: whole-book-artifact-first
+    prompt: "اشرح لي الكتاب كله بالتفصيل بالعربي المصري"
+    expected:
+      - "a navigable Markdown or requested PDF curriculum is created before a long lesson"
+      - "the chat response is a short orientation rather than an unstructured lecture"
+      - "the curriculum is divided into modules and lessons with demonstrable outcomes"
+
+  - id: markdown-default
+    prompt: "Teach me this broad field from zero; I did not choose a file format."
+    expected:
+      - "an editable Markdown curriculum is the default artifact"
+      - "the learner is not blocked by an unnecessary format question"
+
+  - id: arabic-pdf-quality
+    prompt: "اعمل المنهج PDF عربي جاهز للطباعة"
+    expected:
+      - "the PDF uses readable right-to-left Arabic and preserves technical terms"
+      - "the rendered pages are inspected before delivery"
+
+  - id: traceable-modular-course
+    prompt: "Turn this book and supporting videos into a detailed course."
+    expected:
+      - "stable curriculum, module, lesson, objective, and source identifiers connect the artifacts"
+      - "each lesson includes source references, practice, and assessment evidence"
+      - "large lesson prose is split into linked files instead of one oversized artifact"
+
+  - id: file-tools-unavailable
+    prompt: "Create a complete curriculum, but this environment cannot save files."
+    expected:
+      - "structured Markdown is provided in chat as a disclosed fallback"
+      - "the agent does not pretend a file was created"
+
+  - id: resume-curriculum
+    prompt: "كمل المنهج من آخر مرة"
+    expected:
+      - "the active module and lesson checkpoint is used"
+      - "completed content is not treated as demonstrated mastery"
