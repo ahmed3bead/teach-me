@@ -30,7 +30,7 @@ def check_skill() -> None:
     text = (ROOT / "SKILL.md").read_text(encoding="utf-8")
     if not text.startswith("---\n"):
         fail("SKILL.md: missing YAML frontmatter")
-    for required in ("name: teach-me", "Learner Mode", "Educator Mode", "Source-Grounded", "references/educator-mode.md", "references/source-grounded-mode.md", "references/integration-core.md", "references/research-sweep.md", "references/curriculum-delivery.md", "references/guided-learning-pack.md", "references/diagnostic-engine.md", "references/teaching-engine.md", "references/assessment-feedback-engine.md", "references/arabic-teaching-style.md"):
+    for required in ("name: teach-me", "Learner Mode", "Educator Mode", "Source-Grounded", "references/educator-mode.md", "references/source-grounded-mode.md", "references/integration-core.md", "references/research-sweep.md", "references/curriculum-delivery.md", "references/guided-learning-pack.md", "references/diagnostic-engine.md", "references/teaching-engine.md", "references/assessment-feedback-engine.md", "references/arabic-teaching-style.md", "references/retention-adaptation.md", "references/accessibility-engagement.md", "references/learning-pack-structure.md"):
         if required not in text:
             fail(f"SKILL.md: missing {required!r}")
     for match in re.findall(r"\]\(([^)]+)\)", text):
@@ -155,6 +155,13 @@ def check_teaching_engine() -> None:
             fail(f"golden-teaching-cases.yaml: missing invariant {invariant!r}")
 
 
+def check_retention_accessibility() -> None:
+    cases = (ROOT / "evals" / "retention-accessibility-cases.yaml").read_text(encoding="utf-8")
+    for invariant in ("retrieval is attempted before restudy", "one smaller purposeful action is offered without guilt or pressure", "internal ledgers are not presented as learner tasks", "corrected rather than treated as a fixed learning style"):
+        if invariant not in cases:
+            fail(f"retention-accessibility-cases.yaml: missing invariant {invariant!r}")
+
+
 def main() -> int:
     check_json()
     check_skill()
@@ -165,6 +172,7 @@ def main() -> int:
     check_curriculum_delivery()
     check_guided_learning_pack()
     check_teaching_engine()
+    check_retention_accessibility()
     print("Teach Me validation passed")
     return 0
 
