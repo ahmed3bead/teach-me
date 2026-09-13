@@ -1,0 +1,55 @@
+name: Teaching failure
+description: Report a reproducible teaching, evidence, language, or educator-mode failure without personal data.
+title: "[Teaching failure]: "
+labels: ["teaching-failure"]
+body:
+  - type: markdown
+    attributes:
+      value: "Do not paste private learner transcripts, student names, contact details, or protected curriculum content."
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Mode
+      options: [Learner, Educator]
+    validations:
+      required: true
+  - type: dropdown
+    id: language
+    attributes:
+      label: Language
+      options: [Modern Standard Arabic, Egyptian Arabic, English, Mixed]
+    validations:
+      required: true
+  - type: textarea
+    id: request
+    attributes:
+      label: Minimal reproducible request
+      description: Remove personal and copyrighted material.
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What should have happened?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Skill version
+      placeholder: v0.2.0
+    validations:
+      required: true
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy confirmation
+      options:
+        - label: I removed personal data and content I am not authorized to share.
+          required: true
