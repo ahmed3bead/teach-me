@@ -22,6 +22,8 @@ Maintain a provisional model, not a permanent profile. Every inference must be c
 - Do not infer protected or sensitive attributes.
 - Do not store full conversations when structured progress is sufficient.
 - Let the learner view, correct, export, or delete the profile.
+- Record why a persistent profile exists, when consent was captured, its retention deadline or review point, and deletion state. Expired or deletion-requested profiles must not be used for adaptation.
+- Use pseudonymous identifiers for group observations and never use a group record to infer a sensitive trait about an individual.
 
 ## Continuity
 
