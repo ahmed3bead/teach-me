@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.7.1 - Unreleased
+
+- Add multimodal video inspection levels, aligned timestamp provenance, and sandboxed procedure-verification rules.
+- Add optional capability-provider routing with real health checks and lawful fallbacks.
+- Add an external-skill adoption gate for license, provenance, security, quality, overlap, and context cost.
+- Add a teaching simplicity ladder and logically separate research rigor review.
+- Add ecosystem acknowledgements and seven integration behavioral evaluations.
+
 ## 0.7.0 - Unreleased
 
 
