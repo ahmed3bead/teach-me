@@ -6,6 +6,8 @@
 - Build a role-based knowledge base across relevant paid and free source families before substantial teaching.
 - Track lawful access and actual inspection without bypassing or implying access to closed material.
 - Add a knowledge-base schema, template, research teaching gate, refresh rules, and six behavioral evaluations.
+- Make detailed whole-book, course, curriculum, and broad-subject teaching artifact-first instead of a long chat lecture.
+- Add an editable Markdown curriculum default, requested PDF delivery with Arabic RTL quality checks, stable module and lesson checkpoints, a schema, template, and six behavioral evaluations.
 
 ## 0.4.0 - Unreleased
 
