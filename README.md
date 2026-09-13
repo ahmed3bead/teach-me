@@ -67,6 +67,12 @@ Teach Me does not promise perfect accuracy. It requires traceable evidence for c
 
 Useful contributions include reproducible teaching failures, bilingual language improvements, authoritative-source corrections, accessibility improvements, and evaluation cases. Remove personal information before opening an issue. Do not submit raw learner transcripts without explicit permission.
 
+Read [`CONTRIBUTING.md`](CONTRIBUTING.md). Run the repository checks with:
+
+```bash
+python3 scripts/validate.py
+```
+
 ## العربية
 
 `Teach Me` هي مهارة مفتوحة المصدر تحول الـAI إلى مدرس متكيف، وليس مجرد مولّد شرح. تفهم هدف المتعلم ومستواه من خلال أدلة عملية، وتدعم العربية الفصحى والمصرية والإنجليزية، وتغيّر طريقة التدريس عندما لا تنجح المحاولة الأولى.
@@ -75,7 +81,7 @@ Useful contributions include reproducible teaching failures, bilingual language 
 
 ## Status
 
-`v0.1.0` — initial public MVP. Feedback and real-world evaluation are welcome.
+`v0.2.0` — learner and educator MVP. Feedback and real-world evaluation are welcome.
 
 ## License
 
