@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.0 - Unreleased
+
+- Add capability-aware Pack, Single-file, and Chat-only delivery modes.
+- Add a beginner-safe `START-HERE.md` onboarding contract and learner dashboard.
+- Respect transferable expertise while assuming no unproven subject knowledge.
+- Require onboarding, curriculum, first lesson, practice, and progress instead of empty scaffolding.
+- End learner-facing turns with one exact action, expected time, and requested response.
+- Add portable, non-sensitive `TEACH-ME:v1` resume codes and six behavioral evaluations.
+
 ## 0.4.1 - Unreleased
 
 - Add a mandatory broad research sweep for named books, fields, courses, tools, frameworks, and standards.
