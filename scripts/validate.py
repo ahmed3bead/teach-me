@@ -32,7 +32,7 @@ def check_skill() -> None:
     text = (ROOT / "SKILL.md").read_text(encoding="utf-8")
     if not text.startswith("---\n"):
         fail("SKILL.md: missing YAML frontmatter")
-    for required in ("name: teach-me", "Learner Mode", "Educator Mode", "Source-Grounded", "references/educator-mode.md", "references/source-grounded-mode.md", "references/integration-core.md", "references/research-sweep.md", "references/curriculum-delivery.md", "references/guided-learning-pack.md", "references/diagnostic-engine.md", "references/teaching-engine.md", "references/assessment-feedback-engine.md", "references/arabic-teaching-style.md", "references/bidirectional-output.md", "references/retention-adaptation.md", "references/accessibility-engagement.md", "references/learning-pack-structure.md", "references/integration-foundation.md", "references/multimodal-video.md"):
+    for required in ("name: teach-me", "Learner Mode", "Educator Mode", "Source-Grounded", "references/educator-mode.md", "references/source-grounded-mode.md", "references/integration-core.md", "references/research-sweep.md", "references/curriculum-delivery.md", "references/guided-learning-pack.md", "references/diagnostic-engine.md", "references/teaching-engine.md", "references/assessment-feedback-engine.md", "references/conversational-teaching.md", "references/arabic-teaching-style.md", "references/bidirectional-output.md", "references/retention-adaptation.md", "references/accessibility-engagement.md", "references/learning-pack-structure.md", "references/integration-foundation.md", "references/multimodal-video.md"):
         if required not in text:
             fail(f"SKILL.md: missing {required!r}")
     for match in re.findall(r"\]\(([^)]+)\)", text):
@@ -194,6 +194,13 @@ def check_hardening() -> None:
         fail("resume validator: partial/version classification failed")
 
 
+def check_conversational_teaching() -> None:
+    cases = (ROOT / "evals" / "conversational-teaching-cases.yaml").read_text(encoding="utf-8")
+    for invariant in ("accepted without a subject-matter placement test", "without appending a quiz to each part", "does not end with another diagnostic question", "routine evidence classification remains internal", "one authentic low-pressure application"):
+        if invariant not in cases:
+            fail(f"conversational-teaching-cases.yaml: missing invariant {invariant!r}")
+
+
 def main() -> int:
     check_json()
     check_skill()
@@ -207,6 +214,7 @@ def main() -> int:
     check_retention_accessibility()
     check_integration_foundation()
     check_hardening()
+    check_conversational_teaching()
     print("Teach Me validation passed")
     return 0
 

@@ -1,0 +1,31 @@
+cases:
+  - id: explicit-zero-start
+    prompt: "أنا معرفش أي حاجة عن الكتاب، ابدأ معايا من الصفر"
+    expected:
+      - "the stated beginner starting point is accepted without a subject-matter placement test"
+      - "a coherent foundation and worked example are taught before assessment"
+  - id: no-micro-quiz-chain
+    prompt: "اشرح لي الفصل الأول براحة، مش عاوز سؤال بعد كل معلومة"
+    expected:
+      - "the explanation spans a coherent idea cluster without appending a quiz to each part"
+      - "the current action may be reading or reflection without requiring an answer"
+  - id: exam-feel-recovery
+    prompt: "مش عاجبني الأسلوب، حاسس إني في امتحان مش بتعلم"
+    expected:
+      - "the mismatch is acknowledged and questions, scoring, and visible mastery labels stop immediately"
+      - "the response resumes connected explanation and does not end with another diagnostic question"
+  - id: internal-progress-labels
+    prompt: "جاوبت على المثال؛ كمل الشرح"
+    expected:
+      - "routine evidence classification remains internal"
+      - "introduced or mastery labels are not announced after every learner message"
+  - id: meaningful-checkpoint
+    prompt: "خلصنا الوحدة كاملة وعاوز أتأكد إني استفدت"
+    expected:
+      - "one authentic low-pressure application is preferred over several tiny classification questions"
+      - "feedback informs the next lesson without making a score the goal"
+  - id: exam-preparation-exception
+    prompt: "عندي امتحان بكرة وعاوز تختبرني بأسئلة كتير"
+    expected:
+      - "the explicit request for intensive assessment is honored"
+      - "question cadence remains purposeful and feedback-based"

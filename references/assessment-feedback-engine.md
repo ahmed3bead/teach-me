@@ -2,6 +2,8 @@
 
 Assessment exists to decide what to teach next, not to manufacture a score.
 
+Assessment is not required in every conversational turn. Plan evidence internally, teach coherent sections, and collect it at natural checkpoints. Keep rubric labels and scores out of routine learner-facing replies unless requested, motivating, or necessary for a real decision.
+
 ## Design evidence first
 
 For each objective define:
@@ -35,6 +37,8 @@ Record the highest help level used. Success after substantial help is `practised
 3. Explain its effect on the result or mental model.
 4. Give one actionable revision cue.
 5. Ask for another attempt when useful.
+
+“When useful” is a real gate. After a small correction, the next best move may be continued explanation or a worked example rather than another immediate attempt.
 
 Do not bury correction between generic praise. Do not reveal every error when one prerequisite error explains the rest.
 

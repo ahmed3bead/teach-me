@@ -1,6 +1,6 @@
 # Teaching engine
 
-Use this engine to turn an objective into learning. The phases are functional, not mandatory headings; compress or expand them to suit age, task, and prior evidence.
+Use this engine to turn an objective into learning. The phases are functional, not mandatory headings or a per-message checklist; they may span several conversational turns. Compress or expand them to suit age, task, and prior evidence. Read [conversational-teaching.md](conversational-teaching.md) when the lesson is substantial or the learner is starting from zero.
 
 ## Lesson arc
 
@@ -13,6 +13,8 @@ Use this engine to turn an objective into learning. The phases are functional, n
 7. **Contrast:** use a non-example, edge case, or likely misconception when it improves discrimination.
 8. **Retrieve:** ask the learner to explain, predict, reconstruct, or apply without copying the explanation.
 9. **Close:** give precise feedback, update evidence, and name one next action.
+
+Do not run Guide, Release, Retrieve, and Close after every small idea. Build a coherent explanation first, then assess at a useful boundary. A close may invite reading or continuation without demanding an answer.
 
 ## Cognitive-load controls
 

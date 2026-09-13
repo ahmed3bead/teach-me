@@ -26,6 +26,8 @@ For a detailed whole-book, course, curriculum, or broad-subject request, Teach M
 
 `v0.8.1` hardens language continuity, inaccessible-modality recovery, portable resume validation, and learner-data lifecycle controls after a two-agent adversarial evaluation.
 
+`v0.8.2` separates learner-facing explanation from internal assessment. Beginner journeys now default to coherent explain-first teaching, with low-pressure checks at natural boundaries instead of a quiz after every concept.
+
 > Teach for demonstrated progress, not information volume.
 
 ## Languages
@@ -127,7 +129,7 @@ python3 scripts/validate_session.py learning-session.json \
 
 ## Status
 
-`v0.8.1` — pressure-tested adaptive teaching with language, access, resume, and data-lifecycle hardening. Feedback and real-world evaluation are welcome.
+`v0.8.2` — conversational explain-first teaching with evidence-based assessment at natural checkpoints. Feedback and real-world evaluation are welcome.
 
 ## License
 
