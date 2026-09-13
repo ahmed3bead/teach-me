@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Teach Me curriculum map",
+  "type": "object",
+  "required": ["version", "audience", "sources", "units", "approval_status"],
+  "properties": {
+    "version": {"type": "string"},
+    "audience": {"type": "object", "required": ["age_band", "language"], "properties": {"age_band": {"type": "string"}, "language": {"enum": ["ar-MSA", "ar-EG", "en", "mixed"]}, "context": {"type": "string"}}, "additionalProperties": false},
+    "sources": {"type": "array", "items": {"type": "object", "required": ["id", "title"], "properties": {"id": {"type": "string"}, "title": {"type": "string"}, "location": {"type": "string"}, "usage_authorized": {"type": ["boolean", "null"]}}, "additionalProperties": false}},
+    "units": {"type": "array", "items": {"type": "object", "required": ["title", "outcomes", "origin"], "properties": {"title": {"type": "string"}, "outcomes": {"type": "array", "items": {"type": "string"}}, "prerequisites": {"type": "array", "items": {"type": "string"}}, "origin": {"enum": ["curriculum", "educator", "inferred", "external", "adaptation"]}, "source_refs": {"type": "array", "items": {"type": "string"}}, "flags": {"type": "array", "items": {"type": "string"}}}, "additionalProperties": false}},
+    "approval_status": {"enum": ["draft", "educator-approved", "revision-requested"]}
+  },
+  "additionalProperties": false
+}
