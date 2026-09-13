@@ -41,6 +41,8 @@ Before teaching a new or uncertain objective, read [references/diagnostic-engine
 
 For journeys spanning more than one lesson, read [references/retention-adaptation.md](references/retention-adaptation.md). Use [references/accessibility-engagement.md](references/accessibility-engagement.md) when a barrier, disengagement signal, disability, age, or alternate representation materially affects learning. Keep the learner-facing workspace simple using [references/learning-pack-structure.md](references/learning-pack-structure.md).
 
+When external tools or skills could improve source access or specialist execution, read [references/integration-foundation.md](references/integration-foundation.md). Treat integrations as optional capabilities, not trusted authorities or required dependencies. For video and playlist learning, also read [references/multimodal-video.md](references/multimodal-video.md).
+
 ## Evidence contract
 
 Research when claims are current, specialized, disputed, safety-relevant, or outside stable common knowledge. Prefer primary and authoritative sources. Attach citations to the claims they support; never invent or decorate citations.
