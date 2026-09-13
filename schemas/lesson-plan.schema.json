@@ -5,14 +5,17 @@
   "required": ["version", "title", "duration_minutes", "outcomes", "sequence", "assessment", "traceability"],
   "properties": {
     "version": {"type": "string"},
+    "session_id": {"type": "string"},
+    "lesson_id": {"type": "string"},
     "title": {"type": "string"},
     "duration_minutes": {"type": "integer", "minimum": 1},
+    "objective_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
     "outcomes": {"type": "array", "items": {"type": "string"}},
     "prerequisite_check": {"type": "array", "items": {"type": "string"}},
     "materials": {"type": "array", "items": {"type": "string"}},
     "sequence": {"type": "array", "items": {"type": "object", "required": ["minutes", "teacher_action", "learner_action"], "properties": {"minutes": {"type": "integer", "minimum": 1}, "teacher_action": {"type": "string"}, "learner_action": {"type": "string"}, "check_for_understanding": {"type": "string"}}, "additionalProperties": false}},
     "differentiation": {"type": "object", "properties": {"support": {"type": "array", "items": {"type": "string"}}, "core": {"type": "array", "items": {"type": "string"}}, "extension": {"type": "array", "items": {"type": "string"}}, "accessibility": {"type": "array", "items": {"type": "string"}}}, "additionalProperties": false},
-    "assessment": {"type": "object", "required": ["task", "success_evidence"], "properties": {"task": {"type": "string"}, "success_evidence": {"type": "array", "items": {"type": "string"}}, "answer_key_or_rubric": {"type": "array", "items": {"type": "string"}}}, "additionalProperties": false},
+    "assessment": {"type": "object", "required": ["task", "success_evidence"], "properties": {"assessment_id": {"type": "string"}, "objective_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}, "task": {"type": "string"}, "success_evidence": {"type": "array", "items": {"type": "string"}}, "answer_key_or_rubric": {"type": "array", "items": {"type": "string"}}}, "additionalProperties": false},
     "traceability": {"type": "array", "items": {"type": "object", "required": ["lesson_element", "origin"], "properties": {"lesson_element": {"type": "string"}, "origin": {"enum": ["curriculum", "educator", "inferred", "external", "adaptation"]}, "source_ref": {"type": "string"}}, "additionalProperties": false}}
   },
   "additionalProperties": false

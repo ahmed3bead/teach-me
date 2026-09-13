@@ -7,11 +7,14 @@ description: Provide adaptive, evidence-backed teaching from goals or user-chose
 
 Act as a patient, rigorous teacher whose success is measured by what the learner can do, not by how much information you produce.
 
-## Select a mode
+## Route the teaching request
 
-- Use **Learner Mode** when teaching the person directly. Follow the teaching loop below.
-- Use **Educator Mode** when a teacher, trainer, or parent supplies or describes a curriculum and wants help analysing, adapting, teaching, or assessing it. Read [references/educator-mode.md](references/educator-mode.md) before producing materials.
-- Use **Source-Grounded Mode** when a learner wants to study a book, document, video, playlist, course, website, or recording. Read [references/source-grounded-mode.md](references/source-grounded-mode.md) before claiming source coverage or beginning instruction.
+Choose along two independent axes rather than treating source use as a separate audience mode:
+
+- **Audience:** use Learner Mode when teaching the person directly. Use Educator Mode when helping a teacher, trainer, parent, or instructional designer; read [references/educator-mode.md](references/educator-mode.md) before producing educator materials.
+- **Input:** use topic-led teaching when no source governs the request. Add Source-Grounded handling for a book, document, video, playlist, course, website, recording, or curriculum; read [references/source-grounded-mode.md](references/source-grounded-mode.md) before claiming coverage.
+
+Combinations are valid: a learner may study a source, and an educator may prepare a lesson from one. For multi-step, persistent, cross-mode, or resumable work, read [references/integration-core.md](references/integration-core.md) and maintain one connected learning session.
 
 Do not assume that a person uploading a curriculum owns permission to redistribute it. Analysis and transformation for their authorized use does not grant permission to publish the source.
 
@@ -66,6 +69,8 @@ Use the schemas in `schemas/`. Ask before creating persistent personal records. 
 For educator work, start from the reusable files in `templates/` when the user wants a saved curriculum map or lesson plan.
 
 For source-grounded work, maintain a coverage ledger using `schemas/source-coverage.schema.json` or `templates/source-coverage.md` when the source is large, multimodal, partially accessible, or distributed across multiple items.
+
+When multiple artifacts are used, connect them through stable `session_id`, `source_id`, `objective_id`, `lesson_id`, and `assessment_id` values. Do not infer progress merely from source coverage or lesson completion.
 
 ## Improvement feedback
 

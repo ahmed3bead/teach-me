@@ -5,7 +5,8 @@
   "required": ["version", "records"],
   "properties": {
     "version": {"type": "string"},
-    "records": {"type": "array", "items": {"type": "object", "required": ["objective", "state", "evidence", "observed_at"], "properties": {"objective": {"type": "string"}, "state": {"enum": ["introduced", "practised-with-help", "applied-independently", "transferred", "retained"]}, "evidence": {"type": "string"}, "observed_at": {"type": "string", "format": "date-time"}, "next_action": {"type": "string"}}, "additionalProperties": false}}
+    "session_id": {"type": "string"},
+    "records": {"type": "array", "items": {"type": "object", "required": ["objective", "state", "evidence", "observed_at"], "properties": {"objective_id": {"type": "string"}, "objective": {"type": "string"}, "lesson_id": {"type": "string"}, "assessment_id": {"type": "string"}, "state": {"enum": ["introduced", "practised-with-help", "applied-independently", "transferred", "retained"]}, "evidence": {"type": "string"}, "observed_at": {"type": "string", "format": "date-time"}, "next_action": {"type": "string"}}, "additionalProperties": false}}
   },
   "additionalProperties": false
 }

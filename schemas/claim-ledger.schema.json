@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Teach Me claim evidence ledger",
+  "type": "object",
+  "required": ["version", "session_id", "claims"],
+  "properties": {
+    "version": {"type": "string"},
+    "session_id": {"type": "string", "minLength": 1},
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["claim_id", "claim", "status", "support"],
+        "properties": {
+          "claim_id": {"type": "string", "minLength": 1},
+          "claim": {"type": "string", "minLength": 1},
+          "status": {"enum": ["source", "verified", "corroborated", "inferred", "disputed", "unverified", "corrected"]},
+          "support": {"type": "array", "items": {"type": "object", "required": ["location"], "properties": {"source_id": {"type": "string"}, "location": {"type": "string"}, "title": {"type": "string"}}, "additionalProperties": false}},
+          "scope_or_version": {"type": ["string", "null"]},
+          "verified_at": {"type": ["string", "null"], "format": "date-time"},
+          "dependent_objective_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "supersedes_claim_id": {"type": ["string", "null"]},
+          "notes": {"type": "string"}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
