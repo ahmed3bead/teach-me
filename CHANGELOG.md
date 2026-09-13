@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.0 - Unreleased
+
+- Make display direction part of teaching correctness for mixed Arabic/English output.
+- Default bidirectional learning packs to semantic HTML while retaining Markdown for single-direction material.
+- Require isolated left-to-right terms, identifiers, code, numbers, paths, and URLs.
+- Generate requested Arabic PDF from the validated HTML source and inspect rendered pages.
+- Add bidirectional curriculum and complete-pack behavioral evaluations.
+
 ## 0.7.1 - Unreleased
 
 - Add multimodal video inspection levels, aligned timestamp provenance, and sandboxed procedure-verification rules.
