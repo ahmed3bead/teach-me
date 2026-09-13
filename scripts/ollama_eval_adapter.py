@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -18,6 +19,7 @@ from urllib import error, parse, request
 
 
 LOCAL_HOSTS = {"localhost", "127.0.0.1", "::1"}
+ARABIC_TEXT = re.compile(r"[\u0600-\u06ff]")
 
 
 def normalize_host(value: str) -> str:
@@ -48,6 +50,44 @@ def load_skill_context(skill_root: Path) -> str:
         relative = path.relative_to(skill_root)
         chunks.append(f"\n--- {relative} ---\n{path.read_text(encoding='utf-8')}")
     return "".join(chunks)
+
+
+def requested_locale(payload: dict[str, Any]) -> str:
+    """Return the explicit locale or infer a safe default from learner text."""
+    locale = payload.get("locale")
+    if isinstance(locale, str) and locale.strip():
+        return locale.strip()
+
+    text_parts = [payload.get("prompt"), payload.get("learner_message")]
+    text_parts.extend(
+        item.get("content")
+        for item in payload.get("history", [])
+        if isinstance(item, dict)
+    )
+    combined = " ".join(part for part in text_parts if isinstance(part, str))
+    return "ar" if ARABIC_TEXT.search(combined) else "en"
+
+
+def locale_instruction(locale: str) -> str:
+    normalized = locale.lower().replace("_", "-")
+    if normalized == "ar-eg":
+        return (
+            "Respond in natural Egyptian Arabic. Keep English technical terms only when useful, "
+            "and explain each new term in Arabic on first use. Do not switch the explanation to English."
+        )
+    if normalized in {"ar-msa", "ar-sa"}:
+        return (
+            "Respond in clear Modern Standard Arabic. Keep English technical terms only when useful, "
+            "and explain each new term in Arabic on first use. Do not switch the explanation to English."
+        )
+    if normalized.startswith("ar"):
+        return (
+            "Respond in Arabic and match the learner's dialect or register from their latest message. "
+            "Keep English technical terms only when useful, explain them in Arabic, and do not switch the explanation to English."
+        )
+    if normalized.startswith("en"):
+        return "Respond in English and match the learner's level and register."
+    return f"Respond in the requested locale {locale} and match the learner's register."
 
 
 def text_schema(field: str) -> dict[str, Any]:
@@ -108,9 +148,11 @@ def role_for_payload(payload_type: str) -> str:
 def messages_and_schema(payload: dict[str, Any], skill_context: str | None) -> tuple[list[dict[str, str]], dict[str, Any], float]:
     kind = payload["type"]
     if kind == "generate":
+        language_rule = locale_instruction(requested_locale(payload))
         system = (
             "You are the Teach Me teaching agent. Follow the supplied skill contract exactly, "
-            "act directly as the teacher, and do not mention evaluation machinery.\n\n"
+            "act directly as the teacher, and do not mention evaluation machinery.\n"
+            f"Required language rule: {language_rule}\n\n"
             + (skill_context or "")
         )
         messages = [{"role": "system", "content": system}]
@@ -119,9 +161,11 @@ def messages_and_schema(payload: dict[str, Any], skill_context: str | None) -> t
         return messages, text_schema("response"), 0.2
 
     if kind == "teach":
+        language_rule = locale_instruction(requested_locale(payload))
         system = (
             "You are the Teach Me teaching agent in a closed-book simulation. Follow the skill, "
-            "teach naturally in the requested locale, and never discuss the test harness.\n\n"
+            "teach naturally in the requested locale, and never discuss the test harness.\n"
+            f"Required language rule: {language_rule}\n\n"
             + (skill_context or "")
         )
         history = payload.get("history", [])
