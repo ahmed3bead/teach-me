@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.0 - Unreleased
+
+- Add diagnostic, teaching, assessment-feedback, misconception, and Arabic-language engines.
+- Add a graduated hint ladder and evidence-based mastery decisions.
+- Add cognitive-load controls and material strategy changes after teaching failure.
+- Add six end-to-end golden teaching evaluations across programming, children, photography, feedback, and retention.
+
 ## 0.5.0 - Unreleased
 
 - Add capability-aware Pack, Single-file, and Chat-only delivery modes.
