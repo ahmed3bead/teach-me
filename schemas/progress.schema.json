@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Teach Me progress evidence",
+  "type": "object",
+  "required": ["version", "records"],
+  "properties": {
+    "version": {"type": "string"},
+    "records": {"type": "array", "items": {"type": "object", "required": ["objective", "state", "evidence", "observed_at"], "properties": {"objective": {"type": "string"}, "state": {"enum": ["introduced", "practised-with-help", "applied-independently", "transferred", "retained"]}, "evidence": {"type": "string"}, "observed_at": {"type": "string", "format": "date-time"}, "next_action": {"type": "string"}}, "additionalProperties": false}}
+  },
+  "additionalProperties": false
+}
