@@ -43,7 +43,7 @@ def main() -> int:
         passing_suite = temporary / "passing.yaml"
         passing_suite.write_text(
             "suite: runner-pass\nversion: 1.0.0\ncases:\n"
-            "  - id: passes\n    critical: true\n    prompt: OK\n"
+            "  - id: passes\n    critical: true\n    locale: ar-EG\n    prompt: OK\n"
             "    expected:\n      - observable behavior\n",
             encoding="utf-8",
         )
@@ -54,6 +54,9 @@ def main() -> int:
         data = json.loads(passing_report.read_text(encoding="utf-8"))
         if data["summary"]["pass_rate"] != 1.0 or data["summary"]["critical_failures"]:
             raise AssertionError("passing report summary is incorrect")
+        criteria = data["results"][0]["criteria"]
+        if len(criteria) != 2 or "Egyptian Arabic" not in criteria[-1]["criterion"]:
+            raise AssertionError("locale criterion was not added to the grader contract")
 
         failing_suite = temporary / "failing.yaml"
         failing_suite.write_text(

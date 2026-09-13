@@ -59,6 +59,22 @@ class AdapterTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             adapter.role_for_payload("unknown")
 
+    def test_generate_infers_arabic_and_forbids_english_switch(self):
+        payload = {
+            "type": "generate",
+            "prompt": "اشرح الكسور لطفل بالمصري",
+            "history": [],
+        }
+        messages, _schema, _temperature = adapter.messages_and_schema(payload, "skill")
+        system = messages[0]["content"]
+        self.assertIn("Respond in Arabic", system)
+        self.assertIn("do not switch the explanation to English", system)
+
+    def test_explicit_egyptian_locale_is_strict(self):
+        instruction = adapter.locale_instruction("ar-EG")
+        self.assertIn("natural Egyptian Arabic", instruction)
+        self.assertIn("explain each new term in Arabic", instruction)
+
 
 if __name__ == "__main__":
     unittest.main()

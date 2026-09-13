@@ -2,57 +2,68 @@ suite: conversational-teaching
 version: 1.0.0
 cases:
   - id: explicit-zero-start
+    locale: ar-EG
     prompt: "أنا معرفش أي حاجة عن الكتاب، ابدأ معايا من الصفر"
     expected:
       - "the stated beginner starting point is accepted without a subject-matter placement test"
       - "a coherent foundation and worked example are taught before assessment"
   - id: no-micro-quiz-chain
+    locale: ar-EG
     prompt: "اشرح لي الفصل الأول براحة، مش عاوز سؤال بعد كل معلومة"
     expected:
       - "the explanation spans a coherent idea cluster without appending a quiz to each part"
       - "the current action may be reading or reflection without requiring an answer"
   - id: exam-feel-recovery
+    locale: ar-EG
     prompt: "مش عاجبني الأسلوب، حاسس إني في امتحان مش بتعلم"
     expected:
       - "the mismatch is acknowledged and questions, scoring, and visible mastery labels stop immediately"
       - "the response resumes connected explanation and does not end with another diagnostic question"
   - id: internal-progress-labels
+    locale: ar-EG
     prompt: "جاوبت على المثال؛ كمل الشرح"
     expected:
       - "routine evidence classification remains internal"
       - "introduced or mastery labels are not announced after every learner message"
   - id: meaningful-checkpoint
+    locale: ar-EG
     prompt: "خلصنا الوحدة كاملة وعاوز أتأكد إني استفدت"
     expected:
       - "one authentic low-pressure application is preferred over several tiny classification questions"
       - "feedback informs the next lesson without making a score the goal"
   - id: unfinished-slice-is-not-boundary
+    locale: ar-EG
     prompt: "خلصنا صفحتين من الفصل ولسه الدرس مكمل، تسألني دلوقتي؟"
     expected:
       - "an unfinished page slice is not treated as a completed learning-unit boundary"
       - "the connected explanation continues without starting or offering a routine quiz"
   - id: completed-unit-offer-before-questions
+    locale: ar-EG
     prompt: "كده خلصنا درس كتابة Prompt قوي كامل"
     expected:
       - "the completed lesson is recapped before an optional understanding check is offered"
       - "no assessment question is asked until the learner explicitly opts in"
   - id: optional-check-declined
+    locale: ar-EG
     prompt: "لا، مش عاوز أسئلة دلوقتي؛ كمل اللي بعده"
     expected:
       - "the learner's choice is accepted without pressure, penalty language, or a negative mastery inference"
       - "the next lesson continues without repeating the offer inside the same completed unit"
   - id: optional-check-accepted
+    locale: ar-EG
     prompt: "أيوه، اسألني كام سؤال نعرف بيهم أنا فهمت الدرس ولا لأ"
     expected:
       - "three to five concise items sample explanation, misconception discrimination, and application as relevant"
       - "the result is used to continue or repair teaching rather than manufacture a score"
   - id: declined-check-before-dependent-unit
+    locale: ar-EG
     prompt: "مش عاوز أسئلة، بس الدرس الجاي مبني بالكامل على اللي شرحته"
     expected:
       - "the learner is not pressured or assigned a negative label"
       - "unverified mastery is not assumed for a dependent objective"
       - "an equivalent low-pressure evidence option or non-dependent continuation is offered"
   - id: exam-preparation-exception
+    locale: ar-EG
     prompt: "عندي امتحان بكرة وعاوز تختبرني بأسئلة كتير"
     expected:
       - "the explicit request for intensive assessment is honored"
