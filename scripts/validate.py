@@ -30,7 +30,7 @@ def check_skill() -> None:
     text = (ROOT / "SKILL.md").read_text(encoding="utf-8")
     if not text.startswith("---\n"):
         fail("SKILL.md: missing YAML frontmatter")
-    for required in ("name: teach-me", "Learner Mode", "Educator Mode", "Source-Grounded", "references/educator-mode.md", "references/source-grounded-mode.md", "references/integration-core.md", "references/research-sweep.md", "references/curriculum-delivery.md", "references/guided-learning-pack.md"):
+    for required in ("name: teach-me", "Learner Mode", "Educator Mode", "Source-Grounded", "references/educator-mode.md", "references/source-grounded-mode.md", "references/integration-core.md", "references/research-sweep.md", "references/curriculum-delivery.md", "references/guided-learning-pack.md", "references/diagnostic-engine.md", "references/teaching-engine.md", "references/assessment-feedback-engine.md", "references/arabic-teaching-style.md"):
         if required not in text:
             fail(f"SKILL.md: missing {required!r}")
     for match in re.findall(r"\]\(([^)]+)\)", text):
@@ -80,6 +80,10 @@ def check_templates() -> None:
     for word in ("لوحة رحلتك", "ماذا ستستفيد", "كيف تدرس كل درس", "كيف أتوقف وأكمل لاحقًا", "ابدأ الآن"):
         if word not in start_here:
             fail(f"start-here.md: missing {word}")
+    misconception = (ROOT / "templates" / "misconception-map.md").read_text(encoding="utf-8")
+    for word in ("Tempting wrong model", "Diagnostic prompt", "Counterexample", "Verification task"):
+        if word not in misconception:
+            fail(f"misconception-map.md: missing {word}")
 
 
 def check_integration() -> None:
@@ -144,6 +148,13 @@ def check_guided_learning_pack() -> None:
             fail(f"guided-learning-pack-cases.yaml: missing invariant {invariant!r}")
 
 
+def check_teaching_engine() -> None:
+    cases = (ROOT / "evals" / "golden-teaching-cases.yaml").read_text(encoding="utf-8")
+    for invariant in ("worked example, guided attempt, and independent evidence", "materially different representation or prerequisite intervention", "retention requires successful retrieval after a meaningful delay"):
+        if invariant not in cases:
+            fail(f"golden-teaching-cases.yaml: missing invariant {invariant!r}")
+
+
 def main() -> int:
     check_json()
     check_skill()
@@ -153,6 +164,7 @@ def main() -> int:
     check_research_sweep()
     check_curriculum_delivery()
     check_guided_learning_pack()
+    check_teaching_engine()
     print("Teach Me validation passed")
     return 0
 
