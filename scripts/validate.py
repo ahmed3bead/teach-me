@@ -30,7 +30,7 @@ def check_skill() -> None:
     text = (ROOT / "SKILL.md").read_text(encoding="utf-8")
     if not text.startswith("---\n"):
         fail("SKILL.md: missing YAML frontmatter")
-    for required in ("name: teach-me", "Learner Mode", "Educator Mode", "Source-Grounded", "references/educator-mode.md", "references/source-grounded-mode.md", "references/integration-core.md", "references/research-sweep.md", "references/curriculum-delivery.md"):
+    for required in ("name: teach-me", "Learner Mode", "Educator Mode", "Source-Grounded", "references/educator-mode.md", "references/source-grounded-mode.md", "references/integration-core.md", "references/research-sweep.md", "references/curriculum-delivery.md", "references/guided-learning-pack.md"):
         if required not in text:
             fail(f"SKILL.md: missing {required!r}")
     for match in re.findall(r"\]\(([^)]+)\)", text):
@@ -76,6 +76,10 @@ def check_templates() -> None:
     for word in ("Curriculum ID", "Learning path", "Demonstrable outcome", "Source references", "Progress and resume checkpoint"):
         if word not in curriculum:
             fail(f"study-curriculum.md: missing {word}")
+    start_here = (ROOT / "templates" / "start-here.md").read_text(encoding="utf-8")
+    for word in ("لوحة رحلتك", "ماذا ستستفيد", "كيف تدرس كل درس", "كيف أتوقف وأكمل لاحقًا", "ابدأ الآن"):
+        if word not in start_here:
+            fail(f"start-here.md: missing {word}")
 
 
 def check_integration() -> None:
@@ -133,6 +137,13 @@ def check_curriculum_delivery() -> None:
             fail(f"curriculum-delivery-cases.yaml: missing invariant {invariant!r}")
 
 
+def check_guided_learning_pack() -> None:
+    cases = (ROOT / "evals" / "guided-learning-pack-cases.yaml").read_text(encoding="utf-8")
+    for invariant in ("the learner is not asked to design the course", "empty module scaffolding is not created", "a valid non-sensitive TEACH-ME v1 resume code is included", "one exact action, expected time, and requested reply"):
+        if invariant not in cases:
+            fail(f"guided-learning-pack-cases.yaml: missing invariant {invariant!r}")
+
+
 def main() -> int:
     check_json()
     check_skill()
@@ -141,6 +152,7 @@ def main() -> int:
     check_integration()
     check_research_sweep()
     check_curriculum_delivery()
+    check_guided_learning_pack()
     print("Teach Me validation passed")
     return 0
 
