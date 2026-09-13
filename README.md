@@ -12,6 +12,8 @@ The **Integration Core** treats audience and source as independent choices, so s
 
 For any named book, field, course, tool, framework, or standard, Teach Me performs a broad research sweep before substantial instruction. It builds a role-based knowledge base across relevant official, academic, audiovisual, practical, community, paid, and free sources while clearly recording what was actually accessible and inspected.
 
+For a detailed whole-book, course, curriculum, or broad-subject request, Teach Me now creates a structured curriculum artifact before teaching at length. Markdown is the editable default; print-ready PDF is available on request. Modules, lessons, outcomes, sources, practice, assessment, and resume checkpoints replace unstructured chat lectures.
+
 > Teach for demonstrated progress, not information volume.
 
 ## Languages
@@ -69,6 +71,10 @@ Study this YouTube playlist, verify the important claims, then teach it to me pr
 This paid course page is inaccessible. Use only its public topic and learning outcomes to build an independent path from lawful, authoritative sources. Do not claim to reproduce the course.
 ```
 
+```text
+اشرح لي الكتاب كله بالتفصيل بالعربي المصري، واعمل الأول ملف Markdown كمنهج منظم أقدر أمشي عليه وأرجع له.
+```
+
 ## Domain teaching packs
 
 The core skill remains general. Optional packs specialize how a subject should be taught without duplicating the teacher, evidence, privacy, or safety rules. Planned first packs cover AI literacy, English communication, programming, data and spreadsheets, design, digital marketing, photography and video, and project management.
@@ -94,6 +100,7 @@ For saved connected artifacts, validate cross-file identifiers with:
 ```bash
 python3 scripts/validate_session.py learning-session.json \
   --knowledge-base knowledge-base.json \
+  --curriculum study-curriculum.json \
   --coverage source-coverage.json \
   --claims claim-ledger.json \
   --lesson lesson-plan.json \
@@ -108,7 +115,7 @@ python3 scripts/validate_session.py learning-session.json \
 
 ## Status
 
-`v0.3.0` — learner, educator, and source-grounded MVP. Feedback and real-world evaluation are welcome.
+`v0.4.1` — integrated, research-backed teaching with structured curriculum delivery. Feedback and real-world evaluation are welcome.
 
 ## License
 
