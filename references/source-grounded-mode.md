@@ -53,6 +53,8 @@ Keep the learner moving with this fallback:
 
 When tools permit, combine transcript, audio, sampled and event-driven frames, OCR, chapters, descriptions, and linked materials. Increase frame density around demonstrations, slide changes, code edits, diagrams, or references such as “click here.” Preserve timestamps.
 
+Apply the inspection levels, conflict rules, and provenance contract in [multimodal-video.md](multimodal-video.md). A transcript-only result may support audio claims but cannot establish what appeared or happened on screen.
+
 For a playlist, map dependencies, duration, duplication, outdated sections, optional items, and missing prerequisites. Distinguish viewing progress, demonstrated understanding, transfer, and retention.
 
 ## Teach and cite
