@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Teach Me source coverage ledger",
+  "type": "object",
+  "required": ["version", "sources", "overall_status"],
+  "properties": {
+    "version": {"type": "string"},
+    "sources": {"type": "array", "items": {"type": "object", "required": ["id", "media_type", "access", "coverage", "confidence"], "properties": {"id": {"type": "string"}, "title": {"type": "string"}, "location": {"type": "string"}, "media_type": {"enum": ["text", "document", "audio", "video", "playlist", "course", "website", "mixed"]}, "access": {"enum": ["full", "partial", "metadata-only", "unavailable"]}, "inspected_components": {"type": "array", "items": {"enum": ["text", "structure", "audio", "transcript-human", "transcript-auto", "visuals", "frames-sampled", "frames-complete", "ocr", "links", "attachments", "metadata"]}}, "coverage": {"enum": ["complete", "progressive", "sampled", "metadata-only", "none"]}, "confidence": {"enum": ["high", "medium", "low"]}, "limitations": {"type": "array", "items": {"type": "string"}}, "source_refs": {"type": "array", "items": {"type": "string"}}}, "additionalProperties": false}},
+    "overall_status": {"enum": ["ready-to-teach", "ready-for-progressive-study", "needs-more-access", "independent-alternative-only"]}
+  },
+  "additionalProperties": false
+}

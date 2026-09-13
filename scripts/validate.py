@@ -30,7 +30,7 @@ def check_skill() -> None:
     text = (ROOT / "SKILL.md").read_text(encoding="utf-8")
     if not text.startswith("---\n"):
         fail("SKILL.md: missing YAML frontmatter")
-    for required in ("name: teach-me", "Educator Mode", "references/educator-mode.md"):
+    for required in ("name: teach-me", "Educator Mode", "Source-Grounded Mode", "references/educator-mode.md", "references/source-grounded-mode.md"):
         if required not in text:
             fail(f"SKILL.md: missing {required!r}")
     for match in re.findall(r"\]\(([^)]+)\)", text):
@@ -60,6 +60,10 @@ def check_templates() -> None:
             fail(f"lesson-plan.md: missing {word}")
     if not ALLOWED_ORIGINS.issubset(set(lesson.replace("/", " ").split())):
         fail("lesson-plan.md: origin labels are incomplete")
+    coverage = (ROOT / "templates" / "source-coverage.md").read_text(encoding="utf-8")
+    for word in ("Actually inspected", "Understanding gate", "Safe teaching scope"):
+        if word not in coverage:
+            fail(f"source-coverage.md: missing {word}")
 
 
 def main() -> int:

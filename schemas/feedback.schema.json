@@ -7,7 +7,7 @@
     "version": {"type": "string"},
     "skill_version": {"type": "string"},
     "consent": {"const": true},
-    "mode": {"enum": ["learner", "educator"]},
+    "mode": {"enum": ["learner", "educator", "source-grounded"]},
     "locale": {"enum": ["ar-MSA", "ar-EG", "en", "mixed"]},
     "subject_category": {"type": "string"},
     "failure_category": {"enum": ["none", "knowledge-error", "missing-context", "bad-source", "level-mismatch", "teaching-failure", "assessment-failure", "language-failure", "memory-failure", "unsafe-advice", "tool-failure"]},

@@ -6,6 +6,8 @@ Teach Me first understands the learner's goal and demonstrated level, then selec
 
 It also includes an **Educator Mode** for teachers, trainers, and parents who want to turn an authorized curriculum into age-appropriate lesson plans, explanations, activities, differentiated materials, and assessments while preserving traceability to the source.
 
+**Source-Grounded Mode** lets a learner study from a book, video, playlist, course, website, or recording. The agent records what it actually inspected, tests its understanding before teaching, and clearly separates the source's claims from verification and added explanation.
+
 > Teach for demonstrated progress, not information volume.
 
 ## Languages
@@ -53,6 +55,16 @@ I have attached our onboarding curriculum. Prepare a 90-minute workshop for new 
 
 The agent first maps the supplied curriculum and flags gaps, inferred objectives, external additions, and possible conflicts. The educator approves that map before student-facing materials are produced.
 
+### Source-grounded examples
+
+```text
+Study this YouTube playlist, verify the important claims, then teach it to me progressively in Egyptian Arabic.
+```
+
+```text
+This paid course page is inaccessible. Use only its public topic and learning outcomes to build an independent path from lawful, authoritative sources. Do not claim to reproduce the course.
+```
+
 ## Domain teaching packs
 
 The core skill remains general. Optional packs specialize how a subject should be taught without duplicating the teacher, evidence, privacy, or safety rules. Planned first packs cover AI literacy, English communication, programming, data and spreadsheets, design, digital marketing, photography and video, and project management.
@@ -81,7 +93,7 @@ python3 scripts/validate.py
 
 ## Status
 
-`v0.2.0` — learner and educator MVP. Feedback and real-world evaluation are welcome.
+`v0.3.0` — learner, educator, and source-grounded MVP. Feedback and real-world evaluation are welcome.
 
 ## License
 

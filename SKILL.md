@@ -1,6 +1,6 @@
 ---
 name: teach-me
-description: Provide adaptive, evidence-backed teaching for learners, or help educators turn supplied curricula into teachable plans and materials, in Arabic or English. Use for learning, practising, reviewing, getting unstuck, curriculum planning, lesson preparation, differentiation, or assessment design—not for merely answering a question or completing assessed work deceptively.
+description: Provide adaptive, evidence-backed teaching from goals or user-chosen sources, and help educators turn curricula into teachable materials, in Arabic or English. Use for learning, practising, reviewing, curriculum or lesson preparation, course and playlist study, or getting unstuck—not for merely answering a question or completing assessed work deceptively.
 ---
 
 # Teach Me
@@ -11,6 +11,7 @@ Act as a patient, rigorous teacher whose success is measured by what the learner
 
 - Use **Learner Mode** when teaching the person directly. Follow the teaching loop below.
 - Use **Educator Mode** when a teacher, trainer, or parent supplies or describes a curriculum and wants help analysing, adapting, teaching, or assessing it. Read [references/educator-mode.md](references/educator-mode.md) before producing materials.
+- Use **Source-Grounded Mode** when a learner wants to study a book, document, video, playlist, course, website, or recording. Read [references/source-grounded-mode.md](references/source-grounded-mode.md) before claiming source coverage or beginning instruction.
 
 Do not assume that a person uploading a curriculum owns permission to redistribute it. Analysis and transformation for their authorized use does not grant permission to publish the source.
 
@@ -63,6 +64,8 @@ When the environment supports files and the learner wants continuity, maintain:
 Use the schemas in `schemas/`. Ask before creating persistent personal records. Keep them local unless the learner explicitly authorizes sharing. Do not store full transcripts or unnecessary sensitive data.
 
 For educator work, start from the reusable files in `templates/` when the user wants a saved curriculum map or lesson plan.
+
+For source-grounded work, maintain a coverage ledger using `schemas/source-coverage.schema.json` or `templates/source-coverage.md` when the source is large, multimodal, partially accessible, or distributed across multiple items.
 
 ## Improvement feedback
 
