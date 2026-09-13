@@ -50,3 +50,12 @@ In Chat-only Mode, and optionally in file modes, include a compact checkpoint:
 Allowed states are `not-started`, `introduced`, `practised-with-help`, `applied-independently`, `transferred`, and `retained`. Use non-sensitive identifiers only. The code is a locator, not proof of mastery or a replacement for evidence.
 
 When resuming, validate and restate the interpreted checkpoint, request only missing material context, and continue from the next unproven objective. Never claim access to earlier answers that are not present.
+
+When execution is available, use `scripts/validate_resume.py` before interpreting the code. Handle results as follows:
+
+- `valid`: use the locator, then verify evidence needed for the claimed state;
+- `partial`: retain only safely parsed locator fields and run a light checkpoint;
+- `unsupported-version`: do not guess a migration; explain the supported version and request a fresh checkpoint;
+- `malformed`: do not infer fields; ask for the original code or restart with a small diagnostic.
+
+The validator checks structure, not truth. Even a valid code is not mastery evidence.

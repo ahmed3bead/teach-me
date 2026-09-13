@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.1 - Unreleased
+
+- Preserve the established teaching language across incidental code-switching.
+- Add capability-aware accessibility fallbacks and an explicit hard-block path.
+- Add a machine-readable portable resume-code validator without treating locators as mastery evidence.
+- Add purpose, consent time, retention, deletion state, and pseudonymous group observations to learner-profile governance.
+- Add six regression cases from the two-agent pressure test.
+
 ## 0.8.0 - Unreleased
 
 - Make display direction part of teaching correctness for mixed Arabic/English output.

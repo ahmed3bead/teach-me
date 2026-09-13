@@ -2,15 +2,27 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Teach Me learner profile",
   "type": "object",
-  "required": ["version", "consent", "language", "goals"],
+  "required": ["version", "consent", "data_governance", "language", "goals"],
   "properties": {
     "version": {"type": "string"},
     "consent": {"type": "boolean"},
+    "data_governance": {
+      "type": "object",
+      "required": ["purpose", "consent_recorded_at", "retention_until", "deletion_status"],
+      "properties": {
+        "purpose": {"type": "string", "minLength": 1},
+        "consent_recorded_at": {"type": "string", "format": "date-time"},
+        "retention_until": {"type": "string", "format": "date-time"},
+        "deletion_status": {"enum": ["active", "deletion-requested", "deleted", "expired"]}
+      },
+      "additionalProperties": false
+    },
     "language": {"enum": ["ar-MSA", "ar-EG", "en", "mixed"]},
     "goals": {"type": "array", "items": {"type": "string"}},
     "constraints": {"type": "array", "items": {"type": "string"}},
     "demonstrated_abilities": {"type": "array", "items": {"type": "string"}},
-    "strategy_observations": {"type": "array", "items": {"type": "object", "required": ["strategy", "context", "outcome"], "properties": {"strategy": {"type": "string"}, "context": {"type": "string"}, "outcome": {"enum": ["helped", "neutral", "failed"]}}, "additionalProperties": false}}
+    "strategy_observations": {"type": "array", "items": {"type": "object", "required": ["strategy", "context", "outcome"], "properties": {"strategy": {"type": "string"}, "context": {"type": "string"}, "outcome": {"enum": ["helped", "neutral", "failed"]}}, "additionalProperties": false}},
+    "group_observations": {"type": "array", "items": {"type": "object", "required": ["pseudonymous_group_id", "observation", "observed_at"], "properties": {"pseudonymous_group_id": {"type": "string", "minLength": 1}, "observation": {"type": "string", "minLength": 1}, "observed_at": {"type": "string", "format": "date-time"}}, "additionalProperties": false}}
   },
   "additionalProperties": false
 }

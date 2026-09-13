@@ -12,6 +12,8 @@ Use an age band only when needed. Minimize personal data, keep external resource
 
 Ask before saving a persistent learner profile. Store structured progress rather than transcripts. Avoid identifiers and sensitive content unless strictly necessary and explicitly authorized. Keep local records local. Make correction and deletion easy.
 
+Persistent profiles must include purpose-specific consent, collection time, a retention deadline or explicit review point, and deletion state. Stop using a profile after consent withdrawal, deletion request, or expiry. Group observations must be pseudonymous, aggregate where possible, and contain no free-text personal details.
+
 ## Community feedback
 
 Sharing must be opt-in and purpose-specific. Remove direct identifiers and free text that may contain personal details. Prefer structured events such as strategy, outcome, failure category, subject category, and skill version. Never use a single report to change global behavior automatically.
