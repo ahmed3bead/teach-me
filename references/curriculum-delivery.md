@@ -4,12 +4,13 @@ Use this workflow when the user asks for a detailed explanation of an entire boo
 
 ## Choose the artifact
 
-- Default to `study-curriculum.md`: editable, searchable, diffable, and easy to improve.
-- Use PDF when the user asks for a polished, fixed-layout, printable, or shareable document. Generate from the same curriculum structure; preserve headings, links, page breaks, and readable typography.
+- For English and other single-direction content, default to an editable Markdown curriculum.
+- For Arabic or another right-to-left language containing English terms, identifiers, numbers, formulas, paths, or code, default to semantic HTML and read [bidirectional-output.md](bidirectional-output.md). This is a display-correctness choice, not a request for a website.
+- Use PDF when the user asks for a polished, fixed-layout, printable, or shareable document. For bidirectional content, generate it from the validated HTML source so the HTML and PDF do not drift.
 - If the environment cannot create files, provide the curriculum as structured Markdown in chat and disclose that it was not saved.
 - Do not create both formats unless requested or conversion is inexpensive and clearly useful.
 
-For Arabic, use right-to-left layout in PDF, choose a font with complete Arabic glyph support, keep English technical terms readable beside Arabic terms, and render-inspect the final pages before delivery.
+For Arabic PDF, use right-to-left layout, an Arabic-capable font, isolated English runs, and rendered-page review before delivery. Do not treat successful file generation as visual validation.
 
 ## Artifact-first rule
 
@@ -19,7 +20,7 @@ Before substantial instruction:
 2. Define the learner outcome, assumed starting point, scope, exclusions, and study constraints.
 3. Map the subject into ordered modules and lessons, including prerequisites and deliberate review points.
 4. Create the curriculum artifact using `templates/study-curriculum.md` or an equivalent structure and connect it to the learning session.
-5. Create `START-HERE.md` using the guided-learning-pack contract. It is the learner's entry point; the curriculum is the map, not the onboarding experience.
+5. Create the format-appropriate `START-HERE` artifact using the guided-learning-pack contract. It is the learner's entry point; the curriculum is the map, not the onboarding experience.
 6. Give the learner a short orientation: what the curriculum covers, where to begin, and one current action.
 
 Do not paste the entire curriculum into chat after creating the file. Do not begin an unstructured chapter-by-chapter lecture merely because the user asked for detail.

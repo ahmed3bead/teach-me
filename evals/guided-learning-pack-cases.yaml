@@ -15,6 +15,12 @@ cases:
     expected:
       - "START-HERE, curriculum, first real lesson, practice, and progress are delivered"
       - "every delivered link resolves and empty module scaffolding is not created"
+  - id: complete-arabic-bidi-pack
+    prompt: "اعمل لي Learning Pack عربي لتعلم Laravel وفيه كود ومصطلحات إنجليزية"
+    expected:
+      - "the learner-facing pack uses consistent HTML files"
+      - "START-HERE is the only entry point and links to the existing curriculum, lesson, practice, and progress artifacts"
+      - "English terms and code remain left-to-right without disrupting Arabic order"
   - id: chat-only-resume
     prompt: "علمني هنا بس لأن الشات مش بيطلع ملفات"
     expected:

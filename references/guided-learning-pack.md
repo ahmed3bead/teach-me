@@ -6,11 +6,11 @@ Use this contract for learners starting a subject, whole-source journeys, and de
 
 Inspect available capabilities silently and choose the strongest supported delivery:
 
-1. **Pack mode:** when folders and files can be created, produce `START-HERE.md`, `CURRICULUM.md`, the first real lesson, its practice, and a progress artifact. Do not create empty module scaffolding.
-2. **Single-file mode:** when one maintained file is practical, create or update one Markdown learning guide containing onboarding, curriculum, current lesson, practice, and checkpoint.
+1. **Pack mode:** when folders and files can be created, produce `START-HERE`, `CURRICULUM`, the first real lesson, its practice, and a progress artifact in one consistent source format. Use `.html` for bidirectional Arabic/English material and `.md` where direction mixing is not a display risk. Do not create empty module scaffolding.
+2. **Single-file mode:** when one maintained file is practical, create or update one learning guide containing onboarding, curriculum, current lesson, practice, and checkpoint. Use HTML for bidirectional Arabic/English material.
 3. **Chat-only mode:** when files cannot be created, teach one bounded lesson per turn and include a portable resume code. Never imply that a file or persistent memory exists.
 
-PDF is a presentation format, not the only progress record. Keep a Markdown or structured checkpoint when continuity is available.
+PDF is a presentation format, not the only progress record. Keep an editable HTML, Markdown, or structured checkpoint when continuity is available.
 
 ## Beginner-safe onboarding
 
@@ -31,7 +31,7 @@ Define every new term on first use. Reduce optional choices early. Prefer a tiny
 
 ## START-HERE contract
 
-Use `templates/start-here.md` where files are supported. This file is a learner-facing guide, not project metadata. It must link to the curriculum and first real lesson, name the expected response from the learner, and show one worked example of completing a lesson.
+Use `templates/start-here.md` as a content checklist where files are supported, adapting it to HTML when required by [bidirectional-output.md](bidirectional-output.md). The result is a learner-facing guide, not project metadata. It must link to the curriculum and first real lesson, name the expected response from the learner, and show one worked example of completing a lesson.
 
 Keep a small dashboard near the top: goal, current module and lesson, demonstrated state, estimated time for the current action, one current action, and the next checkpoint.
 

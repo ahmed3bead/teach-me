@@ -6,17 +6,25 @@ cases:
       - "the chat response is a short orientation rather than an unstructured lecture"
       - "the curriculum is divided into modules and lessons with demonstrable outcomes"
 
-  - id: markdown-default
+  - id: markdown-default-ltr
     prompt: "Teach me this broad field from zero; I did not choose a file format."
     expected:
       - "an editable Markdown curriculum is the default artifact"
       - "the learner is not blocked by an unnecessary format question"
+
+  - id: html-default-arabic-bidi
+    prompt: "اشرح لي distributed systems بالعربي وفيه المصطلحات الإنجليزية"
+    expected:
+      - "semantic HTML is the default learner-facing source"
+      - "English terms, identifiers, numbers, URLs, and code are directionally isolated"
+      - "the agent does not rely on Markdown backticks alone for bidirectional correctness"
 
   - id: arabic-pdf-quality
     prompt: "اعمل المنهج PDF عربي جاهز للطباعة"
     expected:
       - "the PDF uses readable right-to-left Arabic and preserves technical terms"
       - "the rendered pages are inspected before delivery"
+      - "the PDF is generated from the validated bidirectional source rather than maintained as separate content"
 
   - id: traceable-modular-course
     prompt: "Turn this book and supporting videos into a detailed course."
