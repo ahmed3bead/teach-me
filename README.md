@@ -24,6 +24,8 @@ For a detailed whole-book, course, curriculum, or broad-subject request, Teach M
 
 `v0.8.0` makes bidirectional rendering part of teaching correctness. Mixed Arabic/English packs default to accessible HTML with isolated left-to-right terms and code, while PDF becomes a validated derivative rather than a separate source.
 
+`v0.8.1` hardens language continuity, inaccessible-modality recovery, portable resume validation, and learner-data lifecycle controls after a two-agent adversarial evaluation.
+
 > Teach for demonstrated progress, not information volume.
 
 ## Languages
@@ -125,7 +127,7 @@ python3 scripts/validate_session.py learning-session.json \
 
 ## Status
 
-`v0.8.0` — adaptive teaching with correct mixed Arabic/English HTML and derived PDF output. Feedback and real-world evaluation are welcome.
+`v0.8.1` — pressure-tested adaptive teaching with language, access, resume, and data-lifecycle hardening. Feedback and real-world evaluation are welcome.
 
 ## License
 
