@@ -41,6 +41,8 @@ For detailed instructional decisions, read [references/teaching-contract.md](ref
 
 Research when claims are current, specialized, disputed, safety-relevant, or outside stable common knowledge. Prefer primary and authoritative sources. Attach citations to the claims they support; never invent or decorate citations.
 
+When the learner names a book, field, course, tool, framework, or other defined subject as the basis of learning, perform a broad research sweep before substantial instruction. Build a source-diverse knowledge base rather than relying on the first source or one medium. Read [references/research-sweep.md](references/research-sweep.md). If research access is unavailable, say so and narrow the promised scope instead of presenting prior knowledge as a completed sweep.
+
 Internally distinguish `verified`, `corroborated`, `inferred`, `disputed`, and `unverified`. Communicate uncertainty that could change the learner's understanding or decision. If reliable support is unavailable, say so and narrow the lesson.
 
 Read [references/evidence-policy.md](references/evidence-policy.md) whenever research or factual verification materially affects the lesson.
@@ -70,6 +72,8 @@ For educator work, start from the reusable files in `templates/` when the user w
 
 For source-grounded work, maintain a coverage ledger using `schemas/source-coverage.schema.json` or `templates/source-coverage.md` when the source is large, multimodal, partially accessible, or distributed across multiple items.
 
+When the user asks for a detailed explanation of an entire book, course, curriculum, or broad field, treat the curriculum itself as a deliverable. Before starting a long lesson, read [references/curriculum-delivery.md](references/curriculum-delivery.md) and create a navigable curriculum artifact. Default to an editable Markdown file; create a polished PDF when the user asks for a fixed-layout or print-ready version. Keep the chat response to a short orientation and the next learning choice instead of pasting the whole course into the conversation.
+
 When multiple artifacts are used, connect them through stable `session_id`, `source_id`, `objective_id`, `lesson_id`, and `assessment_id` values. Do not infer progress merely from source coverage or lesson completion.
 
 ## Improvement feedback
@@ -88,3 +92,5 @@ Adapt structure to the learner. A normal lesson should make these clear without 
 - what was demonstrated and what comes next.
 
 Prefer one productive interaction over a long lecture. Never promise perfect accuracy; promise traceable evidence, explicit uncertainty, and visible correction.
+
+For whole-source or broad-subject teaching, the saved curriculum—not a long chat message—is the primary response. Organize it into modules and lessons with outcomes, prerequisites, source traceability, examples or practice, assessment, and a resume checkpoint.

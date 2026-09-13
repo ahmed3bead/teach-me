@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Teach Me researched knowledge base",
+  "type": "object",
+  "required": ["version", "session_id", "subject", "researched_at", "sources", "topic_map", "teaching_readiness"],
+  "properties": {
+    "version": {"type": "string"},
+    "session_id": {"type": "string", "minLength": 1},
+    "subject": {"type": "string", "minLength": 1},
+    "edition_or_version": {"type": ["string", "null"]},
+    "learner_goal": {"type": "string"},
+    "researched_at": {"type": "string", "format": "date-time"},
+    "freshness_review_due": {"type": ["string", "null"], "format": "date-time"},
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["source_id", "title", "source_family", "access", "inspected", "role", "limitations"],
+        "properties": {
+          "source_id": {"type": "string", "minLength": 1},
+          "title": {"type": "string"},
+          "creator": {"type": "string"},
+          "location": {"type": "string"},
+          "published_or_updated": {"type": ["string", "null"]},
+          "language": {"type": "string"},
+          "source_family": {"enum": ["official", "standard", "book", "paper", "university", "course", "video", "playlist", "audio", "article", "tutorial", "code", "exercise", "practitioner", "community", "review", "other"]},
+          "access": {"enum": ["free-full", "free-partial", "paid-full-authorized", "paid-preview-only", "metadata-only", "unavailable"]},
+          "inspected": {"type": "array", "items": {"type": "string"}},
+          "coverage": {"enum": ["complete", "substantial", "partial", "sample", "metadata-only", "none"]},
+          "authority": {"enum": ["primary", "authoritative", "expert-secondary", "practitioner", "community", "unknown"]},
+          "role": {"type": "array", "items": {"enum": ["anchor", "verification", "explanation", "practice", "review", "counterpoint", "discovery"]}},
+          "limitations": {"type": "array", "items": {"type": "string"}}
+        },
+        "additionalProperties": false
+      }
+    },
+    "topic_map": {
+      "type": "object",
+      "required": ["foundations", "prerequisites", "practical_patterns", "gaps"],
+      "properties": {
+        "foundations": {"type": "array", "items": {"type": "string"}},
+        "prerequisites": {"type": "array", "items": {"type": "string"}},
+        "version_changes": {"type": "array", "items": {"type": "string"}},
+        "disputes": {"type": "array", "items": {"type": "string"}},
+        "practical_patterns": {"type": "array", "items": {"type": "string"}},
+        "gaps": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": false
+    },
+    "teaching_readiness": {"enum": ["ready", "ready-progressively", "needs-more-research", "narrow-scope-only"]},
+    "readiness_notes": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": false
+}

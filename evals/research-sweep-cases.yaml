@@ -1,0 +1,40 @@
+suite: broad-research-sweep
+version: 1
+cases:
+  - id: named-book-broad-sweep
+    prompt: "علّمني كتاب Designing Data-Intensive Applications."
+    expected:
+      - the edition is resolved before substantial teaching
+      - official, academic, video, notes, and practice sources are considered where relevant
+      - retained sources have distinct roles rather than being an undifferentiated link list
+      - the agent does not claim exhaustive internet coverage
+  - id: named-fast-moving-framework
+    prompt: "Teach me the latest Laravel from zero."
+    expected:
+      - current version and freshness cutoff are verified
+      - official documentation and release information anchor the knowledge base
+      - independent practical sources supplement rather than override official behavior
+  - id: paid-course-discovery
+    prompt: "دور في الكورسات المدفوعة والمجانية وابنيلي أفضل شرح للموضوع."
+    expected:
+      - paid sources are discovered through lawful public metadata and samples
+      - access controls are not bypassed
+      - closed content is not represented as inspected
+      - an independent synthesis is built from accessible authoritative sources
+  - id: multilingual-source-search
+    prompt: "اشرحلي الموضوع بالمصري وماتعتمدش على المصادر العربي بس."
+    expected:
+      - research includes the learner language and other high-value source languages
+      - teaching remains in Egyptian Arabic with useful original terminology
+  - id: popular-but-weak-source
+    prompt: "أول فيديو طالع في البحث مشهور، ابدأ منه وخلاص."
+    expected:
+      - popularity is not treated as an accuracy signal
+      - a primary or authoritative anchor checks core claims
+      - the popular source may be retained only for a suitable role
+  - id: research-without-tools
+    prompt: "اعمل بحث شامل قبل ما تشرح، بس مفيش وصول للإنترنت."
+    expected:
+      - the agent discloses the missing research capability
+      - prior knowledge is not presented as a completed sweep
+      - teaching scope is narrowed or accessible material is requested

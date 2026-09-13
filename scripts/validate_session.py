@@ -18,6 +18,8 @@ def validate(
     session: dict[str, Any],
     *,
     coverage: dict[str, Any] | None = None,
+    knowledge_base: dict[str, Any] | None = None,
+    curriculum: dict[str, Any] | None = None,
     claims: dict[str, Any] | None = None,
     lesson: dict[str, Any] | None = None,
     progress: dict[str, Any] | None = None,
@@ -51,6 +53,8 @@ def validate(
 
     artifacts = [
         ("coverage", coverage),
+        ("knowledge-base", knowledge_base),
+        ("curriculum", curriculum),
         ("claims", claims),
         ("lesson", lesson),
         ("progress", progress),
@@ -59,6 +63,29 @@ def validate(
         if artifact is not None and artifact.get("session_id") != session_id:
             errors.append(f"{name} session_id does not match the learning session")
 
+    if curriculum is not None:
+        if session.get("curriculum_id") != curriculum.get("curriculum_id"):
+            errors.append("curriculum_id does not match the learning session")
+        modules = curriculum.get("modules", [])
+        module_ids = [item.get("module_id") for item in modules]
+        lesson_ids = [lesson.get("lesson_id") for module in modules for lesson in module.get("lessons", [])]
+        if None in module_ids or len(module_ids) != len(set(module_ids)):
+            errors.append("curriculum module_id values must be present and unique")
+        if None in lesson_ids or len(lesson_ids) != len(set(lesson_ids)):
+            errors.append("curriculum lesson_id values must be present and unique")
+        for module in modules:
+            for lesson in module.get("lessons", []):
+                for objective_id in lesson.get("objective_ids", []):
+                    if objective_id not in known_objectives:
+                        errors.append(f"curriculum lesson references unknown objective_id: {objective_id!r}")
+        checkpoint = session.get("checkpoint", {})
+        active_module = checkpoint.get("active_module_id")
+        active_lesson = checkpoint.get("active_lesson_id")
+        if active_module is not None and active_module not in set(module_ids):
+            errors.append(f"checkpoint references unknown module_id: {active_module!r}")
+        if active_lesson is not None and active_lesson not in set(lesson_ids):
+            errors.append(f"checkpoint references unknown lesson_id: {active_lesson!r}")
+
     if coverage is not None:
         coverage_ids = [item.get("id") for item in coverage.get("sources", [])]
         if len(coverage_ids) != len(set(coverage_ids)):
@@ -66,6 +93,14 @@ def validate(
         missing = known_sources.difference(coverage_ids)
         if missing:
             errors.append(f"session source_ids missing from coverage: {sorted(missing)}")
+
+    if knowledge_base is not None:
+        research_ids = [item.get("source_id") for item in knowledge_base.get("sources", [])]
+        if len(research_ids) != len(set(research_ids)):
+            errors.append("knowledge-base source IDs must be unique")
+        missing = known_sources.difference(research_ids)
+        if missing:
+            errors.append(f"session source_ids missing from knowledge-base: {sorted(missing)}")
 
     if claims is not None:
         for claim in claims.get("claims", []):
@@ -97,6 +132,8 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("session", type=Path)
     parser.add_argument("--coverage", type=Path)
+    parser.add_argument("--knowledge-base", type=Path)
+    parser.add_argument("--curriculum", type=Path)
     parser.add_argument("--claims", type=Path)
     parser.add_argument("--lesson", type=Path)
     parser.add_argument("--progress", type=Path)
@@ -105,6 +142,8 @@ def main() -> int:
     errors = validate(
         load(args.session),
         coverage=load(args.coverage) if args.coverage else None,
+        knowledge_base=load(args.knowledge_base) if args.knowledge_base else None,
+        curriculum=load(args.curriculum) if args.curriculum else None,
         claims=load(args.claims) if args.claims else None,
         lesson=load(args.lesson) if args.lesson else None,
         progress=load(args.progress) if args.progress else None,

@@ -12,6 +12,7 @@
     "goal": {"type": "string", "minLength": 1},
     "constraints": {"type": "array", "items": {"type": "string"}},
     "source_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "curriculum_id": {"type": ["string", "null"]},
     "objectives": {
       "type": "array",
       "items": {
@@ -38,6 +39,8 @@
       "required": ["active_objective_id", "latest_state", "evidence", "next_action"],
       "properties": {
         "active_objective_id": {"type": "string"},
+        "active_module_id": {"type": ["string", "null"]},
+        "active_lesson_id": {"type": ["string", "null"]},
         "latest_state": {"enum": ["not-started", "introduced", "practised-with-help", "applied-independently", "transferred", "retained"]},
         "evidence": {"type": "string"},
         "blocker_or_misconception": {"type": ["string", "null"]},
