@@ -1,0 +1,38 @@
+{
+  "version": "1.0.0",
+  "session_id": "S001",
+  "audience": "learner",
+  "input_mode": "source-grounded",
+  "language": "ar-EG",
+  "goal": "كتابة Prompt واضح وقابل للتقييم",
+  "constraints": ["شرح بدون افتراض معرفة مسبقة"],
+  "source_ids": ["SRC1"],
+  "curriculum_id": "CUR1",
+  "objectives": [
+    {
+      "objective_id": "OBJ1",
+      "capability": "يكتب Prompt يحدد المهمة والسياق والقيود وشكل الناتج",
+      "origin": "learner",
+      "prerequisite_objective_ids": [],
+      "source_ids": ["SRC1"],
+      "source_refs": ["SRC1#prompt-components"],
+      "mastery_evidence": ["Prompt جديد يحقق rubric من أربع نقاط"],
+      "state": "introduced",
+      "lesson_ids": ["LES1"],
+      "assessment_ids": ["ASM1"],
+      "next_action": "إكمال المثال الموجّه"
+    }
+  ],
+  "checkpoint": {
+    "active_objective_id": "OBJ1",
+    "active_module_id": "MOD1",
+    "active_lesson_id": "LES1",
+    "latest_state": "introduced",
+    "evidence": "استطاع تمييز المهمة من السياق داخل المثال",
+    "blocker_or_misconception": null,
+    "strategy_context": "مثال ثم تفكيك",
+    "next_action": "إكمال المثال الموجّه",
+    "review_due_at": null,
+    "updated_at": "2026-09-13T18:00:00Z"
+  }
+}

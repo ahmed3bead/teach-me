@@ -1,5 +1,7 @@
 # Source coverage ledger
 
+- Session ID: `{{session_id}}`
+
 ## Learning goal
 
 - Goal:
@@ -9,9 +11,9 @@
 
 ## Coverage
 
-| Source | Media | Access | Actually inspected | Coverage | Confidence | Limitations |
-|---|---|---|---|---|---|---|
-| | | | | | | |
+| Source ID | Source | Media | Access | Actually inspected | Coverage | Confidence | Limitations |
+|---|---|---|---|---|---|---|---|
+| | | | | | | | |
 
 ## Understanding gate
 

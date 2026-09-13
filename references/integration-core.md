@@ -19,8 +19,8 @@ An artifact may link to several upstream records. References must resolve to an 
 3. Inspect and map governing sources; otherwise research only as required by the evidence policy.
 4. Define a small objective with prerequisites and explicit mastery evidence.
 5. Create or deliver the lesson appropriate to the audience.
-6. Assess the objective. Source consumption and lesson completion are activity, not mastery evidence.
-7. Update progress and a resumable checkpoint; schedule review only when it serves retention.
+6. At the complete-unit boundary, offer an assessment and run it after learner opt-in. Source consumption and lesson completion are activity, not mastery evidence. If the learner declines, preserve the evidence state and continue only where the next objective does not depend on unverified mastery.
+7. Update progress and a resumable checkpoint after evidence, a plan change, or a meaningful pause; schedule review only when it serves retention.
 8. Collect minimized feedback at a meaningful checkpoint and apply the reviewed improvement loop.
 
 ## Objective contract

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{arabic_title}}</title>
+  <style>
+    html, body { direction: rtl; }
+    body { max-width: 72rem; margin: auto; padding: 1.5rem; text-align: right; font-family: "Noto Sans Arabic", Tahoma, Arial, sans-serif; line-height: 1.8; }
+    bdi, .ltr, code, pre { unicode-bidi: isolate; }
+    .ltr, code, pre { direction: ltr; text-align: left; }
+    table { direction: rtl; border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #bbb; padding: .5rem; }
+    nav ul { padding-inline-start: 1.25rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>{{arabic_title}}</h1>
+    <p>{{arabic_journey_summary}}</p>
+  </header>
+  <nav aria-label="التنقل داخل المنهج">
+    <ul>
+      <li><a href="CURRICULUM.html">{{arabic_curriculum_label}}</a></li>
+      <li><a href="LESSON-01.html">{{arabic_lesson_label}}</a></li>
+      <li><a href="PROGRESS.html">{{arabic_progress_label}}</a></li>
+    </ul>
+  </nav>
+  <main>
+    <section>
+      <h2>{{arabic_current_outcome_heading}}</h2>
+      <p>{{arabic_explanation_with_isolated_terms}}</p>
+      <p><bdi dir="ltr">{{english_term_or_identifier}}</bdi></p>
+      <pre dir="ltr"><code>{{escaped_code_or_command}}</code></pre>
+    </section>
+    <section>
+      <h2>{{arabic_current_action_heading}}</h2>
+      <p>{{arabic_one_action}}</p>
+      <p><bdi dir="ltr">TEACH-ME:v2:{{session_id}}:{{subject}}:{{language}}:{{module_id}}:{{lesson_id}}</bdi></p>
+    </section>
+  </main>
+</body>
+</html>

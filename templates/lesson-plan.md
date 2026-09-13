@@ -1,5 +1,9 @@
 # Lesson plan
 
+- Session ID: `{{session_id}}`
+- Lesson ID: `{{lesson_id}}`
+- Objective IDs: `{{objective_ids}}`
+
 ## Context
 
 - Title:
@@ -35,6 +39,8 @@
 
 ## Assessment
 
+- Assessment ID: `{{assessment_id}}`
+- Objective IDs: `{{assessment_objective_ids}}`
 - Task:
 - Success evidence:
 - Educator answer key or rubric:

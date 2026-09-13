@@ -1,0 +1,23 @@
+{
+  "version": "1.0.0",
+  "session_id": "S001",
+  "claims": [
+    {
+      "claim_id": "CLM1",
+      "claim": "تحديد شكل الناتج يقلل الغموض في الطلب",
+      "status": "source",
+      "support": [
+        {
+          "source_id": "SRC1",
+          "location": "prompt-components",
+          "title": "Prompt engineering guide"
+        }
+      ],
+      "scope_or_version": null,
+      "verified_at": null,
+      "dependent_objective_ids": ["OBJ1"],
+      "supersedes_claim_id": null,
+      "notes": "مثال fixture وليس ادعاءً بحثيًا فعليًا"
+    }
+  ]
+}

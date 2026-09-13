@@ -1,0 +1,45 @@
+{
+  "version": "1.0.0",
+  "session_id": "S001",
+  "lesson_id": "LES1",
+  "title": "من الطلب المبهم للطلب الواضح",
+  "duration_minutes": 20,
+  "objective_ids": ["OBJ1"],
+  "outcomes": ["يكتب المتعلم Prompt من أربعة مكوّنات"],
+  "prerequisite_check": [],
+  "materials": ["مثال Prompt مبهم"],
+  "sequence": [
+    {
+      "minutes": 10,
+      "teacher_action": "يشرح المكوّنات ويفكك مثالًا",
+      "learner_action": "يتابع ويحدد وظيفة كل مكوّن",
+      "check_for_understanding": "ملاحظة اختيارية داخل المثال بدون اختبار"
+    },
+    {
+      "minutes": 10,
+      "teacher_action": "يعرض تطبيقًا موجهًا ثم يدعو لاختبار اختياري",
+      "learner_action": "يعيد كتابة الطلب إذا اختار التطبيق",
+      "check_for_understanding": "rubric من أربع نقاط"
+    }
+  ],
+  "differentiation": {
+    "support": ["قالب جاهز"],
+    "core": ["مثال موجه"],
+    "extension": ["إضافة معيار جودة"],
+    "accessibility": ["جمل قصيرة ومثال واحد كل مرة"]
+  },
+  "assessment": {
+    "assessment_id": "ASM1",
+    "objective_ids": ["OBJ1"],
+    "task": "اكتب Prompt لتلخيص فصل دراسي",
+    "success_evidence": ["مهمة", "سياق", "قيود", "شكل ناتج"],
+    "answer_key_or_rubric": ["نقطة لكل مكوّن واضح"]
+  },
+  "traceability": [
+    {
+      "lesson_element": "مكوّنات الـPrompt",
+      "origin": "curriculum",
+      "source_ref": "SRC1#prompt-components"
+    }
+  ]
+}

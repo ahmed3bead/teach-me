@@ -1,0 +1,17 @@
+{
+  "version": "1.0.0",
+  "event_id": "EVT1",
+  "recorded_at": "2026-09-13T18:05:00Z",
+  "skill_version": "0.9.0",
+  "consent": true,
+  "audience": "learner",
+  "input_mode": "topic-led",
+  "locale": "ar-EG",
+  "subject_category": "writing",
+  "host": "fixture",
+  "model_family": "fixture",
+  "failure_category": "none",
+  "outcome": "helped",
+  "reproducible_summary": "المثال الموجّه ساعد المتعلم على فصل المهمة عن السياق.",
+  "contains_personal_data": false
+}

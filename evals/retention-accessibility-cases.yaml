@@ -1,3 +1,5 @@
+suite: retention-accessibility
+version: 1.0.0
 cases:
   - id: delayed-retention-review
     prompt: "راجع معايا درس الأسبوع اللي فات وسجل إني فاكره"

@@ -15,4 +15,26 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          cache: pip
+      - run: python3 -m pip install -r requirements-dev.txt
       - run: python3 scripts/validate.py
+      - run: python3 scripts/validate_schemas.py
+      - run: python3 scripts/validate_evals.py
+      - run: python3 scripts/validate_domain_packs.py
+      - run: python3 scripts/run_behavioral_evals.py --validate-only
+      - run: python3 scripts/test_behavioral_eval_runner.py
+      - run: python3 scripts/test_package_release.py
+      - run: python3 scripts/test_feedback_pipeline.py
+      - run: python3 scripts/test_validate_bidi_html.py
+      - run: python3 scripts/test_validate_session.py
+      - run: python3 scripts/test_validate_resume.py
+      - run: >-
+          python3 scripts/validate_session.py
+          fixtures/session/learning-session.json
+          --coverage fixtures/session/source-coverage.json
+          --knowledge-base fixtures/session/knowledge-base.json
+          --curriculum-map fixtures/session/curriculum-map.json
+          --curriculum fixtures/session/study-curriculum.json
+          --claims fixtures/session/claim-ledger.json
+          --lesson fixtures/session/lesson-plan.json
+          --progress fixtures/session/progress.json

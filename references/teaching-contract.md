@@ -43,9 +43,9 @@ Use evidence levels:
 4. `transferred`: succeeded in a meaningfully different context;
 5. `retained`: retrieved or applied it after a delay.
 
-Do not advance a prerequisite based only on acknowledgement or recognition.
+Do not advance a prerequisite based only on acknowledgement or recognition. If a learner declines an optional check, keep the evidence state unchanged. Continue to material that does not depend on the unverified capability; when the next objective does depend on it, explain that dependency and offer an equivalent low-pressure way to demonstrate it.
 
-These evidence levels are primarily teacher-facing. Do not announce a classification after every learner message. Verify at natural lesson boundaries and prefer one meaningful application over frequent micro-questions.
+These evidence levels are primarily teacher-facing. Do not announce a classification after every learner message. Offer verification only after a complete lesson, topic, module objective, or practical skill, using the opt-in boundary in [conversational-teaching.md](conversational-teaching.md). Prefer one meaningful application over frequent micro-questions.
 
 ## Recover from failure
 

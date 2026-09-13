@@ -15,16 +15,22 @@ Each pack lives in `domain-packs/<domain>/PACK.md` and should define:
 - bilingual terminology where useful;
 - reproducible evaluation cases.
 
-Packs inherit the teaching, evidence, privacy, and safety contracts from the core skill. They may narrow those contracts for a domain but cannot weaken them.
+Packs inherit the teaching, evidence, privacy, and safety contracts from the core skill. They may narrow those contracts for a domain but cannot weaken them. Validate manifests, concept dependencies, guides, and pack evals with `python3 scripts/validate_domain_packs.py`.
 
-## Proposed layout
+## Implemented pilots
+
+- `programming`: executable prediction, debugging, testing, and project evidence.
+- `photography`: available-equipment visual practice, cause-specific critique, and safe capture.
+
+Both pilots are marked `needs-qualified-review`; they demonstrate and test the pack contract but must not be presented as fully reviewed curricula.
+
+## Layout
 
 ```text
 domain-packs/
 └── programming/
     ├── PACK.md
-    ├── concept-map.yaml
-    ├── terminology.ar-en.yaml
+    ├── pack.yaml
     └── evals.yaml
 ```
 

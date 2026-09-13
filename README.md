@@ -41,15 +41,41 @@ For a detailed whole-book, course, curriculum, or broad-subject request, Teach M
 
 ## Install
 
-Copy the `teach-me` directory into the skills directory supported by your agent. For Codex:
+Clone directly into the skills directory supported by your agent. This avoids the nested `teach-me/teach-me` folder produced when a copy command is repeated.
+
+### Codex on Linux or macOS
 
 ```bash
-git clone https://github.com/ahmed3bead/teach-me.git
-mkdir -p ~/.codex/skills
-cp -R teach-me ~/.codex/skills/teach-me
+skills_dir="${CODEX_HOME:-$HOME/.codex}/skills"
+mkdir -p "$skills_dir"
+git clone https://github.com/ahmed3bead/teach-me.git "$skills_dir/teach-me"
 ```
 
-Restart or reload the agent after installation. Other Agent Skills-compatible clients may use a project-level or user-level skills directory; follow the client's documentation.
+### Codex on Windows PowerShell
+
+```powershell
+$skillsDir = if ($env:CODEX_HOME) { Join-Path $env:CODEX_HOME "skills" } else { Join-Path $HOME ".codex\skills" }
+New-Item -ItemType Directory -Force -Path $skillsDir | Out-Null
+git clone https://github.com/ahmed3bead/teach-me.git (Join-Path $skillsDir "teach-me")
+```
+
+Restart or reload the agent, then ask it to use `$teach-me`. Other Agent Skills-compatible clients may use a project-level or user-level skills directory; follow that client's documentation and keep `SKILL.md` at the root of the installed `teach-me` directory.
+
+### Verify, update, or safely remove
+
+```bash
+skills_dir="${CODEX_HOME:-$HOME/.codex}/skills"
+test -f "$skills_dir/teach-me/SKILL.md"
+python3 "$skills_dir/teach-me/scripts/validate.py"
+
+# Update an existing Git clone.
+git -C "$skills_dir/teach-me" pull --ff-only
+
+# Recoverable removal: move it out of the active skills directory.
+mv "$skills_dir/teach-me" "$skills_dir/teach-me.disabled"
+```
+
+If an older copy has `teach-me/teach-me/SKILL.md`, move the inner folder to a temporary location, remove or archive the outer duplicate, then install fresh with the command above. See [`docs/compatibility.md`](docs/compatibility.md) for capability-dependent behavior and costs.
 
 ## Use
 
@@ -93,7 +119,7 @@ This paid course page is inaccessible. Use only its public topic and learning ou
 
 ## Domain teaching packs
 
-The core skill remains general. Optional packs specialize how a subject should be taught without duplicating the teacher, evidence, privacy, or safety rules. Planned first packs cover AI literacy, English communication, programming, data and spreadsheets, design, digital marketing, photography and video, and project management.
+The core skill remains general. Optional packs specialize how a subject should be taught without duplicating the teacher, evidence, privacy, or safety rules. The first testable pilots cover programming and photography; both are explicitly marked as needing qualified review. Future candidates include AI literacy, English communication, data and spreadsheets, design, digital marketing, video, and project management.
 
 See [`domain-packs/README.md`](domain-packs/README.md) and [`docs/domain-roadmap.md`](docs/domain-roadmap.md).
 
@@ -105,10 +131,17 @@ Teach Me does not promise perfect accuracy. It requires traceable evidence for c
 
 Useful contributions include reproducible teaching failures, bilingual language improvements, authoritative-source corrections, accessibility improvements, and evaluation cases. Remove personal information before opening an issue. Do not submit raw learner transcripts without explicit permission.
 
-Read [`CONTRIBUTING.md`](CONTRIBUTING.md). Run the repository checks with:
+Read [`CONTRIBUTING.md`](CONTRIBUTING.md). Install development dependencies and run the repository checks with:
 
 ```bash
+python3 -m pip install -r requirements-dev.txt
 python3 scripts/validate.py
+python3 scripts/validate_schemas.py
+python3 scripts/validate_evals.py
+python3 scripts/validate_domain_packs.py
+python3 scripts/test_validate_session.py
+python3 scripts/test_validate_resume.py
+python3 scripts/test_behavioral_eval_runner.py
 ```
 
 For saved connected artifacts, validate cross-file identifiers with:
@@ -116,6 +149,7 @@ For saved connected artifacts, validate cross-file identifiers with:
 ```bash
 python3 scripts/validate_session.py learning-session.json \
   --knowledge-base knowledge-base.json \
+  --curriculum-map curriculum-map.json \
   --curriculum study-curriculum.json \
   --coverage source-coverage.json \
   --claims claim-ledger.json \
@@ -131,7 +165,7 @@ python3 scripts/validate_session.py learning-session.json \
 
 ## Status
 
-`v0.8.3` — complete-unit teaching with opt-in understanding checks and adaptive feedback. Feedback and real-world evaluation are welcome.
+`v0.9.0` candidate — hardened schemas, evidence-safe resume codes, executable behavioral evals, and tested installation/release tooling. Real model evaluation is required before `v1.0.0`.
 
 ## License
 

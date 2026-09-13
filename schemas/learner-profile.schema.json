@@ -1,11 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ahmed3bead/teach-me/schemas/learner-profile.schema.json",
   "title": "Teach Me learner profile",
   "type": "object",
-  "required": ["version", "consent", "data_governance", "language", "goals"],
+  "required": ["version", "profile_id", "consent", "data_governance", "language", "goals"],
   "properties": {
-    "version": {"type": "string"},
-    "consent": {"type": "boolean"},
+    "version": {"const": "1.0.0"},
+    "profile_id": {"type": "string", "minLength": 1},
+    "consent": {"const": true},
     "data_governance": {
       "type": "object",
       "required": ["purpose", "consent_recorded_at", "retention_until", "deletion_status"],
@@ -18,11 +20,11 @@
       "additionalProperties": false
     },
     "language": {"enum": ["ar-MSA", "ar-EG", "en", "mixed"]},
-    "goals": {"type": "array", "items": {"type": "string"}},
+    "goals": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
     "constraints": {"type": "array", "items": {"type": "string"}},
     "demonstrated_abilities": {"type": "array", "items": {"type": "string"}},
     "strategy_observations": {"type": "array", "items": {"type": "object", "required": ["strategy", "context", "outcome"], "properties": {"strategy": {"type": "string"}, "context": {"type": "string"}, "outcome": {"enum": ["helped", "neutral", "failed"]}}, "additionalProperties": false}},
-    "group_observations": {"type": "array", "items": {"type": "object", "required": ["pseudonymous_group_id", "observation", "observed_at"], "properties": {"pseudonymous_group_id": {"type": "string", "minLength": 1}, "observation": {"type": "string", "minLength": 1}, "observed_at": {"type": "string", "format": "date-time"}}, "additionalProperties": false}}
+    "group_observations": {"type": "array", "items": {"type": "object", "required": ["pseudonymous_group_id", "subject_category", "strategy", "outcome", "observed_at"], "properties": {"pseudonymous_group_id": {"type": "string", "minLength": 1}, "subject_category": {"type": "string", "minLength": 1}, "strategy": {"type": "string", "minLength": 1}, "outcome": {"enum": ["helped", "neutral", "failed"]}, "observed_at": {"type": "string", "format": "date-time"}}, "additionalProperties": false}}
   },
   "additionalProperties": false
 }

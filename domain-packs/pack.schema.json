@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ahmed3bead/teach-me/domain-packs/pack.schema.json",
+  "title": "Teach Me domain teaching pack",
+  "type": "object",
+  "required": ["version", "id", "title", "languages", "reviewer_status", "scope", "exclusions", "prerequisites", "concepts", "misconceptions", "source_policy", "freshness"],
+  "properties": {
+    "version": {"const": "1.0.0"},
+    "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "title": {"type": "string", "minLength": 1},
+    "languages": {"type": "array", "minItems": 2, "items": {"enum": ["ar-MSA", "ar-EG", "en"]}, "uniqueItems": true},
+    "reviewer_status": {"enum": ["draft", "needs-qualified-review", "qualified-reviewed"]},
+    "scope": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "exclusions": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "prerequisites": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "description", "diagnostic"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+          "description": {"type": "string", "minLength": 1},
+          "diagnostic": {"type": "string", "minLength": 1}
+        },
+        "additionalProperties": false
+      }
+    },
+    "concepts": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "object",
+        "required": ["id", "outcome", "prerequisite_ids", "practice", "mastery_evidence"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+          "outcome": {"type": "string", "minLength": 1},
+          "prerequisite_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "practice": {"type": "string", "minLength": 1},
+          "mastery_evidence": {"type": "string", "minLength": 1}
+        },
+        "additionalProperties": false
+      }
+    },
+    "misconceptions": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["claim", "signal", "repair"],
+        "properties": {
+          "claim": {"type": "string", "minLength": 1},
+          "signal": {"type": "string", "minLength": 1},
+          "repair": {"type": "string", "minLength": 1}
+        },
+        "additionalProperties": false
+      }
+    },
+    "source_policy": {
+      "type": "object",
+      "required": ["anchors", "supplements", "verification_triggers"],
+      "properties": {
+        "anchors": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "supplements": {"type": "array", "items": {"type": "string"}},
+        "verification_triggers": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+      },
+      "additionalProperties": false
+    },
+    "freshness": {
+      "type": "object",
+      "required": ["stable", "must_research"],
+      "properties": {
+        "stable": {"type": "array", "items": {"type": "string"}},
+        "must_research": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

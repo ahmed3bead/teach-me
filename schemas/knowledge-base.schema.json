@@ -1,10 +1,11 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ahmed3bead/teach-me/schemas/knowledge-base.schema.json",
   "title": "Teach Me researched knowledge base",
   "type": "object",
   "required": ["version", "session_id", "subject", "researched_at", "sources", "topic_map", "teaching_readiness"],
   "properties": {
-    "version": {"type": "string"},
+    "version": {"const": "1.0.0"},
     "session_id": {"type": "string", "minLength": 1},
     "subject": {"type": "string", "minLength": 1},
     "edition_or_version": {"type": ["string", "null"]},

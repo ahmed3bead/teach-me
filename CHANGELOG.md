@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.9.0 - Unreleased
+
+- Resolve the explain-first versus continuous-testing contradictions across the teaching engine, handoff, integration, and accessibility contracts.
+- Pin and meta-validate ten JSON Schemas with connected positive fixtures and negative rejection tests.
+- Require stable session, source, objective, lesson, assessment, claim, event, and progress identifiers where applicable.
+- Add cross-artifact cycle, checkpoint, source, assessment, and active-module integrity checks.
+- Replace mastery-bearing resume codes with evidence-safe `TEACH-ME:v2` locators while accepting `v1` only as an unverified legacy locator.
+- Normalize 15 behavioral suites containing 88 single- and multi-turn cases and add provider-neutral response/grader execution with thresholds and critical failures.
+- Add capability and cost documentation, corrected fresh-install/update/removal instructions, and deterministic release archives with checksums.
+- Add a consent-gated local feedback recorder and privacy-minimized aggregation that excludes free text and suppresses small groups.
+- Add a release gate requiring real Arabic and English model evaluation, end-to-end journeys, and rendered bidirectional artifact review before `v1.0.0`.
+- Add a reusable bidi HTML template plus structural isolation, CSS, landmark, and link validation with positive and negative fixtures.
+- Turn domain packs into a validated manifest and concept-graph system, with programming and photography pilots and six behavioral cases; both remain pending qualified review.
+
 ## 0.8.3 - Unreleased
 
 - Define routine assessment boundaries as a complete lesson, topic, module objective, or practical skill—not a page, paragraph, isolated fact, or chat turn.

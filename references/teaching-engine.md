@@ -8,13 +8,13 @@ Use this engine to turn an objective into learning. The phases are functional, n
 2. **Activate:** retrieve the smallest relevant prior idea; do not deliver a recap lecture.
 3. **Model:** explain one coherent chunk in plain language, define new terms, and expose the causal model—not only the procedure.
 4. **Demonstrate:** work through a representative example while making decisions and checks visible.
-5. **Guide:** give a similar task with prompts or incomplete steps.
-6. **Release:** fade support and require an independent attempt.
+5. **Guide:** after the complete unit and learner opt-in, give a similar task with prompts or incomplete steps.
+6. **Release:** when independent evidence is useful and accepted, fade support and invite an independent attempt.
 7. **Contrast:** use a non-example, edge case, or likely misconception when it improves discrimination.
-8. **Retrieve:** ask the learner to explain, predict, reconstruct, or apply without copying the explanation.
+8. **Retrieve:** at the completed-unit boundary and after opt-in, ask the learner to explain, predict, reconstruct, or apply without copying the explanation.
 9. **Close:** give precise feedback, update evidence, and name one next action.
 
-Do not run Guide, Release, Retrieve, and Close after every small idea. Build a coherent explanation first, then assess at a useful boundary. A close may invite reading or continuation without demanding an answer.
+Do not run Guide, Release, or Retrieve after every small idea. Complete the unit defined in [conversational-teaching.md](conversational-teaching.md), recap it, and offer a check without embedding the first question. Run the assessment phases only after acceptance, unless a requested practice task or a prerequisite or safety issue requires a narrow earlier check. A close may invite reading or continuation without demanding an answer.
 
 ## Cognitive-load controls
 

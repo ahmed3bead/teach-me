@@ -1,0 +1,68 @@
+version: 1.0.0
+id: programming
+title: Programming from zero to independent problem solving
+languages: [ar-MSA, ar-EG, en]
+reviewer_status: needs-qualified-review
+scope:
+  - General programming foundations independent of one language
+  - Executable practice, debugging, testing, and a small authentic project
+exclusions:
+  - Framework-specific certification preparation without a fresh source sweep
+  - Security exploitation, production operations, or safety-critical software
+prerequisites:
+  - id: basic-device-use
+    description: Open files, type text, and run an available learning environment.
+    diagnostic: Ask for one tiny file or browser-editor action only if tool use is uncertain.
+concepts:
+  - id: input-output
+    outcome: Predict and explain what a small program receives and produces.
+    prerequisite_ids: [basic-device-use]
+    practice: Change one input and predict the output before running.
+    mastery_evidence: Correct prediction and explanation on a fresh example.
+  - id: data-state
+    outcome: Represent changing information with suitable values and names.
+    prerequisite_ids: [input-output]
+    practice: Model a small real situation such as cart total or study time.
+    mastery_evidence: Selects and updates data without copying a shown solution.
+  - id: control-flow
+    outcome: Express a decision and repetition with traceable execution.
+    prerequisite_ids: [data-state]
+    practice: Trace a condition and loop, then fix an off-by-one case.
+    mastery_evidence: Predicts fresh branches and terminates a loop correctly.
+  - id: functions
+    outcome: Split behavior into named, testable units with clear inputs and outputs.
+    prerequisite_ids: [control-flow]
+    practice: Extract repeated logic and call it from two contexts.
+    mastery_evidence: Creates a function that passes fresh normal and edge cases.
+  - id: testing-debugging
+    outcome: Reproduce, isolate, explain, and verify a software defect.
+    prerequisite_ids: [functions]
+    practice: Diagnose a seeded bug using observed output and a minimal test.
+    mastery_evidence: Fixes a different bug and shows the test that prevents recurrence.
+  - id: interfaces-project
+    outcome: Build and explain a small program with explicit contracts between parts.
+    prerequisite_ids: [testing-debugging]
+    practice: Deliver a goal-driven project in reviewable increments.
+    mastery_evidence: Runs, explains trade-offs, handles an unseen case, and changes one requirement independently.
+misconceptions:
+  - claim: Memorizing syntax is the same as learning programming.
+    signal: Can copy a pattern but cannot predict or change it.
+    repair: Use prediction, tracing, and fresh modifications before adding syntax.
+  - claim: A program that ran once is correct.
+    signal: Tests only one happy-path example.
+    repair: Contrast normal, boundary, and invalid inputs and write a regression test.
+  - claim: Debugging means randomly changing code until it works.
+    signal: Makes several edits without a reproducible failing case.
+    repair: Freeze the failure, form one hypothesis, observe, then change one cause.
+source_policy:
+  anchors:
+    - Official language and runtime documentation for syntax and behavior
+    - Stable computer-science references for general concepts
+  supplements:
+    - Executable examples, reputable course exercises, and practitioner postmortems
+  verification_triggers:
+    - Current language or framework version
+    - Security, deployment, concurrency, performance, or platform-specific behavior
+freshness:
+  stable: [input-output reasoning, decomposition, tracing, testing principles]
+  must_research: [versions, APIs, tooling commands, security guidance, framework conventions]

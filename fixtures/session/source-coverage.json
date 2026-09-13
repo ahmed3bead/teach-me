@@ -1,0 +1,19 @@
+{
+  "version": "1.0.0",
+  "session_id": "S001",
+  "sources": [
+    {
+      "source_id": "SRC1",
+      "title": "Prompt engineering guide",
+      "location": "https://example.org/prompt-guide",
+      "media_type": "website",
+      "access": "full",
+      "inspected_components": ["text", "structure"],
+      "coverage": "complete",
+      "confidence": "high",
+      "limitations": ["مثال اصطناعي للاختبار"],
+      "source_refs": ["SRC1#prompt-components"]
+    }
+  ],
+  "overall_status": "ready-to-teach"
+}
