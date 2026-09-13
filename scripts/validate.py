@@ -30,7 +30,7 @@ def check_skill() -> None:
     text = (ROOT / "SKILL.md").read_text(encoding="utf-8")
     if not text.startswith("---\n"):
         fail("SKILL.md: missing YAML frontmatter")
-    for required in ("name: teach-me", "Learner Mode", "Educator Mode", "Source-Grounded", "references/educator-mode.md", "references/source-grounded-mode.md", "references/integration-core.md", "references/research-sweep.md"):
+    for required in ("name: teach-me", "Learner Mode", "Educator Mode", "Source-Grounded", "references/educator-mode.md", "references/source-grounded-mode.md", "references/integration-core.md", "references/research-sweep.md", "references/curriculum-delivery.md"):
         if required not in text:
             fail(f"SKILL.md: missing {required!r}")
     for match in re.findall(r"\]\(([^)]+)\)", text):
@@ -72,6 +72,10 @@ def check_templates() -> None:
     for word in ("Source matrix", "Actually inspected", "Topic map", "Teaching readiness"):
         if word not in knowledge:
             fail(f"knowledge-base.md: missing {word}")
+    curriculum = (ROOT / "templates" / "study-curriculum.md").read_text(encoding="utf-8")
+    for word in ("Curriculum ID", "Learning path", "Demonstrable outcome", "Source references", "Progress and resume checkpoint"):
+        if word not in curriculum:
+            fail(f"study-curriculum.md: missing {word}")
 
 
 def check_integration() -> None:
@@ -110,6 +114,25 @@ def check_research_sweep() -> None:
             fail(f"research-sweep-cases.yaml: missing invariant {invariant!r}")
 
 
+def check_curriculum_delivery() -> None:
+    schema = json.loads((ROOT / "schemas" / "study-curriculum.schema.json").read_text(encoding="utf-8"))
+    for field in ("curriculum_id", "session_id", "subject", "language", "target_capability", "scope", "modules", "completion_criteria"):
+        if field not in schema["required"]:
+            fail(f"study-curriculum.schema.json: {field} must be required")
+    module = schema["properties"]["modules"]["items"]
+    for field in ("module_id", "title", "outcome", "lessons"):
+        if field not in module["required"]:
+            fail(f"study-curriculum.schema.json: module {field} must be required")
+    lesson = module["properties"]["lessons"]["items"]
+    for field in ("lesson_id", "objective_ids", "demonstrable_outcome", "activity", "assessment", "source_refs"):
+        if field not in lesson["required"]:
+            fail(f"study-curriculum.schema.json: lesson {field} must be required")
+    cases = (ROOT / "evals" / "curriculum-delivery-cases.yaml").read_text(encoding="utf-8")
+    for invariant in ("an editable Markdown curriculum is the default artifact", "the rendered pages are inspected before delivery", "structured Markdown is provided in chat as a disclosed fallback"):
+        if invariant not in cases:
+            fail(f"curriculum-delivery-cases.yaml: missing invariant {invariant!r}")
+
+
 def main() -> int:
     check_json()
     check_skill()
@@ -117,6 +140,7 @@ def main() -> int:
     check_templates()
     check_integration()
     check_research_sweep()
+    check_curriculum_delivery()
     print("Teach Me validation passed")
     return 0
 
