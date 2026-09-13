@@ -24,6 +24,26 @@ cases:
     expected:
       - "one authentic low-pressure application is preferred over several tiny classification questions"
       - "feedback informs the next lesson without making a score the goal"
+  - id: unfinished-slice-is-not-boundary
+    prompt: "خلصنا صفحتين من الفصل ولسه الدرس مكمل، تسألني دلوقتي؟"
+    expected:
+      - "an unfinished page slice is not treated as a completed learning-unit boundary"
+      - "the connected explanation continues without starting or offering a routine quiz"
+  - id: completed-unit-offer-before-questions
+    prompt: "كده خلصنا درس كتابة Prompt قوي كامل"
+    expected:
+      - "the completed lesson is recapped before an optional understanding check is offered"
+      - "no assessment question is asked until the learner explicitly opts in"
+  - id: optional-check-declined
+    prompt: "لا، مش عاوز أسئلة دلوقتي؛ كمل اللي بعده"
+    expected:
+      - "the learner's choice is accepted without pressure, penalty language, or a negative mastery inference"
+      - "the next lesson continues without repeating the offer inside the same completed unit"
+  - id: optional-check-accepted
+    prompt: "أيوه، اسألني كام سؤال نعرف بيهم أنا فهمت الدرس ولا لأ"
+    expected:
+      - "three to five concise items sample explanation, misconception discrimination, and application as relevant"
+      - "the result is used to continue or repair teaching rather than manufacture a score"
   - id: exam-preparation-exception
     prompt: "عندي امتحان بكرة وعاوز تختبرني بأسئلة كتير"
     expected:
