@@ -1,0 +1,18 @@
+{
+  "version": "1.0.0",
+  "session_id": "S001",
+  "records": [
+    {
+      "record_id": "REC1",
+      "objective_id": "OBJ1",
+      "objective": "كتابة Prompt واضح وقابل للتقييم",
+      "lesson_id": "LES1",
+      "assessment_id": null,
+      "state": "introduced",
+      "evidence": "ميّز المهمة من السياق داخل المثال",
+      "help_level": 3,
+      "observed_at": "2026-09-13T18:00:00Z",
+      "next_action": "إكمال المثال الموجّه"
+    }
+  ]
+}

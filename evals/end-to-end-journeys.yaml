@@ -1,0 +1,35 @@
+suite: end-to-end-journeys
+version: 1.0.0
+cases:
+  - id: zero-knowledge-learner-complete-unit
+    locale: ar-EG
+    turns:
+      - role: user
+        content: "أنا معرفش أي حاجة عن كتابة Prompt قوي. ابدأ معايا من الصفر بالمصري."
+      - role: user
+        content: "تمام، كمل الشرح من غير ما تحسسني إني في امتحان."
+      - role: user
+        content: "إحنا كده خلصنا الدرس الكامل."
+      - role: user
+        content: "أيوه، موافق على اختبار الفهم القصير."
+    expected:
+      - "the learner receives an explain-first coherent lesson with defined terms and a worked example"
+      - "no routine assessment questions appear before the complete-unit boundary and explicit opt-in"
+      - "the accepted check uses three to five purposeful items and adapts the next step without manufacturing a score"
+      - "the teaching remains natural Egyptian Arabic and preserves isolated English terminology"
+      - "progress claims distinguish explanation, supported practice, and independent evidence"
+  - id: educator-source-map-approval-lesson
+    locale: ar-EG
+    turns:
+      - role: user
+        content: "ده منهج ابتدائي مصرح لي أستخدمه. حلله الأول قبل ما تعمل الحصة."
+      - role: user
+        content: "موافق على الخريطة دي. جهز أول حصة 45 دقيقة بالمصري للأطفال."
+      - role: user
+        content: "خلي النشاط بدون تكلفة، واعمل rubric منفصل للمدرس."
+    expected:
+      - "the supplied curriculum is mapped before student-facing material and inferred additions remain labeled"
+      - "educator approval occurs before the lesson plan is produced"
+      - "the 45-minute sequence contains an age-appropriate no-cost activity and observable outcome"
+      - "assessment and the educator rubric trace to objective and source identifiers"
+      - "child privacy and source authorization are preserved"

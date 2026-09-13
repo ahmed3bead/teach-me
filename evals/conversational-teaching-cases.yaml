@@ -1,3 +1,5 @@
+suite: conversational-teaching
+version: 1.0.0
 cases:
   - id: explicit-zero-start
     prompt: "أنا معرفش أي حاجة عن الكتاب، ابدأ معايا من الصفر"
@@ -44,6 +46,12 @@ cases:
     expected:
       - "three to five concise items sample explanation, misconception discrimination, and application as relevant"
       - "the result is used to continue or repair teaching rather than manufacture a score"
+  - id: declined-check-before-dependent-unit
+    prompt: "مش عاوز أسئلة، بس الدرس الجاي مبني بالكامل على اللي شرحته"
+    expected:
+      - "the learner is not pressured or assigned a negative label"
+      - "unverified mastery is not assumed for a dependent objective"
+      - "an equivalent low-pressure evidence option or non-dependent continuation is offered"
   - id: exam-preparation-exception
     prompt: "عندي امتحان بكرة وعاوز تختبرني بأسئلة كتير"
     expected:

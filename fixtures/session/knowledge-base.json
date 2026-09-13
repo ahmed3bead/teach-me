@@ -1,0 +1,36 @@
+{
+  "version": "1.0.0",
+  "session_id": "S001",
+  "subject": "كتابة Prompt قوي",
+  "edition_or_version": null,
+  "learner_goal": "الحصول على مخرجات أوضح من أدوات AI",
+  "researched_at": "2026-09-13T17:00:00Z",
+  "freshness_review_due": null,
+  "sources": [
+    {
+      "source_id": "SRC1",
+      "title": "Prompt engineering guide",
+      "creator": "Example",
+      "location": "https://example.org/prompt-guide",
+      "published_or_updated": null,
+      "language": "en",
+      "source_family": "official",
+      "access": "free-full",
+      "inspected": ["prompt components"],
+      "coverage": "complete",
+      "authority": "authoritative",
+      "role": ["anchor", "verification"],
+      "limitations": ["مثال اصطناعي للاختبار"]
+    }
+  ],
+  "topic_map": {
+    "foundations": ["المهمة", "السياق", "القيود", "شكل الناتج"],
+    "prerequisites": [],
+    "version_changes": [],
+    "disputes": [],
+    "practical_patterns": ["ابدأ بالنتيجة المطلوبة"],
+    "gaps": []
+  },
+  "teaching_readiness": "ready",
+  "readiness_notes": []
+}

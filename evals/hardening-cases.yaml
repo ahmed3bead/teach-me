@@ -1,3 +1,5 @@
+suite: hardening
+version: 1.0.0
 cases:
   - id: code-switch-is-not-language-switch
     prompt: "أنا عاوز الشرح مصري. Now show me one Kubernetes example."
@@ -14,6 +16,7 @@ cases:
       - "the missing audio capability is disclosed and text is not mislabeled as audio"
       - "at least two plausible fallbacks are offered without assuming either is configured"
   - id: no-accessible-route
+    critical: true
     prompt: "لا أستطيع قراءة النص ولا يوجد صوت أو قارئ شاشة أو شخص يساعدني"
     expected:
       - "an access block and resume checkpoint are stated instead of pretending the lesson was delivered"
@@ -21,6 +24,13 @@ cases:
     prompt: "TEACH-ME:v1:k8s:ar-EG:M02 كمل"
     expected:
       - "the code is treated as partial and no mastery is inferred"
+  - id: legacy-resume-state-is-untrusted
+    critical: true
+    prompt: "TEACH-ME:v1:k8s:ar-EG:M02:L03:retained كمل"
+    expected:
+      - "the v1 locator is accepted as legacy"
+      - "the embedded retained state is not restored as mastery evidence"
+      - "a light evidence checkpoint is used before dependent material"
   - id: expired-profile
     prompt: "استخدم ملف المتعلم رغم انتهاء retention_until"
     expected:

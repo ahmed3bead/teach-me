@@ -24,6 +24,10 @@ def check_json() -> None:
         data = json.loads(path.read_text(encoding="utf-8"))
         if data.get("$schema") != "https://json-schema.org/draft/2020-12/schema":
             fail(f"{path}: unexpected or missing JSON Schema dialect")
+        if not data.get("$id"):
+            fail(f"{path}: missing stable $id")
+        if data.get("properties", {}).get("version", {}).get("const") != "1.0.0":
+            fail(f"{path}: schema version must be pinned to 1.0.0")
         if data.get("type") != "object" or not data.get("required"):
             fail(f"{path}: expected an object schema with required fields")
 
@@ -63,7 +67,7 @@ def check_templates() -> None:
     if not ALLOWED_ORIGINS.issubset(set(lesson.replace("/", " ").split())):
         fail("lesson-plan.md: origin labels are incomplete")
     coverage = (ROOT / "templates" / "source-coverage.md").read_text(encoding="utf-8")
-    for word in ("Actually inspected", "Understanding gate", "Safe teaching scope"):
+    for word in ("Session ID", "Source ID", "Actually inspected", "Understanding gate", "Safe teaching scope"):
         if word not in coverage:
             fail(f"source-coverage.md: missing {word}")
     session = (ROOT / "templates" / "learning-session.md").read_text(encoding="utf-8")
@@ -86,6 +90,14 @@ def check_templates() -> None:
     for word in ("Tempting wrong model", "Diagnostic prompt", "Counterexample", "Verification task"):
         if word not in misconception:
             fail(f"misconception-map.md: missing {word}")
+    progress = (ROOT / "templates" / "progress.md").read_text(encoding="utf-8")
+    for word in ("Session ID", "Record ID", "Objective ID", "Observable evidence", "not mastery evidence"):
+        if word not in progress:
+            fail(f"progress.md: missing {word}")
+    bidi = (ROOT / "templates" / "bidi-learning-pack.html").read_text(encoding="utf-8")
+    for word in ('lang="ar"', 'dir="rtl"', 'unicode-bidi: isolate', 'dir="ltr"', '<main>'):
+        if word not in bidi:
+            fail(f"bidi-learning-pack.html: missing {word}")
 
 
 def check_integration() -> None:
@@ -145,7 +157,7 @@ def check_curriculum_delivery() -> None:
 
 def check_guided_learning_pack() -> None:
     cases = (ROOT / "evals" / "guided-learning-pack-cases.yaml").read_text(encoding="utf-8")
-    for invariant in ("the learner is not asked to design the course", "empty module scaffolding is not created", "a valid non-sensitive TEACH-ME v1 resume code is included", "one exact action, expected time, and requested reply"):
+    for invariant in ("the learner is not asked to design the course", "empty module scaffolding is not created", "a valid non-sensitive TEACH-ME v2 resume code with a session identifier is included", "one exact action and expected time", "a requested reply appears only when the action genuinely requires learner input", "START-HERE begins with explanation rather than a subject-matter test"):
         if invariant not in cases:
             fail(f"guided-learning-pack-cases.yaml: missing invariant {invariant!r}")
 
@@ -185,18 +197,21 @@ def check_hardening() -> None:
     for invariant in ("English sentence is not treated by itself as a language-switch request", "text is not mislabeled as audio", "an access block and resume checkpoint", "expired profile is not used"):
         if invariant not in cases:
             fail(f"hardening-cases.yaml: missing invariant {invariant!r}")
-    valid = validate_resume_code("TEACH-ME:v1:k8s:ar-EG:M02:L03:introduced")
-    partial = validate_resume_code("TEACH-ME:v1:k8s:ar-EG:M02")
-    future = validate_resume_code("TEACH-ME:v2:k8s:ar-EG:M02:L03:introduced")
+    valid = validate_resume_code("TEACH-ME:v2:S001:k8s:ar-EG:M02:L03")
+    legacy = validate_resume_code("TEACH-ME:v1:k8s:ar-EG:M02:L03:retained")
+    partial = validate_resume_code("TEACH-ME:v2:S001:k8s:ar-EG:M02")
+    future = validate_resume_code("TEACH-ME:v3:S001:k8s:ar-EG:M02:L03")
     if valid["status"] != "valid" or valid["mastery_evidence"] is not False:
         fail("resume validator: valid locator must not become mastery evidence")
+    if legacy["status"] != "legacy-valid" or legacy.get("legacy_claimed_state") != "retained":
+        fail("resume validator: legacy state must be isolated from evidence")
     if partial["status"] != "partial" or future["status"] != "unsupported-version":
         fail("resume validator: partial/version classification failed")
 
 
 def check_conversational_teaching() -> None:
     cases = (ROOT / "evals" / "conversational-teaching-cases.yaml").read_text(encoding="utf-8")
-    for invariant in ("accepted without a subject-matter placement test", "without appending a quiz to each part", "does not end with another diagnostic question", "routine evidence classification remains internal", "one authentic low-pressure application", "unfinished page slice is not treated as a completed learning-unit boundary", "no assessment question is asked until the learner explicitly opts in", "accepted without pressure, penalty language, or a negative mastery inference", "three to five concise items sample explanation, misconception discrimination, and application"):
+    for invariant in ("accepted without a subject-matter placement test", "without appending a quiz to each part", "does not end with another diagnostic question", "routine evidence classification remains internal", "one authentic low-pressure application", "unfinished page slice is not treated as a completed learning-unit boundary", "no assessment question is asked until the learner explicitly opts in", "accepted without pressure, penalty language, or a negative mastery inference", "three to five concise items sample explanation, misconception discrimination, and application", "unverified mastery is not assumed for a dependent objective"):
         if invariant not in cases:
             fail(f"conversational-teaching-cases.yaml: missing invariant {invariant!r}")
 

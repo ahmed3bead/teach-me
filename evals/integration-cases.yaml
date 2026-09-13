@@ -1,5 +1,5 @@
 suite: integration-core
-version: 1
+version: 1.0.0
 cases:
   - id: learner-book-connected-flow
     prompt: "علّمني من الكتاب المرفق وسجّل تقدمي عشان نكمل بكرة."

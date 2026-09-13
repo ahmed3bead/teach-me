@@ -1,5 +1,5 @@
 suite: broad-research-sweep
-version: 1
+version: 1.0.0
 cases:
   - id: named-book-broad-sweep
     prompt: "علّمني كتاب Designing Data-Intensive Applications."

@@ -1,3 +1,5 @@
+suite: golden-teaching
+version: 1.0.0
 cases:
   - id: ddia-senior-developer
     prompt: "أنا Senior Laravel developer وعاوز أفهم replication من DDIA بالمصري"

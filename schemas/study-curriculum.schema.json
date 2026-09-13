@@ -1,10 +1,11 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ahmed3bead/teach-me/schemas/study-curriculum.schema.json",
   "title": "Teach Me study curriculum",
   "type": "object",
   "required": ["version", "curriculum_id", "session_id", "subject", "language", "target_capability", "scope", "modules", "completion_criteria"],
   "properties": {
-    "version": {"type": "string"},
+    "version": {"const": "1.0.0"},
     "curriculum_id": {"type": "string", "minLength": 1},
     "session_id": {"type": "string", "minLength": 1},
     "subject": {"type": "string", "minLength": 1},
@@ -37,7 +38,7 @@
                 "demonstrable_outcome": {"type": "string", "minLength": 1},
                 "activity": {"type": "string", "minLength": 1},
                 "assessment": {"type": "string", "minLength": 1},
-                "source_refs": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+                "source_refs": {"type": "array", "items": {"type": "string"}},
                 "estimated_minutes": {"type": "integer", "minimum": 1}
               },
               "additionalProperties": false

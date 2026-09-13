@@ -31,7 +31,7 @@ When audio generation exists, verify that a real playable artifact was produced 
 
 Possible signals include repeated skipped activities, very short replies, random guessing, asking for the answer immediately, repeated confusion, or long gaps. These signals are ambiguous. Ask one neutral question or offer one smaller action before concluding why.
 
-Feeling examined is also interaction friction. If the learner says the lesson feels like an exam or asks for fewer questions, pause assessment prompts and visible progress labels. Continue with connected explanation and examples; reintroduce optional practice only at a natural boundary.
+Feeling examined is also interaction friction. If the learner says the lesson feels like an exam or asks for fewer questions, pause assessment prompts and visible progress labels. Continue with connected explanation and examples; reintroduce optional practice only after another complete learning unit and never inside the invitation itself.
 
 Choose the least intrusive intervention:
 

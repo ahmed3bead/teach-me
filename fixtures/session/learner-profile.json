@@ -1,0 +1,23 @@
+{
+  "version": "1.0.0",
+  "profile_id": "PROF1",
+  "consent": true,
+  "data_governance": {
+    "purpose": "تخصيص طريقة الشرح داخل جلسة تعليمية",
+    "consent_recorded_at": "2026-09-13T17:00:00Z",
+    "retention_until": "2026-10-13T17:00:00Z",
+    "deletion_status": "active"
+  },
+  "language": "ar-EG",
+  "goals": ["كتابة Prompt واضح"],
+  "constraints": ["شرح قصير"],
+  "demonstrated_abilities": ["يميّز المهمة من السياق داخل مثال"],
+  "strategy_observations": [
+    {
+      "strategy": "مثال ثم تفكيك",
+      "context": "مقدمة الدرس",
+      "outcome": "helped"
+    }
+  ],
+  "group_observations": []
+}

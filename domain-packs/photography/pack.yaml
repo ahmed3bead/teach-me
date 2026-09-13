@@ -1,0 +1,67 @@
+version: 1.0.0
+id: photography
+title: Practical photography with available equipment
+languages: [ar-MSA, ar-EG, en]
+reviewer_status: needs-qualified-review
+scope:
+  - Phone and camera photography foundations for practical personal or product goals
+  - Visual practice with observable critique and a small portfolio sequence
+exclusions:
+  - Drone, hazardous-location, surveillance, or regulated commercial operations
+  - Claims that expensive equipment is required for foundational learning
+prerequisites:
+  - id: usable-camera
+    description: Access to any phone or camera that can capture and review an image.
+    diagnostic: Ask the learner to locate capture, focus, and image review only if device use is uncertain.
+concepts:
+  - id: intention-frame
+    outcome: State the subject and intended viewer attention before capture.
+    prerequisite_ids: [usable-camera]
+    practice: Photograph one subject with two different intended messages.
+    mastery_evidence: A fresh image has a clear subject and the learner explains the choice.
+  - id: light
+    outcome: Observe direction, hardness, brightness, and color of available light.
+    prerequisite_ids: [intention-frame]
+    practice: Move the same subject relative to one window or lamp and compare.
+    mastery_evidence: Chooses and adjusts available light to solve a new visual problem.
+  - id: composition
+    outcome: Control framing, background, spacing, and visual hierarchy.
+    prerequisite_ids: [intention-frame]
+    practice: Make three deliberate frames without changing equipment.
+    mastery_evidence: Removes a new distraction and directs attention intentionally.
+  - id: focus-exposure
+    outcome: Produce intentional sharpness and usable brightness on the available device.
+    prerequisite_ids: [light, composition]
+    practice: Lock focus or select the subject and compare exposure adjustments.
+    mastery_evidence: Diagnoses blur versus focus versus exposure on an unseen image and corrects it.
+  - id: edit-select
+    outcome: Select and edit without hiding capture problems or destroying natural detail.
+    prerequisite_ids: [focus-exposure]
+    practice: Choose the strongest frame and make restrained crop, brightness, and color edits.
+    mastery_evidence: Justifies a selection and creates a consistent fresh pair of images.
+  - id: visual-series
+    outcome: Plan, capture, select, and explain a short coherent series for a real audience.
+    prerequisite_ids: [edit-select]
+    practice: Create a three-to-five image product, place, or process story.
+    mastery_evidence: The series communicates its goal, stays visually coherent, and improves from critique.
+misconceptions:
+  - claim: Better gear automatically creates better photographs.
+    signal: Responds to every visual problem by recommending equipment.
+    repair: Hold the device constant and change light, position, framing, and timing.
+  - claim: Brightness, focus, and motion blur are the same failure.
+    signal: Uses one correction for visually different problems.
+    repair: Compare controlled examples and require a cause-specific correction.
+  - claim: More editing always improves an image.
+    signal: Heavy filters hide detail and inconsistent color replaces intention.
+    repair: Tie every edit to subject attention, truthful appearance, or series consistency.
+source_policy:
+  anchors:
+    - Camera or phone manufacturer documentation for device-specific controls
+    - Reputable photography education for stable light, composition, focus, and exposure principles
+  supplements:
+    - Original controlled examples, professional breakdowns, and learner image comparisons
+  verification_triggers:
+    - Device-specific features, software interfaces, platform export requirements, safety, privacy, or commercial rules
+freshness:
+  stable: [light observation, subject-background separation, framing, visual intention]
+  must_research: [device controls, editing app interfaces, platform specifications, privacy and commercial requirements]

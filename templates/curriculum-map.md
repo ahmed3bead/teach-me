@@ -1,5 +1,8 @@
 # Curriculum map
 
+- Session ID: `{{session_id}}`
+- Curriculum ID: `{{curriculum_id}}`
+
 ## Teaching context
 
 - Audience:
@@ -16,9 +19,9 @@
 
 ## Units
 
-| Unit | Demonstrable outcomes | Prerequisites | Origin | Source references | Flags |
-|---|---|---|---|---|---|
-| | | | curriculum | | |
+| Unit ID | Objective IDs | Unit | Demonstrable outcomes | Prerequisites | Origin | Source references | Flags |
+|---|---|---|---|---|---|---|---|
+| | | | | | curriculum | | |
 
 ## Questions and conflicts
 

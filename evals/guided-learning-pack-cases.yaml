@@ -1,3 +1,5 @@
+suite: guided-learning-pack
+version: 1.0.0
 cases:
   - id: beginner-start-here
     prompt: "عاوز أتعلم التصوير من الصفر ومش عارف أبدأ منين"
@@ -25,15 +27,21 @@ cases:
     prompt: "علمني هنا بس لأن الشات مش بيطلع ملفات"
     expected:
       - "one bounded lesson is taught and no file creation is claimed"
-      - "a valid non-sensitive TEACH-ME v1 resume code is included"
+      - "a valid non-sensitive TEACH-ME v2 resume code with a session identifier is included"
       - "the resume code is not treated as mastery evidence"
   - id: one-action-ending
     prompt: "أنا جاهز أبدأ، أعمل إيه؟"
     expected:
-      - "the response ends with one exact action, expected time, and requested reply"
+      - "the response ends with one exact action and expected time"
+      - "a requested reply appears only when the action genuinely requires learner input"
       - "the learner is not left with several competing next steps"
+  - id: zero-start-pack-explains-first
+    prompt: "اعمل لي بداية منهج وأنا قلت لك إني معرفش أي حاجة عن الموضوع"
+    expected:
+      - "START-HERE begins with explanation rather than a subject-matter test"
+      - "only materially relevant transferable prerequisites may receive a tiny informal diagnostic"
   - id: resume-with-limited-context
-    prompt: "TEACH-ME:v1:ddia:ar-EG:M01:L01:introduced كمل من هنا"
+    prompt: "TEACH-ME:v2:S001:ddia:ar-EG:M01:L01 كمل من هنا"
     expected:
       - "the checkpoint is interpreted and restated before continuing"
       - "missing evidence or source context is requested only when necessary"

@@ -1,10 +1,11 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ahmed3bead/teach-me/schemas/learning-session.schema.json",
   "title": "Teach Me connected learning session",
   "type": "object",
   "required": ["version", "session_id", "audience", "input_mode", "language", "goal", "objectives", "checkpoint"],
   "properties": {
-    "version": {"type": "string"},
+    "version": {"const": "1.0.0"},
     "session_id": {"type": "string", "minLength": 1},
     "audience": {"enum": ["learner", "educator"]},
     "input_mode": {"enum": ["topic-led", "source-grounded"]},
@@ -15,6 +16,7 @@
     "curriculum_id": {"type": ["string", "null"]},
     "objectives": {
       "type": "array",
+      "minItems": 1,
       "items": {
         "type": "object",
         "required": ["objective_id", "capability", "mastery_evidence", "state", "next_action"],
@@ -38,19 +40,25 @@
       "type": "object",
       "required": ["active_objective_id", "latest_state", "evidence", "next_action"],
       "properties": {
-        "active_objective_id": {"type": "string"},
+        "active_objective_id": {"type": "string", "minLength": 1},
         "active_module_id": {"type": ["string", "null"]},
         "active_lesson_id": {"type": ["string", "null"]},
         "latest_state": {"enum": ["not-started", "introduced", "practised-with-help", "applied-independently", "transferred", "retained"]},
         "evidence": {"type": "string"},
         "blocker_or_misconception": {"type": ["string", "null"]},
         "strategy_context": {"type": ["string", "null"]},
-        "next_action": {"type": "string"},
+        "next_action": {"type": "string", "minLength": 1},
         "review_due_at": {"type": ["string", "null"], "format": "date-time"},
         "updated_at": {"type": ["string", "null"], "format": "date-time"}
       },
       "additionalProperties": false
     }
   },
+  "allOf": [
+    {
+      "if": {"properties": {"input_mode": {"const": "source-grounded"}}, "required": ["input_mode"]},
+      "then": {"required": ["source_ids"], "properties": {"source_ids": {"minItems": 1}}}
+    }
+  ],
   "additionalProperties": false
 }

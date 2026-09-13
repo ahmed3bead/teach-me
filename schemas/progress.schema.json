@@ -1,12 +1,32 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ahmed3bead/teach-me/schemas/progress.schema.json",
   "title": "Teach Me progress evidence",
   "type": "object",
-  "required": ["version", "records"],
+  "required": ["version", "session_id", "records"],
   "properties": {
-    "version": {"type": "string"},
-    "session_id": {"type": "string"},
-    "records": {"type": "array", "items": {"type": "object", "required": ["objective", "state", "evidence", "observed_at"], "properties": {"objective_id": {"type": "string"}, "objective": {"type": "string"}, "lesson_id": {"type": "string"}, "assessment_id": {"type": "string"}, "state": {"enum": ["introduced", "practised-with-help", "applied-independently", "transferred", "retained"]}, "evidence": {"type": "string"}, "observed_at": {"type": "string", "format": "date-time"}, "next_action": {"type": "string"}}, "additionalProperties": false}}
+    "version": {"const": "1.0.0"},
+    "session_id": {"type": "string", "minLength": 1},
+    "records": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["record_id", "objective_id", "objective", "state", "evidence", "observed_at", "next_action"],
+        "properties": {
+          "record_id": {"type": "string", "minLength": 1},
+          "objective_id": {"type": "string", "minLength": 1},
+          "objective": {"type": "string", "minLength": 1},
+          "lesson_id": {"type": ["string", "null"]},
+          "assessment_id": {"type": ["string", "null"]},
+          "state": {"enum": ["introduced", "practised-with-help", "applied-independently", "transferred", "retained"]},
+          "evidence": {"type": "string", "minLength": 1},
+          "help_level": {"type": ["integer", "null"], "minimum": 0, "maximum": 6},
+          "observed_at": {"type": "string", "format": "date-time"},
+          "next_action": {"type": "string", "minLength": 1}
+        },
+        "additionalProperties": false
+      }
+    }
   },
   "additionalProperties": false
 }

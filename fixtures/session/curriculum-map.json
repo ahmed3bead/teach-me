@@ -1,0 +1,32 @@
+{
+  "version": "1.0.0",
+  "session_id": "S001",
+  "curriculum_id": "CUR1",
+  "audience": {
+    "age_band": "adult",
+    "language": "ar-EG",
+    "context": "متعلم فردي"
+  },
+  "sources": [
+    {
+      "source_id": "SRC1",
+      "title": "Prompt engineering guide",
+      "location": "https://example.org/prompt-guide",
+      "usage_authorized": true
+    }
+  ],
+  "units": [
+    {
+      "unit_id": "UNIT1",
+      "title": "مكوّنات الـPrompt",
+      "objective_ids": ["OBJ1"],
+      "outcomes": ["كتابة Prompt واضح"],
+      "prerequisites": [],
+      "origin": "curriculum",
+      "source_ids": ["SRC1"],
+      "source_refs": ["SRC1#prompt-components"],
+      "flags": []
+    }
+  ],
+  "approval_status": "draft"
+}
