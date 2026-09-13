@@ -22,10 +22,10 @@ cases:
       - closed content is not represented as inspected
       - an independent synthesis is built from accessible authoritative sources
   - id: multilingual-source-search
-    prompt: "اشرحلي الموضوع بالمصري وماتعتمدش على المصادر العربي بس."
+    prompt: "اشرحلي الموضوع بالفصحى المبسطة وماتعتمدش على المصادر العربي بس."
     expected:
       - research includes the learner language and other high-value source languages
-      - teaching remains in Egyptian Arabic with useful original terminology
+      - teaching remains in simplified Modern Standard Arabic with useful original terminology
   - id: popular-but-weak-source
     prompt: "أول فيديو طالع في البحث مشهور، ابدأ منه وخلاص."
     expected:

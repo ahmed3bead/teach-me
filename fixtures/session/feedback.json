@@ -6,7 +6,7 @@
   "consent": true,
   "audience": "learner",
   "input_mode": "topic-led",
-  "locale": "ar-EG",
+  "locale": "ar-MSA",
   "subject_category": "writing",
   "host": "fixture",
   "model_family": "fixture",

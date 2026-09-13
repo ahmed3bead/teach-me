@@ -15,7 +15,7 @@
         "required": ["id", "expected"],
         "properties": {
           "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
-          "locale": {"enum": ["ar-MSA", "ar-EG", "en", "mixed"]},
+          "locale": {"description": "Use ar-MSA or en; ar-EG is a deprecated alias normalized to ar-MSA.", "enum": ["ar-MSA", "ar-EG", "en"]},
           "critical": {"type": "boolean"},
           "prompt": {"type": "string", "minLength": 1},
           "turns": {

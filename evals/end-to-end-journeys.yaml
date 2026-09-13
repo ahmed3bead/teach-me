@@ -2,10 +2,10 @@ suite: end-to-end-journeys
 version: 1.0.0
 cases:
   - id: zero-knowledge-learner-complete-unit
-    locale: ar-EG
+    locale: ar-MSA
     turns:
       - role: user
-        content: "أنا معرفش أي حاجة عن كتابة Prompt قوي. ابدأ معايا من الصفر بالمصري."
+        content: "أنا معرفش أي حاجة عن كتابة Prompt قوي. ابدأ معايا من الصفر بالفصحى المبسطة."
       - role: user
         content: "تمام، كمل الشرح من غير ما تحسسني إني في امتحان."
       - role: user
@@ -16,15 +16,15 @@ cases:
       - "the learner receives an explain-first coherent lesson with defined terms and a worked example"
       - "no routine assessment questions appear before the complete-unit boundary and explicit opt-in"
       - "the accepted check uses three to five purposeful items and adapts the next step without manufacturing a score"
-      - "the teaching remains natural Egyptian Arabic and preserves isolated English terminology"
+      - "the teaching remains clear simplified Modern Standard Arabic and preserves isolated English terminology"
       - "progress claims distinguish explanation, supported practice, and independent evidence"
   - id: educator-source-map-approval-lesson
-    locale: ar-EG
+    locale: ar-MSA
     turns:
       - role: user
         content: "ده منهج ابتدائي مصرح لي أستخدمه. حلله الأول قبل ما تعمل الحصة."
       - role: user
-        content: "موافق على الخريطة دي. جهز أول حصة 45 دقيقة بالمصري للأطفال."
+        content: "موافق على الخريطة دي. جهز أول حصة 45 دقيقة بالفصحى المبسطة للأطفال."
       - role: user
         content: "خلي النشاط بدون تكلفة، واعمل rubric منفصل للمدرس."
     expected:

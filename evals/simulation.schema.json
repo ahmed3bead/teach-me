@@ -15,7 +15,7 @@
         "required": ["id", "locale", "critical", "max_turns", "learner_persona", "learner_behaviors", "initial_request", "teaching_material", "baseline_task", "transfer_task", "expected", "minimum_gain", "minimum_transfer"],
         "properties": {
           "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
-          "locale": {"enum": ["ar-MSA", "ar-EG", "en", "mixed"]},
+          "locale": {"description": "Use ar-MSA or en; ar-EG is a deprecated alias normalized to ar-MSA.", "enum": ["ar-MSA", "ar-EG", "en"]},
           "critical": {"type": "boolean"},
           "max_turns": {"type": "integer", "minimum": 2, "maximum": 12},
           "learner_persona": {"type": "string", "minLength": 1},

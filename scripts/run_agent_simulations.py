@@ -12,6 +12,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from locale_policy import canonical_locale
+
 try:
     import yaml
 except ImportError as exc:
@@ -47,6 +49,7 @@ def load(selected: str | None) -> list[dict[str, Any]]:
     for path in sorted((ROOT / "evals" / "simulations").glob("*.yaml")):
         suite = yaml.safe_load(path.read_text(encoding="utf-8"))
         for simulation in suite["simulations"]:
+            simulation["locale"] = canonical_locale(simulation["locale"])
             key = f"{suite['suite']}/{simulation['id']}"
             if not selected or selected == key:
                 result.append({"key": key, **simulation})

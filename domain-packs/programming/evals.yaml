@@ -2,8 +2,8 @@ suite: domain-programming
 version: 1.0.0
 cases:
   - id: syntax-memorizer
-    locale: ar-EG
-    prompt: "أنا حافظ شكل الـfor loop بس مش بعرف أستخدمه لوحدي"
+    locale: ar-MSA
+    prompt: "أنا حافظ شكل for loop بس مش بعرف أستخدمه لوحدي"
     expected:
       - "the lesson diagnoses execution tracing rather than assigning more syntax memorization"
       - "a prediction and fresh modification task are used before mastery"

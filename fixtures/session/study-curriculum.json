@@ -3,7 +3,7 @@
   "curriculum_id": "CUR1",
   "session_id": "S001",
   "subject": "كتابة Prompt قوي",
-  "language": "ar-EG",
+  "language": "ar-MSA",
   "target_capability": "كتابة Prompt واضح وقابل للتقييم",
   "starting_point": "لا توجد معرفة مسبقة",
   "scope": "Prompt نصي لمهمة واحدة",
@@ -11,7 +11,7 @@
   "modules": [
     {
       "module_id": "MOD1",
-      "title": "مكوّنات الـPrompt",
+      "title": "مكوّنات Prompt",
       "outcome": "يبني Prompt من أربعة مكوّنات",
       "prerequisite_module_ids": [],
       "lessons": [
@@ -19,7 +19,7 @@
           "lesson_id": "LES1",
           "title": "من الطلب المبهم للطلب الواضح",
           "objective_ids": ["OBJ1"],
-          "demonstrable_outcome": "يكتب Prompt جديدًا يحقق الـrubric",
+          "demonstrable_outcome": "يكتب Prompt جديدًا يحقق rubric",
           "activity": "تفكيك مثال ثم إعادة كتابته",
           "assessment": "تطبيق اختياري بعد اكتمال الوحدة",
           "source_refs": ["SRC1#prompt-components"],

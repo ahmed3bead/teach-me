@@ -22,6 +22,7 @@ except ImportError as exc:
 
 from validate_resume import validate as validate_resume
 from validate_session import validate as validate_integrity
+from locale_policy import canonical_locale
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -126,6 +127,7 @@ def require_safe_id(value: str, label: str) -> None:
 
 
 def initialize(args: argparse.Namespace) -> None:
+    args.language = canonical_locale(args.language)
     for value, label in (
         (args.session_id, "session_id"),
         (args.subject_slug, "subject_slug"),
@@ -333,7 +335,7 @@ def resume(directory: Path) -> dict[str, Any]:
                 "v2",
                 session["session_id"],
                 session["subject_slug"],
-                session["language"],
+                canonical_locale(session["language"]),
                 checkpoint["active_module_id"],
                 checkpoint["active_lesson_id"],
             )
@@ -360,7 +362,7 @@ def build_parser() -> argparse.ArgumentParser:
     init.add_argument("--subject-slug", required=True)
     init.add_argument("--audience", choices=("learner", "educator"), required=True)
     init.add_argument("--input-mode", choices=("topic-led", "source-grounded"), required=True)
-    init.add_argument("--language", choices=("ar-MSA", "ar-EG", "en", "mixed"), required=True)
+    init.add_argument("--language", choices=("ar-MSA", "ar-EG", "en"), required=True)
     init.add_argument("--goal", required=True)
     init.add_argument("--constraint", action="append", default=[])
     init.add_argument("--source-id", action="append", default=[])

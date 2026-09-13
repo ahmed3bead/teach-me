@@ -36,10 +36,11 @@ For a detailed whole-book, course, curriculum, or broad-subject request, Teach M
 
 ## Languages
 
-- Modern Standard Arabic (`ar-MSA`)
-- Natural Egyptian Arabic (`ar-EG`)
+- Simplified Modern Standard Arabic (`ar-MSA`), including replies to learners who write in an Arabic dialect
 - English (`en`)
-- Natural bilingual use when technical terminology benefits from it
+- Original-script technical terminology such as `API`, `Replication`, `Contract Test`, `Prompt`, and `Database`
+
+The retired `ar-EG` value remains accepted only as a compatibility alias and is normalized to `ar-MSA`. It no longer requests Egyptian Arabic. In Arabic HTML and PDF learning packs, English terms and other left-to-right runs are isolated with `<bdi dir="ltr">` or `dir="ltr"`.
 
 ## Install
 
@@ -108,7 +109,7 @@ The agent first maps the supplied curriculum and flags gaps, inferred objectives
 ### Source-grounded examples
 
 ```text
-Study this YouTube playlist, verify the important claims, then teach it to me progressively in Egyptian Arabic.
+Study this YouTube playlist, verify the important claims, then teach it to me progressively in simplified Modern Standard Arabic.
 ```
 
 ```text
@@ -116,7 +117,7 @@ This paid course page is inaccessible. Use only its public topic and learning ou
 ```
 
 ```text
-اشرح لي الكتاب كله بالتفصيل بالعربي المصري، واعمل منهج HTML منظم يحافظ على اتجاه العربي والمصطلحات الإنجليزية.
+اشرح لي الكتاب كله بالتفصيل بالعربية الفصحى المبسطة، وأنشئ منهج HTML منظمًا يحافظ على اتجاه العربية والمصطلحات الإنجليزية الأصلية.
 ```
 
 ## Domain teaching packs
@@ -169,7 +170,7 @@ python3 scripts/validate_session.py learning-session.json \
 
 ## العربية
 
-`Teach Me` هي مهارة مفتوحة المصدر تحول الـAI إلى مدرس متكيف، وليس مجرد مولّد شرح. تفهم هدف المتعلم ومستواه من خلال أدلة عملية، وتدعم العربية الفصحى والمصرية والإنجليزية، وتغيّر طريقة التدريس عندما لا تنجح المحاولة الأولى.
+`Teach Me` هي مهارة مفتوحة المصدر تحول `AI` إلى معلّم متكيف، وليس مجرد مولّد شرح. تفهم هدف المتعلم ومستواه من خلال أدلة عملية، وتدعم العربية الفصحى المبسطة والإنجليزية، وتغيّر طريقة التعليم عندما لا تنجح المحاولة الأولى.
 
 لا تعتبر قول المتعلم «فهمت» دليلًا كافيًا، ولا تعرض الادعاءات المهمة بدرجة ثقة أكبر مما تسمح به مصادرها.
 

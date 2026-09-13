@@ -14,6 +14,8 @@ Use this guidance when learner-facing Arabic or another right-to-left language c
 - Set `<html lang="ar" dir="rtl">` and use UTF-8.
 - Keep the document flow right-to-left and text right-aligned.
 - Wrap inline English terms, acronyms, identifiers, numeric expressions, filenames, commands, and URLs in `<bdi dir="ltr">...</bdi>` or an equivalent isolated `.ltr` span.
+- Keep multiword technical terms together with `bdi[dir="ltr"] { white-space: nowrap; }` so PDF line wrapping cannot split and reorder a term.
+- Preserve foreign technical terms in their original script; isolation must not transliterate or translate `API`, `Replication`, `Contract Test`, `Prompt`, `Database`, or another established term.
 - Render code and preformatted blocks with `dir="ltr"`, left alignment, and `unicode-bidi: isolate`.
 - Use logical CSS properties such as `margin-inline-start` instead of physical left/right spacing where practical.
 - Preserve semantic headings, lists, tables, links, and landmarks. Do not replace text with images to avoid direction problems.
@@ -25,6 +27,7 @@ Minimum direction rules:
 html { direction: rtl; }
 body { direction: rtl; text-align: right; }
 bdi, .ltr, code, pre { unicode-bidi: isolate; }
+bdi[dir="ltr"] { white-space: nowrap; }
 .ltr, code, pre { direction: ltr; text-align: left; }
 table { direction: rtl; }
 ```
@@ -39,7 +42,7 @@ Use one consistent learner-facing format across `START-HERE`, curriculum, lesson
 
 Open or render representative pages before delivery. Check at least:
 
-- an Arabic sentence containing two separated English terms;
+- an Arabic sentence containing separated original-script terms such as `API`, `Replication`, `Contract Test`, `Prompt`, and `Database`;
 - parentheses, colon, slash, percentage, and numbered list rendering;
 - tables with mixed-language cells;
 - inline code, multi-line code, URL, filename, and command order;

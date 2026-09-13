@@ -41,7 +41,7 @@ cases:
       - "START-HERE begins with explanation rather than a subject-matter test"
       - "only materially relevant transferable prerequisites may receive a tiny informal diagnostic"
   - id: resume-with-limited-context
-    prompt: "TEACH-ME:v2:S001:ddia:ar-EG:M01:L01 كمل من هنا"
+    prompt: "TEACH-ME:v2:S001:ddia:ar-MSA:M01:L01 كمل من هنا"
     expected:
       - "the checkpoint is interpreted and restated before continuing"
       - "missing evidence or source context is requested only when necessary"

@@ -11,7 +11,7 @@
     "subject_slug": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"},
     "audience": {"enum": ["learner", "educator"]},
     "input_mode": {"enum": ["topic-led", "source-grounded"]},
-    "language": {"enum": ["ar-MSA", "ar-EG", "en", "mixed"]},
+    "language": {"description": "Canonical values are ar-MSA and en; ar-EG is a read-compatibility alias.", "enum": ["ar-MSA", "ar-EG", "en"]},
     "goal": {"type": "string", "minLength": 1},
     "constraints": {"type": "array", "items": {"type": "string"}},
     "source_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},

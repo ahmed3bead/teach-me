@@ -2,7 +2,7 @@ suite: curriculum-delivery
 version: 1.0.0
 cases:
   - id: whole-book-artifact-first
-    prompt: "اشرح لي الكتاب كله بالتفصيل بالعربي المصري"
+    prompt: "اشرح لي الكتاب كله بالتفصيل بالعربية الفصحى المبسطة"
     expected:
       - "a navigable Markdown or requested PDF curriculum is created before a long lesson"
       - "the chat response is a short orientation rather than an unstructured lecture"

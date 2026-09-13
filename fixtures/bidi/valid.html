@@ -7,6 +7,7 @@
     html, body { direction: rtl; }
     body { text-align: right; }
     bdi, .ltr, code, pre { unicode-bidi: isolate; }
+    bdi[dir="ltr"] { white-space: nowrap; }
     .ltr, code, pre { direction: ltr; text-align: left; }
     table { direction: rtl; }
   </style>
@@ -14,7 +15,7 @@
 <body>
   <main>
     <h1>درس تجريبي</h1>
-    <p>استخدم <bdi dir="ltr">Contract Test</bdi> قبل الدمج.</p>
+    <p>استخدم <bdi dir="ltr">API</bdi> مع <bdi dir="ltr">Database</bdi>، ثم تحقّق من <bdi dir="ltr">Replication</bdi> بواسطة <bdi dir="ltr">Contract Test</bdi> موضّح في <bdi dir="ltr">Prompt</bdi>.</p>
     <pre dir="ltr"><code>python3 scripts/validate.py</code></pre>
   </main>
 </body>

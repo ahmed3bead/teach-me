@@ -1,17 +1,17 @@
 suite: zero-knowledge-fictional
 version: 1.0.0
 simulations:
-  - id: luma-routing-ar-eg
-    locale: ar-EG
+  - id: luma-routing-ar-msa
+    locale: ar-MSA
     critical: true
     max_turns: 7
-    learner_persona: "متعلم بالغ يبدأ بصفر معرفة عن نظام Luma الخيالي. لا تستخدم أي معرفة غير موجودة في كلام المدرس. اتكلم مصري طبيعي."
+    learner_persona: "متعلم بالغ يبدأ بصفر معرفة عن نظام Luma الخيالي. لا تستخدم أي معرفة غير موجودة في كلام المدرس. تحدث بالفصحى المبسطة."
     learner_behaviors:
       - "بعد أول شرح حقيقي، عبّر مرة واحدة إن الفرق بين القاعدة والاستثناء مش واضح."
       - "لو المدرس سألك أسئلة قبل ما يشرح وحدة كاملة، ارفض بلطف واطلب استكمال الشرح."
       - "بعد شرح القواعد والأمثلة كوحدة كاملة، وافق على فحص فهم قصير."
       - "جاوب من المعلومات التي شرحها المدرس فقط، واظهر أي نقطة ما زالت غير واضحة."
-    initial_request: "أنا معرفش أي حاجة عن نظام Luma. علّمني من الصفر بالمصري عشان أعرف أوجّه الصناديق صح."
+    initial_request: "أنا معرفش أي حاجة عن نظام Luma. علّمني من الصفر بالفصحى المبسطة عشان أعرف أوجّه الصناديق صح."
     teaching_material: |
       نظام Luma خيالي ولا توجد عنه معرفة خارج هذا السيناريو.
       القاعدة 1: الصندوق ذو الملصق الأزرق يذهب إلى البوابة N.
@@ -27,7 +27,7 @@ simulations:
       - "the teacher changes representation when the learner reports confusion"
       - "the learner is not pressured when declining an early check"
       - "the transfer answer correctly routes all four unseen cases and explains exception priority"
-      - "the interaction remains natural Egyptian Arabic without fabricated mastery"
+      - "the interaction remains clear simplified Modern Standard Arabic without fabricated mastery"
     minimum_gain: 0.6
     minimum_transfer: 0.8
   - id: vela-constraints-en

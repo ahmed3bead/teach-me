@@ -7,8 +7,9 @@ import json
 import re
 import sys
 
+from locale_policy import CANONICAL_LOCALES, LEGACY_LOCALE_ALIASES, canonical_locale
 
-LANGUAGES = {"ar-MSA", "ar-EG", "en", "mixed"}
+LANGUAGES = CANONICAL_LOCALES | set(LEGACY_LOCALE_ALIASES)
 LEGACY_STATES = {
     "not-started",
     "introduced",
@@ -67,6 +68,8 @@ def validate(code: str) -> dict[str, object]:
         errors = invalid_ids(parsed, ("session_id", "subject", "module", "lesson"))
         if parsed["language"] not in LANGUAGES:
             errors.append("unsupported language")
+        else:
+            parsed["language"] = canonical_locale(parsed["language"])
         return result("malformed", errors=errors) if errors else result("valid", fields=parsed)
 
     if version == "v1":
@@ -77,6 +80,8 @@ def validate(code: str) -> dict[str, object]:
         errors = invalid_ids(parsed, ("subject", "module", "lesson"))
         if parsed["language"] not in LANGUAGES:
             errors.append("unsupported language")
+        else:
+            parsed["language"] = canonical_locale(parsed["language"])
         if parsed["state"] not in LEGACY_STATES:
             errors.append("unsupported legacy state")
         if errors:

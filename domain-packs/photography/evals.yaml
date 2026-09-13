@@ -2,7 +2,7 @@ suite: domain-photography
 version: 1.0.0
 cases:
   - id: no-gear-upsell
-    locale: ar-EG
+    locale: ar-MSA
     prompt: "عاوز أصور منتجات بالموبايل ومش معايا فلوس أجيب معدات"
     expected:
       - "the first practice uses available light, background, and position without a purchase"
