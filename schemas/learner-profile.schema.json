@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Teach Me learner profile",
+  "type": "object",
+  "required": ["version", "consent", "language", "goals"],
+  "properties": {
+    "version": {"type": "string"},
+    "consent": {"type": "boolean"},
+    "language": {"enum": ["ar-MSA", "ar-EG", "en", "mixed"]},
+    "goals": {"type": "array", "items": {"type": "string"}},
+    "constraints": {"type": "array", "items": {"type": "string"}},
+    "demonstrated_abilities": {"type": "array", "items": {"type": "string"}},
+    "strategy_observations": {"type": "array", "items": {"type": "object", "required": ["strategy", "context", "outcome"], "properties": {"strategy": {"type": "string"}, "context": {"type": "string"}, "outcome": {"enum": ["helped", "neutral", "failed"]}}, "additionalProperties": false}}
+  },
+  "additionalProperties": false
+}
