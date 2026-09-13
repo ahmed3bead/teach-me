@@ -1,30 +1,27 @@
-# Arabic teaching style
+# Simplified Modern Standard Arabic teaching style
 
-Teach in natural Modern Standard Arabic or Egyptian Arabic according to the learner's wording and explicit preference. Clarity outranks literal translation.
+Teach every Arabic-speaking learner in clear simplified Modern Standard Arabic (`ar-MSA`), regardless of the dialect used in the learner's message. Do not mirror Egyptian or another colloquial dialect. Use English only when the learner explicitly requests it. Treat a legacy `ar-EG` locale value as `ar-MSA`.
 
 ## Language continuity
 
-Keep the established teaching language unless the learner explicitly asks to switch or demonstrates a stable repeated preference. A single English sentence, technical term, code sample, pasted quotation, or source title does not request an English lesson. When the conversation is established in Arabic, answer in the established Arabic variety and preserve useful English terminology. If a true ambiguity would materially change the lesson, ask one short choice rather than silently switching.
+Keep the established teaching language unless the learner explicitly asks to switch. An English technical term, code sample, pasted quotation, source title, or one code-switched sentence does not request an English lesson. Arabic dialect in learner input is a signal to simplify the register, not to imitate the dialect.
 
 ## Terminology
 
-- On first use, give the familiar English term beside a clear Arabic explanation: `Replication (وجود نُسخ متزامنة من البيانات)`.
-- After the first explanation, use the form most common in the learner's field consistently.
+- Keep foreign and technical terms in their original language and script: `API`, `Replication`, `Contract Test`, `Prompt`, and `Database` remain recognizable in Latin letters.
+- On first use when needed, explain the term in Arabic without replacing it, for example: `Replication` (الاحتفاظ بنسخ متزامنة من البيانات).
+- Never write the pronunciation of a foreign term in Arabic letters.
 - Do not translate product names, code, commands, identifiers, or established acronyms.
-- Maintain a small glossary for long journeys; avoid dumping a dictionary before the lesson.
+- Use each chosen form consistently and keep a small glossary for long journeys.
 
-## Egyptian Arabic
+## Simplified Modern Standard Arabic
 
-Use a natural professional Egyptian voice, not caricature, slang overload, or phonetic misspelling. Keep technical definitions precise. Prefer short direct sentences and real examples from the learner's context.
-
-## Modern Standard Arabic
-
-Use clear contemporary language. Avoid unnecessarily ornate vocabulary and long nested sentences. For children, use age-appropriate words without distorting the concept.
+Use contemporary words, short sentences, and direct syntax. Avoid ornate vocabulary, long nested sentences, bureaucratic phrasing, and colloquial expressions. For children, use familiar concrete examples without distorting the concept. Read the explanation aloud mentally and fix awkward inflection, unclear pronouns, invented words, and unstable example names before delivery.
 
 ## Mixed-direction content
 
-Direction is part of correctness. For saved Arabic material containing English terms, code, paths, numbers, or formulas, read [bidirectional-output.md](bidirectional-output.md). Keep left-to-right runs isolated rather than relying on punctuation, Markdown backticks, or the browser's automatic direction guessing. For PDF, use an Arabic-capable font, RTL layout, isolated left-to-right runs, and rendered-page review.
+Direction is part of correctness. For saved Arabic material containing English terms, code, paths, numbers, formulas, or URLs, read [bidirectional-output.md](bidirectional-output.md). In HTML, isolate every left-to-right run with `<bdi dir="ltr">...</bdi>` or an element carrying `dir="ltr"`. Generate PDF from that validated HTML, use an Arabic-capable font, and inspect the rendered pages. Markdown backticks alone are not sufficient isolation.
 
 ## Quality check
 
-Before delivery, verify that the explanation sounds natural aloud, every new term is defined, pronouns have clear referents, translations preserve meaning, and the action requested from the learner is unmistakable.
+Before delivery, verify that the explanation is simplified Modern Standard Arabic, contains no colloquial dialect, preserves every foreign technical term in its original script, defines new terms when needed, uses clear referents, and gives the learner one unmistakable next action.

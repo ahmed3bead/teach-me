@@ -4,7 +4,7 @@
   "curriculum_id": "CUR1",
   "audience": {
     "age_band": "adult",
-    "language": "ar-EG",
+    "language": "ar-MSA",
     "context": "متعلم فردي"
   },
   "sources": [
@@ -18,7 +18,7 @@
   "units": [
     {
       "unit_id": "UNIT1",
-      "title": "مكوّنات الـPrompt",
+      "title": "مكوّنات Prompt",
       "objective_ids": ["OBJ1"],
       "outcomes": ["كتابة Prompt واضح"],
       "prerequisites": [],

@@ -22,8 +22,8 @@ Start with one Arabic teaching case:
 ```bash
 python3 scripts/run_behavioral_evals.py \
   --case golden-teaching/primary-school-concept \
-  --response-command "python3 scripts/ollama_eval_adapter.py --role response --model qwen3:8b" \
-  --grader-command "python3 scripts/ollama_eval_adapter.py --role grader --model qwen3:4b" \
+  --response-command "python3 scripts/ollama_eval_adapter.py --role response --model qwen3:8b --num-ctx 8192 --num-predict 768" \
+  --grader-command "python3 scripts/ollama_eval_adapter.py --role grader --model gemma3:4b --num-ctx 8192 --num-predict 768" \
   --output reports/local-smoke.json \
   --timeout 600
 ```
@@ -32,7 +32,7 @@ Then run the critical zero-knowledge simulation:
 
 ```bash
 python3 scripts/run_agent_simulations.py \
-  --simulation zero-knowledge-fictional/luma-routing-ar-eg \
+  --simulation zero-knowledge-fictional/luma-routing-ar-msa \
   --teacher-command "python3 scripts/ollama_eval_adapter.py --role teacher --model qwen3:8b" \
   --learner-command "python3 scripts/ollama_eval_adapter.py --role learner --model gemma3:4b" \
   --grader-command "python3 scripts/ollama_eval_adapter.py --role grader --model qwen3:4b" \
@@ -43,6 +43,8 @@ python3 scripts/run_agent_simulations.py \
 Only after both smoke commands pass, remove `--case` to run all static suites and remove `--simulation` to run all simulations. Record `ollama list`, the model tags, model settings, repository commit, reports, duration, and failed cases in the release receipt. A mutable model tag is not enough for long-term reproduction; retain the digest shown by Ollama as well.
 
 Local results prove behavior only for the recorded local models. Before claiming compatibility with a hosted provider, run a small representative compatibility sample on that provider. Save a full paid run for the release candidate rather than every commit.
+
+Arabic model runs use canonical `ar-MSA`. Inputs written in an Arabic dialect and legacy `ar-EG` payloads are normalized to simplified Modern Standard Arabic. The runner independently checks script dominance, colloquial markers, preserved technical terms, response completeness, and premature assessment; model-grader approval alone is never sufficient.
 
 ## Static behavioral evaluation
 
@@ -57,6 +59,8 @@ The independent grader receives `type: grade`, the transcript, expected observab
 ```json
 {"model": "provider/grader-version", "results": [{"passed": true, "reason": "observable evidence"}]}
 ```
+
+Each case report records `response_attempts`, `selected_attempts` (one per turn), the final-turn `selected_attempt`, `deterministic_preflight_passed`, and an `attempt_log` containing the model, seed, acceptance state, and deterministic rejection reasons for every generation attempt. A later successful turn cannot erase a deterministic rejection in an earlier selected turn.
 
 Run:
 

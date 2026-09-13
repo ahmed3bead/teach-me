@@ -19,7 +19,7 @@
       },
       "additionalProperties": false
     },
-    "language": {"enum": ["ar-MSA", "ar-EG", "en", "mixed"]},
+    "language": {"description": "Canonical values are ar-MSA and en; ar-EG is a read-compatibility alias.", "enum": ["ar-MSA", "ar-EG", "en"]},
     "goals": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
     "constraints": {"type": "array", "items": {"type": "string"}},
     "demonstrated_abilities": {"type": "array", "items": {"type": "string"}},

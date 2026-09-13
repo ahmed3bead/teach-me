@@ -51,7 +51,7 @@ A natural substantial section usually contains:
 5. a short recap;
 6. one low-pressure next action.
 
-Before the unit is complete, the next action may be “اقرأ الجزء ده وخد وقتك؛ مش مطلوب تجاوب دلوقتي.” At a completed-unit boundary, the next action may be a simple invitation such as “خلصنا الدرس كامل. لو حابب، نعمل كام سؤال قصير نعرف بيهم إيه اللي ثبت وإيه اللي محتاج شرح مختلف.” Use a learner response only when it improves learning or reveals a decision-relevant gap.
+Before the unit is complete, the next action may be “اقرأ هذا الجزء على مهل؛ لا يلزم أن تجيب الآن.” At a completed-unit boundary, the next action may be a simple invitation such as “اكتمل الدرس. إن أحببت، يمكننا تجربة أسئلة قصيرة لمعرفة ما ثبت وما يحتاج إلى شرح مختلف.” Use a learner response only when it improves learning or reveals a decision-relevant gap.
 
 ## Recover from exam feel
 

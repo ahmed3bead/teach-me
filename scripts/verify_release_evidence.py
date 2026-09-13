@@ -16,6 +16,8 @@ except ImportError as exc:
     print("Missing dependency: install requirements-dev.txt", file=sys.stderr)
     raise SystemExit(2) from exc
 
+from locale_policy import canonical_locale
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -34,8 +36,8 @@ def verify(value: dict[str, Any], candidate_commit: str | None = None) -> None:
     simulations = value["simulations"]
     if simulations["count"] < 2 or simulations["pass_rate"] < 0.90 or simulations["minimum_observed_gain"] < 0.60 or simulations["critical_failures"]:
         failures.append("dynamic simulations do not meet count, pass-rate, gain, and critical-failure gates")
-    locales = {item["locale"] for item in value["human_reviews"] if item["verdict"] == "pass"}
-    if "en" not in locales or not locales.intersection({"ar-MSA", "ar-EG"}):
+    locales = {canonical_locale(item["locale"]) for item in value["human_reviews"] if item["verdict"] == "pass"}
+    if not {"ar-MSA", "en"}.issubset(locales):
         failures.append("passing human reviews are required in English and Arabic")
     if not all(value["journeys"].values()) or not all(value["artifact_review"].values()):
         failures.append("journey and artifact review gates must all pass")

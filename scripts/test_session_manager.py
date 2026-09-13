@@ -101,9 +101,12 @@ def main() -> int:
         )
         if state(directory) != (0, "not-started", 0):
             raise AssertionError("initial state is incorrect")
+        initialized = json.loads((directory / "learning-session.json").read_text(encoding="utf-8"))
+        if initialized["language"] != "ar-MSA":
+            raise AssertionError("legacy ar-EG input was not stored canonically as ar-MSA")
 
         resumed = json.loads(call(["resume", str(directory)]).stdout)
-        if resumed["resume_code"] != "TEACH-ME:v2:S001:prompts:ar-EG:MOD1:LES1":
+        if resumed["resume_code"] != "TEACH-ME:v2:S001:prompts:ar-MSA:MOD1:LES1":
             raise AssertionError("resume locator is incorrect")
         if resumed["mastery_evidence"] is not False:
             raise AssertionError("resume locator became mastery evidence")

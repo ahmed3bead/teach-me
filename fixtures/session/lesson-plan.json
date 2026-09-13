@@ -37,7 +37,7 @@
   },
   "traceability": [
     {
-      "lesson_element": "مكوّنات الـPrompt",
+      "lesson_element": "مكوّنات Prompt",
       "origin": "curriculum",
       "source_ref": "SRC1#prompt-components"
     }

@@ -8,7 +8,7 @@
     "retention_until": "2026-10-13T17:00:00Z",
     "deletion_status": "active"
   },
-  "language": "ar-EG",
+  "language": "ar-MSA",
   "goals": ["كتابة Prompt واضح"],
   "constraints": ["شرح قصير"],
   "demonstrated_abilities": ["يميّز المهمة من السياق داخل مثال"],

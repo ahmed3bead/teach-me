@@ -12,7 +12,7 @@
     "consent": {"const": true},
     "audience": {"enum": ["learner", "educator"]},
     "input_mode": {"enum": ["topic-led", "source-grounded"]},
-    "locale": {"enum": ["ar-MSA", "ar-EG", "en", "mixed"]},
+    "locale": {"description": "Canonical values are ar-MSA and en; ar-EG is a read-compatibility alias.", "enum": ["ar-MSA", "ar-EG", "en"]},
     "subject_category": {"type": "string", "minLength": 1},
     "host": {"type": "string", "minLength": 1},
     "model_family": {"type": "string", "minLength": 1},

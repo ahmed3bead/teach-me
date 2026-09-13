@@ -19,10 +19,14 @@ def main() -> int:
     current = expect("TEACH-ME:v2:S001:prompts:ar-EG:M01:L02", "valid")
     if current["fields"].get("session_id") != "S001":
         raise AssertionError("v2 session_id was not preserved")
+    if current["fields"].get("language") != "ar-MSA":
+        raise AssertionError("legacy ar-EG locale was not canonicalized")
 
     legacy = expect("TEACH-ME:v1:prompts:ar-EG:M01:L02:retained", "legacy-valid")
     if legacy.get("legacy_claimed_state") != "retained" or "state" in legacy["fields"]:
         raise AssertionError("legacy mastery claim was not isolated")
+    if legacy["fields"].get("language") != "ar-MSA":
+        raise AssertionError("legacy v1 ar-EG locale was not canonicalized")
 
     expect("TEACH-ME:v2:S001:prompts:ar-EG:M01", "partial")
     expect("TEACH-ME:v1:prompts:ar-EG:M01", "partial")

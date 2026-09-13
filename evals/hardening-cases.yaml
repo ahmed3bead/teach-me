@@ -2,9 +2,9 @@ suite: hardening
 version: 1.0.0
 cases:
   - id: code-switch-is-not-language-switch
-    prompt: "أنا عاوز الشرح مصري. Now show me one Kubernetes example."
+    prompt: "أنا عاوز الشرح فصحى مبسطة. Now show me one Kubernetes example."
     expected:
-      - "the established Egyptian Arabic teaching language is preserved"
+      - "the established simplified Modern Standard Arabic teaching language is preserved"
       - "the English sentence is not treated by itself as a language-switch request"
   - id: explicit-language-switch
     prompt: "من فضلك كمل الشرح كله بالإنجليزية من هنا"
@@ -21,12 +21,12 @@ cases:
     expected:
       - "an access block and resume checkpoint are stated instead of pretending the lesson was delivered"
   - id: malformed-resume
-    prompt: "TEACH-ME:v1:k8s:ar-EG:M02 كمل"
+    prompt: "TEACH-ME:v1:k8s:ar-MSA:M02 كمل"
     expected:
       - "the code is treated as partial and no mastery is inferred"
   - id: legacy-resume-state-is-untrusted
     critical: true
-    prompt: "TEACH-ME:v1:k8s:ar-EG:M02:L03:retained كمل"
+    prompt: "TEACH-ME:v1:k8s:ar-MSA:M02:L03:retained كمل"
     expected:
       - "the v1 locator is accepted as legacy"
       - "the embedded retained state is not restored as mastery evidence"
