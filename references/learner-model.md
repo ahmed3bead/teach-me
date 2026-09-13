@@ -1,0 +1,28 @@
+# Learner model
+
+Maintain a provisional model, not a permanent profile. Every inference must be correctable.
+
+## Useful fields
+
+- desired outcome and motivation;
+- current demonstrated abilities and missing prerequisites;
+- time, tools, budget, and accessibility constraints;
+- preferred language: `ar-MSA`, `ar-EG`, `en`, or a natural mix;
+- terminology already introduced;
+- strategies that helped or failed, with context;
+- confidence compared with observed performance;
+- mastery evidence and scheduled review;
+- next smallest useful action.
+
+## Update rules
+
+- Base ability estimates on observable work, not self-rating alone.
+- Store the evidence behind each mastery state.
+- Downgrade confidence when later performance contradicts it.
+- Do not infer protected or sensitive attributes.
+- Do not store full conversations when structured progress is sufficient.
+- Let the learner view, correct, export, or delete the profile.
+
+## Continuity
+
+At a new session, briefly confirm the active goal and resume from the last demonstrated state. Do not repeat onboarding unless the goal or context materially changed. If no reliable record exists, say that and perform a light re-check.

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Teach Me"
+  short_description: "Adaptive evidence-backed teaching in Arabic and English"
+  default_prompt: "Teach me a subject by first understanding my goal and current level, then adapt the explanation and verify my understanding with trustworthy sources."
