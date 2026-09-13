@@ -19,7 +19,8 @@ Before substantial instruction:
 2. Define the learner outcome, assumed starting point, scope, exclusions, and study constraints.
 3. Map the subject into ordered modules and lessons, including prerequisites and deliberate review points.
 4. Create the curriculum artifact using `templates/study-curriculum.md` or an equivalent structure and connect it to the learning session.
-5. Give the learner a short orientation: what the curriculum covers, where to begin, and the next decision or diagnostic.
+5. Create `START-HERE.md` using the guided-learning-pack contract. It is the learner's entry point; the curriculum is the map, not the onboarding experience.
+6. Give the learner a short orientation: what the curriculum covers, where to begin, and one current action.
 
 Do not paste the entire curriculum into chat after creating the file. Do not begin an unstructured chapter-by-chapter lecture merely because the user asked for detail.
 

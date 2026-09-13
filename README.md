@@ -14,6 +14,8 @@ For any named book, field, course, tool, framework, or standard, Teach Me perfor
 
 For a detailed whole-book, course, curriculum, or broad-subject request, Teach Me now creates a structured curriculum artifact before teaching at length. Markdown is the editable default; print-ready PDF is available on request. Modules, lessons, outcomes, sources, practice, assessment, and resume checkpoints replace unstructured chat lectures.
 
+`v0.5.0` adds a beginner-safe entry experience. A learning pack starts with `START-HERE.md`, explains the benefit and full journey in plain language, delivers the first real lesson instead of empty folders, and always ends with one exact action. When files or persistent memory are unavailable, Chat-only Mode teaches progressively and provides a portable `TEACH-ME` resume code.
+
 > Teach for demonstrated progress, not information volume.
 
 ## Languages
@@ -115,7 +117,7 @@ python3 scripts/validate_session.py learning-session.json \
 
 ## Status
 
-`v0.4.1` — integrated, research-backed teaching with structured curriculum delivery. Feedback and real-world evaluation are welcome.
+`v0.5.0` — guided learning packs across chat-only, single-file, and full workspace environments. Feedback and real-world evaluation are welcome.
 
 ## License
 
