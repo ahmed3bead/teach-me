@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.0 - Unreleased
+
+
+- Add adaptive retrieval, spacing, cumulative review, and retention decisions.
+- Add contextual learner observations with confidence and correction rather than fixed labels.
+- Add accessibility-equivalent representations and ethical engagement recovery.
+- Separate a simple learner-facing pack from internal teaching and evidence artifacts.
+- Add six behavioral evaluations for retention, access, engagement, pack navigation, and stale assumptions.
+
 ## 0.6.0 - Unreleased
 
 - Add diagnostic, teaching, assessment-feedback, misconception, and Arabic-language engines.
