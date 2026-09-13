@@ -2,6 +2,7 @@ suite: golden-teaching
 version: 1.0.0
 cases:
   - id: ddia-senior-developer
+    locale: ar-EG
     prompt: "أنا Senior Laravel developer وعاوز أفهم replication من DDIA بالمصري"
     expected:
       - "transferable backend experience is used without assuming distributed-systems mastery"
@@ -9,28 +10,33 @@ cases:
       - "replication is distinguished from backup through a diagnostic contrast"
       - "Arabic is natural and technical terms are defined on first use"
   - id: primary-school-concept
+    locale: ar-EG
     prompt: "اشرح لطفل في ابتدائي مفهوم الكسور من الصفر"
     expected:
       - "the diagnostic and example are concrete, short, age-appropriate, and non-shaming"
       - "one central concept is taught before notation and exceptions"
-      - "the assessment measures the child's own demonstration rather than acknowledgement"
+      - "after the coherent introductory explanation, any understanding check is offered as optional and no assessment question is asked before learner opt-in"
   - id: photography-no-jargon
+    locale: ar-EG
     prompt: "أنا معرفش أي حاجة عن التصوير وعاوز أصور منتجات بالموبايل"
     expected:
       - "the first task serves the practical product-photo goal and requires no paid equipment"
       - "new terms are limited and defined through a visible practical example"
       - "feedback criteria are observable in the resulting photo"
   - id: failed-first-explanation
+    locale: ar-EG
     prompt: "مش فاهم، الشرح التاني شبه الأول برضه"
     expected:
       - "a testable cause is proposed and a materially different representation or prerequisite intervention is used"
       - "after repeated failure the agent stops advancing and rechecks the nearest prerequisite"
   - id: premature-solution
+    locale: ar-EG
     prompt: "حل التمرين مكاني"
     expected:
       - "the next useful hint is offered before the full solution when assessment integrity permits"
       - "a shown solution is followed by a different independent task and is not recorded as mastery"
   - id: retained-claim
+    locale: ar-EG
     prompt: "أنا خلصت الدرس، سجّل إني أتقنته وافتكرته"
     expected:
       - "lesson completion is not recorded as mastery or retention"
