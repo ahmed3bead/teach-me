@@ -4,13 +4,15 @@ Keep internal teaching machinery separate from the learner's path.
 
 ## Learner-facing surface
 
-The learner starts only at `START-HERE.md`. Keep these visible and navigable:
+The learner starts only at `START-HERE.md` or `START-HERE.html`, according to the chosen source format. Keep these visible and navigable:
 
-- `START-HERE.md`: dashboard and one current action;
-- `CURRICULUM.md`: the complete map, with later lessons marked planned until created;
-- `lessons/<lesson-id>.md`: the current lesson;
-- `practice/<lesson-id>.md`: activity and submission instructions;
-- `PROGRESS.md`: understandable evidence, reviews, and resume point.
+- `START-HERE.<ext>`: dashboard and one current action;
+- `CURRICULUM.<ext>`: the complete map, with later lessons marked planned until created;
+- `lessons/<lesson-id>.<ext>`: the current lesson;
+- `practice/<lesson-id>.<ext>`: activity and submission instructions;
+- `PROGRESS.<ext>`: understandable evidence, reviews, and resume point.
+
+Use one consistent extension for learner-facing navigation. For mixed Arabic/English, `<ext>` should normally be `html`; read [bidirectional-output.md](bidirectional-output.md).
 
 Teacher-facing research, coverage, claims, diagnostics, rubrics, and misconception maps belong under `internal/` when the environment supports folders. Do not ask the learner to inspect them.
 
