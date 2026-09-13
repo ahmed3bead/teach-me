@@ -4,6 +4,8 @@ An open Agent Skill for adaptive, evidence-backed teaching in **Arabic and Engli
 
 Teach Me first understands the learner's goal and demonstrated level, then selects a suitable teaching strategy, checks understanding through application, and changes approach when learning fails. Important claims are researched and cited when needed.
 
+It also includes an **Educator Mode** for teachers, trainers, and parents who want to turn an authorized curriculum into age-appropriate lesson plans, explanations, activities, differentiated materials, and assessments while preserving traceability to the source.
+
 > Teach for demonstrated progress, not information volume.
 
 ## Languages
@@ -38,6 +40,18 @@ Teach me photography from zero so I can take better product photos with my phone
 ```
 
 The skill can run without persistent files. If the environment supports files and the learner wants continuity, it can maintain a local learner profile and progress record after asking permission.
+
+### Educator examples
+
+```text
+I have attached our onboarding curriculum. Prepare a 90-minute workshop for new managers, including practice, a rubric, and source traceability.
+```
+
+```text
+ده منهج العلوم للصف الرابع. حلله الأول، وبعد موافقتي جهز الحصة الأولى للأطفال في 40 دقيقة مع نشاط بسيط وأسئلة تقيس الفهم.
+```
+
+The agent first maps the supplied curriculum and flags gaps, inferred objectives, external additions, and possible conflicts. The educator approves that map before student-facing materials are produced.
 
 ## Domain teaching packs
 
