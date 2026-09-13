@@ -8,6 +8,8 @@ import re
 import sys
 from pathlib import Path
 
+from validate_resume import validate as validate_resume_code
+
 
 ROOT = Path(__file__).resolve().parents[1]
 ALLOWED_ORIGINS = {"curriculum", "educator", "inferred", "external", "adaptation"}
@@ -171,6 +173,27 @@ def check_integration_foundation() -> None:
         fail("missing ecosystem acknowledgements")
 
 
+def check_hardening() -> None:
+    profile = json.loads((ROOT / "schemas" / "learner-profile.schema.json").read_text(encoding="utf-8"))
+    if "data_governance" not in profile["required"]:
+        fail("learner-profile.schema.json: data_governance must be required")
+    governance = profile["properties"]["data_governance"]
+    for field in ("purpose", "consent_recorded_at", "retention_until", "deletion_status"):
+        if field not in governance["required"]:
+            fail(f"learner-profile.schema.json: data_governance {field} must be required")
+    cases = (ROOT / "evals" / "hardening-cases.yaml").read_text(encoding="utf-8")
+    for invariant in ("English sentence is not treated by itself as a language-switch request", "text is not mislabeled as audio", "an access block and resume checkpoint", "expired profile is not used"):
+        if invariant not in cases:
+            fail(f"hardening-cases.yaml: missing invariant {invariant!r}")
+    valid = validate_resume_code("TEACH-ME:v1:k8s:ar-EG:M02:L03:introduced")
+    partial = validate_resume_code("TEACH-ME:v1:k8s:ar-EG:M02")
+    future = validate_resume_code("TEACH-ME:v2:k8s:ar-EG:M02:L03:introduced")
+    if valid["status"] != "valid" or valid["mastery_evidence"] is not False:
+        fail("resume validator: valid locator must not become mastery evidence")
+    if partial["status"] != "partial" or future["status"] != "unsupported-version":
+        fail("resume validator: partial/version classification failed")
+
+
 def main() -> int:
     check_json()
     check_skill()
@@ -183,6 +206,7 @@ def main() -> int:
     check_teaching_engine()
     check_retention_accessibility()
     check_integration_foundation()
+    check_hardening()
     print("Teach Me validation passed")
     return 0
 
