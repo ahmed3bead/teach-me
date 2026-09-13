@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.8.2 - Unreleased
+
+- Add an explain-first conversational teaching contract for beginners and substantial lessons.
+- Stop appending micro-assessments and visible mastery labels to routine learner-facing turns.
+- Accept an explicit zero-knowledge starting point instead of testing the learner to confirm it.
+- Add immediate recovery when the learner says the experience feels like an exam.
+- Keep meaningful assessment at natural checkpoints and preserve intensive testing when explicitly requested.
+- Add six behavioral regressions for conversational teaching cadence.
+
 ## 0.8.1 - Unreleased
 
 - Preserve the established teaching language across incidental code-switching.
