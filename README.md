@@ -12,7 +12,7 @@ The **Integration Core** treats audience and source as independent choices, so s
 
 For any named book, field, course, tool, framework, or standard, Teach Me performs a broad research sweep before substantial instruction. It builds a role-based knowledge base across relevant official, academic, audiovisual, practical, community, paid, and free sources while clearly recording what was actually accessible and inspected.
 
-For a detailed whole-book, course, curriculum, or broad-subject request, Teach Me now creates a structured curriculum artifact before teaching at length. Markdown is the editable default; print-ready PDF is available on request. Modules, lessons, outcomes, sources, practice, assessment, and resume checkpoints replace unstructured chat lectures.
+For a detailed whole-book, course, curriculum, or broad-subject request, Teach Me creates a structured curriculum artifact before teaching at length. Markdown remains the editable default for single-direction material. Mixed Arabic/English learning packs use semantic HTML so technical terms, code, numbers, and punctuation keep the correct visual order; print-ready PDF can be generated from the same validated HTML. Modules, lessons, outcomes, sources, practice, assessment, and resume checkpoints replace unstructured chat lectures.
 
 `v0.5.0` adds a beginner-safe entry experience. A learning pack starts with `START-HERE.md`, explains the benefit and full journey in plain language, delivers the first real lesson instead of empty folders, and always ends with one exact action. When files or persistent memory are unavailable, Chat-only Mode teaches progressively and provides a portable `TEACH-ME` resume code.
 
@@ -21,6 +21,8 @@ For a detailed whole-book, course, curriculum, or broad-subject request, Teach M
 `v0.7.0` extends teaching across time: adaptive retrieval and spacing, contextual learner-model updates, accessible equivalents, ethical recovery from disengagement, and a simpler learner-facing pack separated from internal evidence files.
 
 `v0.7.1` adds an optional integration foundation for multimodal video inspection, capability providers, external-skill adoption, research rigor review, and reuse-first simplicity. Teach Me remains functional without external tools.
+
+`v0.8.0` makes bidirectional rendering part of teaching correctness. Mixed Arabic/English packs default to accessible HTML with isolated left-to-right terms and code, while PDF becomes a validated derivative rather than a separate source.
 
 > Teach for demonstrated progress, not information volume.
 
@@ -80,7 +82,7 @@ This paid course page is inaccessible. Use only its public topic and learning ou
 ```
 
 ```text
-اشرح لي الكتاب كله بالتفصيل بالعربي المصري، واعمل الأول ملف Markdown كمنهج منظم أقدر أمشي عليه وأرجع له.
+اشرح لي الكتاب كله بالتفصيل بالعربي المصري، واعمل منهج HTML منظم يحافظ على اتجاه العربي والمصطلحات الإنجليزية.
 ```
 
 ## Domain teaching packs
@@ -123,7 +125,7 @@ python3 scripts/validate_session.py learning-session.json \
 
 ## Status
 
-`v0.7.1` — adaptive teaching with safe, optional source and skill integrations. Feedback and real-world evaluation are welcome.
+`v0.8.0` — adaptive teaching with correct mixed Arabic/English HTML and derived PDF output. Feedback and real-world evaluation are welcome.
 
 ## License
 
