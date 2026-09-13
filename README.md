@@ -28,6 +28,8 @@ For a detailed whole-book, course, curriculum, or broad-subject request, Teach M
 
 `v0.8.2` separates learner-facing explanation from internal assessment. Beginner journeys now default to coherent explain-first teaching, with low-pressure checks at natural boundaries instead of a quiz after every concept.
 
+`v0.8.3` defines those boundaries precisely. Routine questions are offered only after a complete lesson, topic, module objective, or practical skill—not after a page or paragraph—and begin only when the learner opts in. Accepted checks use a few diagnostic questions to adapt the next teaching step rather than manufacture a score.
+
 > Teach for demonstrated progress, not information volume.
 
 ## Languages
@@ -129,7 +131,7 @@ python3 scripts/validate_session.py learning-session.json \
 
 ## Status
 
-`v0.8.2` — conversational explain-first teaching with evidence-based assessment at natural checkpoints. Feedback and real-world evaluation are welcome.
+`v0.8.3` — complete-unit teaching with opt-in understanding checks and adaptive feedback. Feedback and real-world evaluation are welcome.
 
 ## License
 

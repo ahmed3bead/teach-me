@@ -196,7 +196,7 @@ def check_hardening() -> None:
 
 def check_conversational_teaching() -> None:
     cases = (ROOT / "evals" / "conversational-teaching-cases.yaml").read_text(encoding="utf-8")
-    for invariant in ("accepted without a subject-matter placement test", "without appending a quiz to each part", "does not end with another diagnostic question", "routine evidence classification remains internal", "one authentic low-pressure application"):
+    for invariant in ("accepted without a subject-matter placement test", "without appending a quiz to each part", "does not end with another diagnostic question", "routine evidence classification remains internal", "one authentic low-pressure application", "unfinished page slice is not treated as a completed learning-unit boundary", "no assessment question is asked until the learner explicitly opts in", "accepted without pressure, penalty language, or a negative mastery inference", "three to five concise items sample explanation, misconception discrimination, and application"):
         if invariant not in cases:
             fail(f"conversational-teaching-cases.yaml: missing invariant {invariant!r}")
 

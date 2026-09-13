@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.8.3 - Unreleased
+
+- Define routine assessment boundaries as a complete lesson, topic, module objective, or practical skill—not a page, paragraph, isolated fact, or chat turn.
+- Offer a short understanding check after each completed unit and wait for explicit learner opt-in before asking questions.
+- Use three to five diagnostic items across explanation, misconception discrimination, application, and transfer as relevant.
+- Continue without pressure or negative mastery inference when the learner declines.
+- Preserve focused earlier checks for explicit practice requests, necessary prerequisites, consequential misconceptions, and safety.
+- Add four behavioral regressions for incomplete boundaries, opt-in, refusal, and accepted checks.
+
 ## 0.8.2 - Unreleased
 
 - Add an explain-first conversational teaching contract for beginners and substantial lessons.
