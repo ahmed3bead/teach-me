@@ -1,65 +1,25 @@
 # Teach Me
 
-An open Agent Skill for adaptive, evidence-backed teaching in **Arabic and English**.
+Teach Me is an open-source Agent Skill that turns learning goals and trusted sources into adaptive, evidence-backed teaching in simplified Modern Standard Arabic and English.
 
-Teach Me first understands the learner's goal and demonstrated level, then selects a suitable teaching strategy, checks understanding through application, and changes approach when learning fails. Important claims are researched and cited when needed.
+[![CI](https://github.com/ahmed3bead/teach-me/actions/workflows/validate.yml/badge.svg)](https://github.com/ahmed3bead/teach-me/actions/workflows/validate.yml)
+[![Release](https://img.shields.io/github/v/release/ahmed3bead/teach-me?include_prereleases&label=release)](https://github.com/ahmed3bead/teach-me/releases/tag/v1.0.0-beta.1)
+[![License: MIT](https://img.shields.io/github/license/ahmed3bead/teach-me)](https://github.com/ahmed3bead/teach-me/blob/main/LICENSE)
+[![Languages: ar-MSA | en](https://img.shields.io/badge/languages-ar--MSA%20%7C%20en-0f766e)](https://github.com/ahmed3bead/teach-me#supported-languages)
 
-It also includes an **Educator Mode** for teachers, trainers, and parents who want to turn an authorized curriculum into age-appropriate lesson plans, explanations, activities, differentiated materials, and assessments while preserving traceability to the source.
+It is designed for learners who want progressive instruction, educators who need traceable teaching materials, and people studying from books, documents, courses, websites, recordings, or accessible audiovisual sources.
 
-**Source-Grounded Mode** lets a learner study from a book, video, playlist, course, website, or recording. The agent records what it actually inspected, tests its understanding before teaching, and clearly separates the source's claims from verification and added explanation.
+> The current release, `v1.0.0-beta.1`, is a **public beta**. It is not the stable `v1.0.0` release.
 
-The **Integration Core** treats audience and source as independent choices, so source-grounded learning also works for educators. Connected session, objective, lesson, assessment, evidence, and checkpoint identifiers let the agent resume from demonstrated learning instead of repeating onboarding or confusing content completion with mastery.
+## Overview
 
-For any named book, field, course, tool, framework, or standard, Teach Me performs a broad research sweep before substantial instruction. It builds a role-based knowledge base across relevant official, academic, audiovisual, practical, community, paid, and free sources while clearly recording what was actually accessible and inspected.
+Teach Me begins with the learner's goal and demonstrated starting point. It teaches the smallest useful next objective, offers an understanding check only at an appropriate learning boundary, and changes strategy when the first explanation does not work.
 
-For a detailed whole-book, course, curriculum, or broad-subject request, Teach Me creates a structured curriculum artifact before teaching at length. Markdown remains the editable default for single-direction material. Mixed Arabic/English learning packs use semantic HTML so technical terms, code, numbers, and punctuation keep the correct visual order; print-ready PDF can be generated from the same validated HTML. Modules, lessons, outcomes, sources, practice, assessment, and resume checkpoints replace unstructured chat lectures.
+For current, specialized, disputed, or consequential claims, it requires evidence and communicates uncertainty. When a source governs the lesson, it records what was actually inspected and separates source claims from external verification and added explanation.
 
-`v0.5.0` adds a beginner-safe entry experience. A learning pack starts with `START-HERE.md`, explains the benefit and full journey in plain language, delivers the first real lesson instead of empty folders, and always ends with one exact action. When files or persistent memory are unavailable, Chat-only Mode teaches progressively and provides a portable `TEACH-ME` resume code.
+## Quick start
 
-`v0.6.0` adds the teaching core: prerequisite diagnosis, a progressive lesson arc, cognitive-load controls, misconception repair, graduated hints, observable mastery decisions, and an Arabic teaching style contract.
-
-`v0.7.0` extends teaching across time: adaptive retrieval and spacing, contextual learner-model updates, accessible equivalents, ethical recovery from disengagement, and a simpler learner-facing pack separated from internal evidence files.
-
-`v0.7.1` adds an optional integration foundation for multimodal video inspection, capability providers, external-skill adoption, research rigor review, and reuse-first simplicity. Teach Me remains functional without external tools.
-
-`v0.8.0` makes bidirectional rendering part of teaching correctness. Mixed Arabic/English packs default to accessible HTML with isolated left-to-right terms and code, while PDF becomes a validated derivative rather than a separate source.
-
-`v0.8.1` hardens language continuity, inaccessible-modality recovery, portable resume validation, and learner-data lifecycle controls after a two-agent adversarial evaluation.
-
-`v0.8.2` separates learner-facing explanation from internal assessment. Beginner journeys now default to coherent explain-first teaching, with low-pressure checks at natural boundaries instead of a quiz after every concept.
-
-`v0.8.3` defines those boundaries precisely. Routine questions are offered only after a complete lesson, topic, module objective, or practical skill—not after a page or paragraph—and begin only when the learner opts in. Accepted checks use a few diagnostic questions to adapt the next teaching step rather than manufacture a score.
-
-`v1.0.0-beta.1` is a public beta—not the stable `v1.0.0` release. It includes evidence-derived progress, crash-safe sessions, profile lifecycle enforcement, closed-book teacher/learner simulations, checked HTML-to-PDF output, evidence-bounded source intake, pinned automation dependencies, and a corrected reproducible behavioral evaluator.
-
-> Teach for demonstrated progress, not information volume.
-
-## Languages
-
-- Simplified Modern Standard Arabic (`ar-MSA`), including replies to learners who write in an Arabic dialect
-- English (`en`)
-- Original-script technical terminology such as `API`, `Replication`, `Contract Test`, `Prompt`, and `Database`
-
-The retired `ar-EG` value remains accepted only as a compatibility alias and is normalized to `ar-MSA`. It no longer requests Egyptian Arabic. In Arabic HTML and PDF learning packs, English terms and other left-to-right runs are isolated with `<bdi dir="ltr">` or `dir="ltr"`.
-
-## Install
-
-Clone directly into the skills directory supported by your agent. This avoids the nested `teach-me/teach-me` folder produced when a copy command is repeated.
-
-### Prerequisites
-
-Required for installation:
-
-- Git;
-- a compatible Agent Skills host;
-- filesystem access to that host's skills directory.
-
-Required only for repository validation or development:
-
-- Python 3.10 or newer;
-- the pinned packages in `requirements-dev.txt`, installed after cloning and from the repository root with `python3 -m pip install -r requirements-dev.txt` on Linux/macOS or `python -m pip install -r requirements-dev.txt` on Windows.
-
-Optional capabilities include web research, document or PDF extraction, HTML/PDF rendering and its platform libraries, and audio, transcript, or video-frame inspection. Ollama is optional and is used only when someone explicitly chooses local model evaluation; it is not required to install or use Teach Me. See [`docs/compatibility.md`](docs/compatibility.md) for capability-dependent behavior and lawful fallbacks.
+Install the skill, reload Codex, and try a prompt. Git is required; Python is needed only for repository validation and optional bundled tooling.
 
 ### Codex on Linux or macOS
 
@@ -77,102 +37,178 @@ New-Item -ItemType Directory -Force -Path $skillsDir | Out-Null
 git clone https://github.com/ahmed3bead/teach-me.git (Join-Path $skillsDir "teach-me")
 ```
 
-Restart or reload the agent, then ask it to use `$teach-me`. Other Agent Skills-compatible clients may use a project-level or user-level skills directory; follow that client's documentation and keep `SKILL.md` at the root of the installed `teach-me` directory.
+Restart or reload Codex, then invoke `$teach-me` explicitly or ask naturally:
 
-### Verify, update, disable, or restore on Linux/macOS
+```text
+Teach me SQL from zero so I can analyze customer-support data. Use short examples and adapt when I get stuck.
+```
+
+## Why Teach Me
+
+- **Adaptive instruction:** starts from evidence of current ability and changes pace, representation, or prerequisites when needed.
+- **Evidence-backed claims:** cites important claims, distinguishes verification from inference, and corrects errors visibly.
+- **Demonstrated progress:** treats application and transfer—not “I understand”—as learning evidence.
+- **Learner control:** explains before testing and asks permission before routine understanding checks.
+- **Bilingual teaching:** supports simplified Modern Standard Arabic and English while preserving technical terms in their original script.
+- **Source discipline:** never claims to have inspected inaccessible documents, audio, video, or paid material.
+
+## Key capabilities
+
+- Goal discovery, lightweight diagnosis, progressive lessons, examples, practice, feedback, and misconception repair.
+- Learner Mode, Educator Mode, topic-led teaching, and Source-Grounded Mode in compatible combinations.
+- Structured curricula and lesson plans for whole books, courses, broad subjects, and authorized educator materials.
+- Traceable source coverage, claims, objectives, lessons, assessments, progress, and resume checkpoints.
+- Consent-gated local learner profiles and evidence-derived progress when persistent files are available.
+- Accessible mixed Arabic/English HTML and an optional validated PDF derivative when rendering tools are available.
+- Experimental programming and photography domain packs, both marked `needs-qualified-review`.
+
+## How it works
+
+1. **Establish the goal.** Teach Me identifies the desired real-world outcome, constraints, available time, and demonstrated starting point.
+2. **Choose the next objective.** It selects the smallest useful step and an appropriate teaching strategy instead of producing an unstructured lecture.
+3. **Teach coherently.** It explains, demonstrates, and gives the learner a manageable activity.
+4. **Check by consent.** After a complete lesson, topic, module objective, or practical skill, it offers a short check and waits for the learner to opt in.
+5. **Adapt from evidence.** It records what the learner demonstrated and changes strategy when progress stalls.
+6. **Research when required.** It verifies important claims and narrows the promised scope when suitable evidence or source access is unavailable.
+
+## Example prompts
+
+### English
+
+```text
+Teach me Python functions from zero. My goal is to automate a weekly CSV report, and I have 30 minutes a day.
+```
+
+```text
+Study the attached chapter, tell me what you could actually inspect, verify its important claims, and teach it to me progressively.
+```
+
+```text
+I have attached our onboarding curriculum. Prepare a 90-minute workshop for new managers with practice, a rubric, and source traceability.
+```
+
+### العربية
+
+```text
+علّمني أساسيات تحليل البيانات من الصفر حتى أستطيع فهم تقارير المبيعات، ولديّ 30 دقيقة يوميًا.
+```
+
+```text
+ادرس هذا الكتاب، وحدد ما استطعت فحصه فعليًا، ثم تحقّق من الادعاءات المهمة وعلّمني المحتوى تدريجيًا بالعربية الفصحى المبسطة.
+```
+
+```text
+هذا منهج علوم للصف الرابع. حلّله أولًا، ثم أنشئ بعد موافقتي خطة حصة مدتها 40 دقيقة مع نشاط وأسئلة تقيس الفهم.
+```
+
+## Learner, Educator, and Source-Grounded modes
+
+Teach Me routes requests along two independent axes: the audience and the input. A learner or educator can use either topic-led teaching or Source-Grounded Mode.
+
+| Mode | Use it for | What Teach Me does |
+|---|---|---|
+| Learner Mode | Learning, practising, reviewing, or getting unstuck | Diagnoses the starting point, teaches progressively, adapts, and tracks demonstrated progress when authorized |
+| Educator Mode | Lesson, workshop, curriculum, activity, differentiation, or assessment design | Maps authorized material, flags gaps and conflicts, preserves traceability, and waits for approval before producing learner-facing materials when required |
+| Source-Grounded Mode | Books, documents, videos, playlists, courses, websites, recordings, or curricula | Records actual access and coverage, checks understanding of the source, verifies important claims, and avoids pretending to reproduce inaccessible material |
+
+## Supported languages
+
+- Simplified Modern Standard Arabic (`ar-MSA`), including responses to learners who write in an Arabic dialect.
+- English (`en`).
+- Technical terms and proper names in their original language and script, such as `API`, `Replication`, `Contract Test`, `Prompt`, and `Database`.
+
+The retired `ar-EG` value is accepted only as a compatibility alias and is normalized to `ar-MSA`; it does not request Egyptian Arabic. Mixed-direction Arabic HTML and PDF output isolates left-to-right terms, code, numbers, paths, and URLs.
+
+## Installation
+
+The [quick start](#quick-start) installs Teach Me as a user-level Codex skill with `SKILL.md` at `teach-me/SKILL.md`. Avoid a nested `teach-me/teach-me/SKILL.md` directory.
+
+Normal teaching requires a compatible Agent Skills host that can read `SKILL.md` and its references. Repository development and validation require Python 3.10 or newer plus the exact packages in `requirements-dev.txt`.
+
+Other Agent Skills-compatible hosts may use a project-level or user-level skills directory. Follow the host's documentation and preserve the repository root layout. Capability-specific behavior is documented in [`docs/compatibility.md`](docs/compatibility.md).
+
+## Updating and disabling
+
+### Linux or macOS
 
 ```bash
 skills_dir="${CODEX_HOME:-$HOME/.codex}/skills"
-test -f "$skills_dir/teach-me/SKILL.md"
-python3 "$skills_dir/teach-me/scripts/validate.py"
 
-# Update an existing Git clone.
+# Update.
 git -C "$skills_dir/teach-me" pull --ff-only
 
-# Recoverable removal: move it out of the active skills directory.
+# Disable without deleting.
 mv "$skills_dir/teach-me" "$skills_dir/teach-me.disabled"
 
-# Restore the disabled skill.
+# Restore.
 mv "$skills_dir/teach-me.disabled" "$skills_dir/teach-me"
 ```
 
-### Verify, update, disable, or restore on Windows PowerShell
+### Windows PowerShell
 
 ```powershell
 $skillsDir = if ($env:CODEX_HOME) { Join-Path $env:CODEX_HOME "skills" } else { Join-Path $HOME ".codex\skills" }
 $skillPath = Join-Path $skillsDir "teach-me"
 $disabledPath = Join-Path $skillsDir "teach-me.disabled"
 
-if (-not (Test-Path (Join-Path $skillPath "SKILL.md"))) { throw "Teach Me is not installed at $skillPath" }
-python (Join-Path $skillPath "scripts\validate.py")
-
-# Update an existing Git clone.
+# Update.
 git -C $skillPath pull --ff-only
 
-# Recoverable removal: move it out of the active skills directory.
+# Disable without deleting.
 Move-Item -Path $skillPath -Destination $disabledPath
 
-# Restore the disabled skill.
+# Restore.
 Move-Item -Path $disabledPath -Destination $skillPath
 ```
 
-If an older copy has `teach-me/teach-me/SKILL.md`, move the inner folder to a temporary location, remove or archive the outer duplicate, then install fresh with the command above. See [`docs/compatibility.md`](docs/compatibility.md) for capability-dependent behavior and costs.
+Reload Codex after installing, updating, disabling, or restoring the skill.
 
-## Use
+## Optional capabilities
 
-Invoke `$teach-me` explicitly or ask naturally:
+Teach Me remains usable for core conversational teaching without optional integrations. It uses a capability only when the host exposes it.
 
-```text
-Teach me photography from zero so I can take better product photos with my phone.
-```
+| Capability | What it enables | Fallback when unavailable |
+|---|---|---|
+| File read/write | Connected curricula, lessons, evidence, and resumable local sessions | Teach in chat and provide a portable `TEACH-ME:v2` locator |
+| Web research | Current, specialized, and broad-source verification | Disclose the limit and narrow the claim or lesson scope |
+| Document or PDF extraction | Evidence-bounded inspection of supplied files | Ask for accessible text or teach an independently researched scope |
+| Audio, transcript, or video-frame access | Timestamped spoken-content or sampled visual coverage | Do not claim audiovisual coverage |
+| HTML/PDF rendering | Validated bidirectional learning packs and checked PDF output | Provide structured chat or source HTML |
+| Persistent scheduling | Authorized evidence-based review reminders | Provide a portable review plan |
 
-```text
-علّمني الإنجليزي من الصفر عشان أقدر أتعامل مع العملاء في الشغل.
-```
+The repository includes an optional local Ollama evaluation adapter. Ollama is **not required for normal use**, is not contacted by deterministic validation, and should run only when someone explicitly chooses local model evaluation. External hosts, models, search, transcription, storage, and rendering services may have their own costs.
 
-The skill can run without persistent files. If the environment supports files and the learner wants continuity, it can maintain a local learner profile and progress record after asking permission.
+## Project status and current limitations
 
-### Educator examples
+`v1.0.0-beta.1` is the latest public beta, not the stable `v1.0.0` release.
 
-```text
-I have attached our onboarding curriculum. Prepare a 90-minute workshop for new managers, including practice, a rubric, and source traceability.
-```
+- Accuracy and learning outcomes are not guaranteed.
+- Important, current, disputed, consequential, or high-stakes claims require suitable evidence and may require qualified professional review.
+- Source support depends on host capabilities; inaccessible material is not bypassed, reconstructed, or presented as inspected.
+- Raw video bytes do not prove transcript or visual understanding. Spoken and on-screen coverage must be established separately.
+- PDF rendering depends on the pinned Python packages and platform libraries required by WeasyPrint; validated HTML remains the accessible source of truth when rendering is unavailable.
+- The programming and photography domain packs remain experimental until qualified review.
+- The corrected full 90-case exact-SHA behavioral run remains a requirement for the stable release. Earlier invalid behavioral results are not release evidence.
 
-```text
-ده منهج العلوم للصف الرابع. حلله الأول، وبعد موافقتي جهز الحصة الأولى للأطفال في 40 دقيقة مع نشاط بسيط وأسئلة تقيس الفهم.
-```
+See [`RELEASE_NOTES.md`](RELEASE_NOTES.md) for beta details and [`CHANGELOG.md`](CHANGELOG.md) for version history.
 
-The agent first maps the supplied curriculum and flags gaps, inferred objectives, external additions, and possible conflicts. The educator approves that map before student-facing materials are produced.
+## Documentation
 
-### Source-grounded examples
+| Document | Purpose |
+|---|---|
+| [`SKILL.md`](SKILL.md) | Authoritative teaching, evidence, language, safety, and routing contract |
+| [`RELEASE_NOTES.md`](RELEASE_NOTES.md) | Current public-beta highlights, evidence status, and limitations |
+| [`CHANGELOG.md`](CHANGELOG.md) | Version-by-version history |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Contribution standards and privacy requirements |
+| [`SECURITY.md`](SECURITY.md) | Supported versions and private vulnerability reporting |
+| [`docs/compatibility.md`](docs/compatibility.md) | Host capability matrix, fallbacks, and cost model |
+| [`docs/model-evaluation.md`](docs/model-evaluation.md) | Behavioral and simulation evaluation protocol |
+| [`docs/release-checklist.md`](docs/release-checklist.md) | Stable-release evidence gates |
+| [`domain-packs/README.md`](domain-packs/README.md) | Domain-pack contract and implemented pilots |
 
-```text
-Study this YouTube playlist, verify the important claims, then teach it to me progressively in simplified Modern Standard Arabic.
-```
+## Development and validation
 
-```text
-This paid course page is inaccessible. Use only its public topic and learning outcomes to build an independent path from lawful, authoritative sources. Do not claim to reproduce the course.
-```
-
-```text
-اشرح لي الكتاب كله بالتفصيل بالعربية الفصحى المبسطة، وأنشئ منهج HTML منظمًا يحافظ على اتجاه العربية والمصطلحات الإنجليزية الأصلية.
-```
-
-## Domain teaching packs
-
-The core skill remains general. Optional packs specialize how a subject should be taught without duplicating the teacher, evidence, privacy, or safety rules. The first testable pilots cover programming and photography; both are explicitly marked as needing qualified review. Future candidates include AI literacy, English communication, data and spreadsheets, design, digital marketing, video, and project management.
-
-See [`domain-packs/README.md`](domain-packs/README.md) and [`docs/domain-roadmap.md`](docs/domain-roadmap.md).
-
-## Trust model
-
-Teach Me does not promise perfect accuracy. It requires traceable evidence for consequential claims, distinguishes verified information from inference or disagreement, and includes a correction protocol. Product-wide changes are reviewed and evaluated; the skill never rewrites itself from one user's feedback.
-
-## Contributing
-
-Useful contributions include reproducible teaching failures, bilingual language improvements, authoritative-source corrections, accessibility improvements, and evaluation cases. Remove personal information before opening an issue. Do not submit raw learner transcripts without explicit permission.
-
-Read [`CONTRIBUTING.md`](CONTRIBUTING.md). The Linux `validate` job in [`.github/workflows/validate.yml`](.github/workflows/validate.yml) is authoritative. From the repository root, install the pinned development dependencies and run this complete deterministic command set:
+Install Python 3.10 or newer and the pinned development dependencies. The Linux `validate` job in [`.github/workflows/validate.yml`](.github/workflows/validate.yml) defines the complete deterministic command set:
 
 ```bash
 python3 -m pip install -r requirements-dev.txt
@@ -208,33 +244,24 @@ python3 scripts/validate_session.py fixtures/session/learning-session.json \
   --progress fixtures/session/progress.json
 ```
 
-The Ollama adapter command above runs unit tests only and does not start or contact Ollama. Fixture model adapters prove runner plumbing only. See [`docs/model-evaluation.md`](docs/model-evaluation.md) before making model-quality or release claims.
+This suite validates structure, schemas, evaluation definitions, domain packs, runner behavior, packaging, rendering, source inspection, and connected fixtures. `scripts/test_ollama_eval_adapter.py` runs unit tests only; it does not start or contact Ollama. Deterministic validation does not establish real-model teaching quality—see [`docs/model-evaluation.md`](docs/model-evaluation.md).
 
-For saved connected artifacts, validate cross-file identifiers with:
+## Contributing
 
-```bash
-python3 scripts/validate_session.py learning-session.json \
-  --knowledge-base knowledge-base.json \
-  --curriculum-map curriculum-map.json \
-  --curriculum study-curriculum.json \
-  --coverage source-coverage.json \
-  --claims claim-ledger.json \
-  --lesson lesson-plan.json \
-  --progress progress.json
-```
+Contributions are welcome when they provide a reproducible teaching failure, an authoritative correction, a bilingual language improvement, an accessibility improvement, or an evaluation grounded in observable behavior.
 
-## العربية
+Read [`CONTRIBUTING.md`](CONTRIBUTING.md) before opening a pull request. Remove personal data, private transcripts, protected curricula, and other material you are not authorized to share.
 
-`Teach Me` هي مهارة مفتوحة المصدر تحول `AI` إلى معلّم متكيف، وليس مجرد مولّد شرح. تفهم هدف المتعلم ومستواه من خلال أدلة عملية، وتدعم العربية الفصحى المبسطة والإنجليزية، وتغيّر طريقة التعليم عندما لا تنجح المحاولة الأولى.
+## Security
 
-لا تعتبر قول المتعلم «فهمت» دليلًا كافيًا، ولا تعرض الادعاءات المهمة بدرجة ثقة أكبر مما تسمح به مصادرها.
-
-## Status
-
-`v1.0.0-beta.1` is a public beta, not the stable `v1.0.0` release. Simplified Modern Standard Arabic (`ar-MSA`) and English (`en`) are supported, with technical terms and proper names preserved in their original language and script. Deterministic validation passes, and the Luma Arabic and Vela English simulations passed.
-
-The previous 90-case behavioral report is invalid and is not release evidence. The corrected evaluator has not yet been used for a complete exact-SHA model run, so this beta does not satisfy the stable behavioral-evidence gate. Teach Me does not guarantee perfect factual accuracy. Please report problems involving teaching, language, assessment consent, source grounding, accessibility, or rendering. See [`RELEASE_NOTES.md`](RELEASE_NOTES.md) for beta details and [`docs/release-checklist.md`](docs/release-checklist.md) for the remaining stable-release gates.
+Report suspected vulnerabilities privately through [GitHub Private Vulnerability Reporting](https://github.com/ahmed3bead/teach-me/security/advisories/new). Do not include learner data, credentials, private curricula, or unrelated personal information. See [`SECURITY.md`](SECURITY.md) for the full policy.
 
 ## License
 
-MIT
+Teach Me is released under the [MIT License](LICENSE).
+
+## لمحة بالعربية
+
+`Teach Me` مهارة مفتوحة المصدر للتعليم المتكيف والمدعوم بالأدلة. تبدأ من هدف المتعلم وما يستطيع تطبيقه فعليًا، ثم تقدم شرحًا تدريجيًا بالعربية الفصحى المبسطة أو الإنجليزية، وتغيّر طريقة التعليم عند الحاجة. كما تساعد المعلّمين على تحويل المناهج المصرح باستخدامها إلى خطط وأنشطة وتقييمات قابلة للتتبع، وتوضح دائمًا ما استطاعت فحصه من المصادر.
+
+الإصدار الحالي `v1.0.0-beta.1` نسخة تجريبية عامة، وليس الإصدار المستقر `v1.0.0`. لا تضمن المهارة دقة كاملة أو نتيجة تعليمية محددة، لذلك تتطلب الادعاءات المهمة أدلة مناسبة وتعرض حدود الوصول وعدم اليقين بوضوح.
