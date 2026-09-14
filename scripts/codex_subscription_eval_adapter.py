@@ -16,7 +16,6 @@ from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 from typing import Any
 
-from render_learning_pack import render
 
 DEFAULT_MODEL = "gpt-5.6-sol"
 ADAPTER_VERSION = "2.0.0"
@@ -84,6 +83,7 @@ def materialize_artifacts(raw: dict[str, Any], workspace: Path, capabilities: di
         content_hash = hashlib.sha256(target.read_bytes()).hexdigest()
         records.append({"path": str(relative), "media_type": item["media_type"], "content": item["content"], "sha256": content_hash, "bytes": target.stat().st_size, "materialized": True, "validation": {"exists": target.is_file(), "inside_workspace": target.resolve().is_relative_to(workspace.resolve())}})
     if render_enabled:
+        from render_learning_pack import render
         html = [record for record in records if record["media_type"] == "text/html"]
         if len(html) != 1: raise ValueError("rendering requires exactly one generated HTML artifact")
         source = workspace / html[0]["path"]

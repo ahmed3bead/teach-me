@@ -29,6 +29,7 @@ jobs:
       - run: python3 scripts/run_behavioral_evals.py --validate-only
       - run: python3 scripts/run_agent_simulations.py --validate-only
       - run: python3 scripts/test_behavioral_eval_runner.py
+      - run: python3 scripts/test_openai_api_eval_adapter.py
       - run: python3 scripts/test_agent_simulations.py
       - run: python3 scripts/test_ollama_eval_adapter.py
       - run: python3 scripts/test_package_release.py
@@ -70,6 +71,7 @@ jobs:
       - run: python scripts/validate_schemas.py
       - run: python scripts/validate_evals.py
       - run: python scripts/validate_simulations.py
+      - run: python scripts/test_openai_api_eval_adapter.py
       - run: python scripts/test_validate_session.py
       - run: python scripts/test_validate_resume.py
       - run: python scripts/test_session_manager.py

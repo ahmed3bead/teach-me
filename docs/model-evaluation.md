@@ -44,6 +44,43 @@ Only after both smoke commands pass, remove `--case` to run all static suites an
 
 Local results prove behavior only for the recorded local models. Before claiming compatibility with a hosted provider, run a small representative compatibility sample on that provider. Save a full paid run for the release candidate rather than every commit.
 
+## Paid evaluation with the official OpenAI API
+
+Install the exact dependencies from `requirements-dev.txt`, export `OPENAI_API_KEY` in the parent process, and pass only its environment-variable name. The adapter refuses a literal key or any alternative credential variable. The runner excludes the key from every adapter environment unless the matching per-role option is present.
+
+Confirm model access without making a Responses API generation:
+
+```bash
+python3 scripts/openai_api_eval_adapter.py \
+  --role response \
+  --model gpt-5.6-sol \
+  --api-key-env OPENAI_API_KEY \
+  --check-access
+```
+
+For the single complete release-candidate run, use:
+
+```bash
+python3 scripts/run_behavioral_evals.py \
+  --response-command "python3 scripts/openai_api_eval_adapter.py --role response --model gpt-5.6-sol --api-key-env OPENAI_API_KEY --max-output-tokens 2048 --reasoning-effort none --temperature 0 --timeout 600" \
+  --grader-command "python3 scripts/openai_api_eval_adapter.py --role grader --model gpt-5.6-sol --api-key-env OPENAI_API_KEY --max-output-tokens 2048 --reasoning-effort none --temperature 0 --timeout 600" \
+  --response-api-key-env OPENAI_API_KEY \
+  --grader-api-key-env OPENAI_API_KEY \
+  --expected-response-model openai/gpt-5.6-sol \
+  --expected-grader-model openai/gpt-5.6-sol \
+  --release-evidence \
+  --candidate-commit FULL_FINAL_SHA \
+  --pass-threshold 0.90 \
+  --protocol-retries 0 \
+  --output reports/openai-api-behavioral-evals.json \
+  --timeout 660
+```
+
+The adapter uses Standard processing (`service_tier=default`), `store=false`, strict JSON Schema output, no tools, no SDK retries, controlled fixtures only, a 2,048-token total output bound per request, `reasoning.effort=none`, and `temperature=0`. The response and grader are separate stateless requests. Invocation evidence records only the credential environment-variable name.
+
+Before the run, calculate a conservative ceiling for all 95 response requests and 90 grader requests. At the current [GPT-5.6 Sol Standard prices](https://developers.openai.com/api/docs/models/gpt-5.6-sol), bill uncached input at $4.00/M tokens, cached input at $0.40/M, cache writes at $5.00/M, and output at $20.00/M. Reasoning tokens are included in output tokens and must be reported separately without double-counting. Stop before any paid request if the ceiling exceeds the authorized budget. Do not add a paid smoke test, use Batch, enable retries, or resume a completed educational case.
+
+
 Behavioral cases must declare the canonical locale `ar-MSA` or `en`; missing, ambiguous, invalid, and legacy `ar-EG` case locales fail validation before adapter execution. Inputs written in an Arabic dialect still use `ar-MSA`. The runner independently checks script dominance, colloquial markers, preserved technical terms, response completeness, and premature assessment; model-grader approval alone is never sufficient.
 
 ## Static behavioral evaluation
