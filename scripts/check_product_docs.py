@@ -75,7 +75,10 @@ def main() -> int:
 
     install_doc = (ROOT / "docs" / "codex-installation.md").read_text(encoding="utf-8")
     for relative in ("installers/install.sh", "installers/install.ps1"):
-        checksum = hashlib.sha256((ROOT / relative).read_bytes()).hexdigest()
+        # Raw GitHub serves the LF-normalized Git blob even when a Windows
+        # checkout materializes CRLF worktree files.
+        blob = (ROOT / relative).read_bytes().replace(b"\r\n", b"\n")
+        checksum = hashlib.sha256(blob).hexdigest()
         if checksum not in install_doc:
             failures.append(f"documented bootstrap checksum is stale for {relative}")
 
