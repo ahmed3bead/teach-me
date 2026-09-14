@@ -4,7 +4,7 @@ description: Provide adaptive, evidence-backed teaching from goals or user-chose
 license: MIT
 metadata:
   author: ahmed3bead
-  version: "1.0.0-rc.1"
+  version: "1.0.0"
   compatibility: "Agent Skills host; optional capabilities are documented in docs/compatibility.md; validators require Python 3.10+."
 ---
 

@@ -30,7 +30,7 @@ For a detailed whole-book, course, curriculum, or broad-subject request, Teach M
 
 `v0.8.3` defines those boundaries precisely. Routine questions are offered only after a complete lesson, topic, module objective, or practical skill—not after a page or paragraph—and begin only when the learner opts in. Accepted checks use a few diagnostic questions to adapt the next teaching step rather than manufacture a score.
 
-`v1.0.0-rc.1` turns the contract into a release candidate with evidence-derived progress, crash-safe sessions, profile lifecycle enforcement, closed-book teacher/learner simulations, checked HTML-to-PDF output, evidence-bounded source intake, pinned automation dependencies, and a stable-release evidence receipt.
+`v1.0.0` prepares the final stable candidate with evidence-derived progress, crash-safe sessions, profile lifecycle enforcement, closed-book teacher/learner simulations, checked HTML-to-PDF output, evidence-bounded source intake, pinned automation dependencies, and a stable-release evidence receipt gate.
 
 > Teach for demonstrated progress, not information volume.
 
@@ -45,6 +45,21 @@ The retired `ar-EG` value remains accepted only as a compatibility alias and is 
 ## Install
 
 Clone directly into the skills directory supported by your agent. This avoids the nested `teach-me/teach-me` folder produced when a copy command is repeated.
+
+### Prerequisites
+
+Required for installation:
+
+- Git;
+- a compatible Agent Skills host;
+- filesystem access to that host's skills directory.
+
+Required only for repository validation or development:
+
+- Python 3.10 or newer;
+- the pinned packages in `requirements-dev.txt`, installed after cloning and from the repository root with `python3 -m pip install -r requirements-dev.txt` on Linux/macOS or `python -m pip install -r requirements-dev.txt` on Windows.
+
+Optional capabilities include web research, document or PDF extraction, HTML/PDF rendering and its platform libraries, and audio, transcript, or video-frame inspection. Ollama is optional and is used only when someone explicitly chooses local model evaluation; it is not required to install or use Teach Me. See [`docs/compatibility.md`](docs/compatibility.md) for capability-dependent behavior and lawful fallbacks.
 
 ### Codex on Linux or macOS
 
@@ -64,7 +79,7 @@ git clone https://github.com/ahmed3bead/teach-me.git (Join-Path $skillsDir "teac
 
 Restart or reload the agent, then ask it to use `$teach-me`. Other Agent Skills-compatible clients may use a project-level or user-level skills directory; follow that client's documentation and keep `SKILL.md` at the root of the installed `teach-me` directory.
 
-### Verify, update, or safely remove
+### Verify, update, disable, or restore on Linux/macOS
 
 ```bash
 skills_dir="${CODEX_HOME:-$HOME/.codex}/skills"
@@ -76,6 +91,29 @@ git -C "$skills_dir/teach-me" pull --ff-only
 
 # Recoverable removal: move it out of the active skills directory.
 mv "$skills_dir/teach-me" "$skills_dir/teach-me.disabled"
+
+# Restore the disabled skill.
+mv "$skills_dir/teach-me.disabled" "$skills_dir/teach-me"
+```
+
+### Verify, update, disable, or restore on Windows PowerShell
+
+```powershell
+$skillsDir = if ($env:CODEX_HOME) { Join-Path $env:CODEX_HOME "skills" } else { Join-Path $HOME ".codex\skills" }
+$skillPath = Join-Path $skillsDir "teach-me"
+$disabledPath = Join-Path $skillsDir "teach-me.disabled"
+
+if (-not (Test-Path (Join-Path $skillPath "SKILL.md"))) { throw "Teach Me is not installed at $skillPath" }
+python (Join-Path $skillPath "scripts\validate.py")
+
+# Update an existing Git clone.
+git -C $skillPath pull --ff-only
+
+# Recoverable removal: move it out of the active skills directory.
+Move-Item -Path $skillPath -Destination $disabledPath
+
+# Restore the disabled skill.
+Move-Item -Path $disabledPath -Destination $skillPath
 ```
 
 If an older copy has `teach-me/teach-me/SKILL.md`, move the inner folder to a temporary location, remove or archive the outer duplicate, then install fresh with the command above. See [`docs/compatibility.md`](docs/compatibility.md) for capability-dependent behavior and costs.
@@ -134,26 +172,43 @@ Teach Me does not promise perfect accuracy. It requires traceable evidence for c
 
 Useful contributions include reproducible teaching failures, bilingual language improvements, authoritative-source corrections, accessibility improvements, and evaluation cases. Remove personal information before opening an issue. Do not submit raw learner transcripts without explicit permission.
 
-Read [`CONTRIBUTING.md`](CONTRIBUTING.md). Install development dependencies and run the repository checks with:
+Read [`CONTRIBUTING.md`](CONTRIBUTING.md). The Linux `validate` job in [`.github/workflows/validate.yml`](.github/workflows/validate.yml) is authoritative. From the repository root, install the pinned development dependencies and run this complete deterministic command set:
 
 ```bash
 python3 -m pip install -r requirements-dev.txt
+python3 -m pip check
+python3 scripts/check_dependency_pins.py
+python3 scripts/check_context_budget.py
 python3 scripts/validate.py
 python3 scripts/validate_schemas.py
 python3 scripts/validate_evals.py
 python3 scripts/validate_domain_packs.py
 python3 scripts/validate_simulations.py
-python3 scripts/check_dependency_pins.py
-python3 scripts/check_context_budget.py
-python3 scripts/test_validate_session.py
-python3 scripts/test_validate_resume.py
+python3 scripts/run_behavioral_evals.py --validate-only
+python3 scripts/run_agent_simulations.py --validate-only
 python3 scripts/test_behavioral_eval_runner.py
 python3 scripts/test_agent_simulations.py
+python3 scripts/test_ollama_eval_adapter.py
+python3 scripts/test_package_release.py
+python3 scripts/test_feedback_pipeline.py
+python3 scripts/test_validate_bidi_html.py
+python3 scripts/test_validate_session.py
+python3 scripts/test_validate_resume.py
+python3 scripts/test_session_manager.py
+python3 scripts/test_profile_lifecycle.py
 python3 scripts/test_render_learning_pack.py
 python3 scripts/test_inspect_source.py
+python3 scripts/validate_session.py fixtures/session/learning-session.json \
+  --coverage fixtures/session/source-coverage.json \
+  --knowledge-base fixtures/session/knowledge-base.json \
+  --curriculum-map fixtures/session/curriculum-map.json \
+  --curriculum fixtures/session/study-curriculum.json \
+  --claims fixtures/session/claim-ledger.json \
+  --lesson fixtures/session/lesson-plan.json \
+  --progress fixtures/session/progress.json
 ```
 
-Fixture model adapters prove runner plumbing only. See [`docs/model-evaluation.md`](docs/model-evaluation.md) before making model-quality or release claims.
+The Ollama adapter command above runs unit tests only and does not start or contact Ollama. Fixture model adapters prove runner plumbing only. See [`docs/model-evaluation.md`](docs/model-evaluation.md) before making model-quality or release claims.
 
 For saved connected artifacts, validate cross-file identifiers with:
 
@@ -176,7 +231,7 @@ python3 scripts/validate_session.py learning-session.json \
 
 ## Status
 
-`v1.0.0-rc.1` technical candidate. Repository tests, simulated runner plumbing, connected artifacts, and Arabic/English PDF rendering are executable. Stable `v1.0.0` remains blocked until real named-model evaluation and recorded Arabic/English human review satisfy the release receipt.
+`v1.0.0` final candidate. The GitHub Release has not been published. Publication awaits a `real-release` evidence receipt for the exact final candidate SHA, bilingual human review, verified packaging and checksum, the `v1.0.0` tag, and GitHub Release creation. See [`RELEASE_NOTES.md`](RELEASE_NOTES.md) for the prepared release notes and [`docs/release-checklist.md`](docs/release-checklist.md) for the remaining gates.
 
 ## License
 
