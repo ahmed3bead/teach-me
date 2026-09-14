@@ -30,7 +30,7 @@ For a detailed whole-book, course, curriculum, or broad-subject request, Teach M
 
 `v0.8.3` defines those boundaries precisely. Routine questions are offered only after a complete lesson, topic, module objective, or practical skill—not after a page or paragraph—and begin only when the learner opts in. Accepted checks use a few diagnostic questions to adapt the next teaching step rather than manufacture a score.
 
-`v1.0.0` prepares the final stable candidate with evidence-derived progress, crash-safe sessions, profile lifecycle enforcement, closed-book teacher/learner simulations, checked HTML-to-PDF output, evidence-bounded source intake, pinned automation dependencies, and a stable-release evidence receipt gate.
+`v1.0.0-beta.1` is a public beta—not the stable `v1.0.0` release. It includes evidence-derived progress, crash-safe sessions, profile lifecycle enforcement, closed-book teacher/learner simulations, checked HTML-to-PDF output, evidence-bounded source intake, pinned automation dependencies, and a corrected reproducible behavioral evaluator.
 
 > Teach for demonstrated progress, not information volume.
 
@@ -231,7 +231,9 @@ python3 scripts/validate_session.py learning-session.json \
 
 ## Status
 
-`v1.0.0` final candidate. The GitHub Release has not been published. Publication awaits a `real-release` evidence receipt for the exact final candidate SHA, bilingual human review, verified packaging and checksum, the `v1.0.0` tag, and GitHub Release creation. See [`RELEASE_NOTES.md`](RELEASE_NOTES.md) for the prepared release notes and [`docs/release-checklist.md`](docs/release-checklist.md) for the remaining gates.
+`v1.0.0-beta.1` is a public beta, not the stable `v1.0.0` release. Simplified Modern Standard Arabic (`ar-MSA`) and English (`en`) are supported, with technical terms and proper names preserved in their original language and script. Deterministic validation passes, and the Luma Arabic and Vela English simulations passed.
+
+The previous 90-case behavioral report is invalid and is not release evidence. The corrected evaluator has not yet been used for a complete exact-SHA model run, so this beta does not satisfy the stable behavioral-evidence gate. Teach Me does not guarantee perfect factual accuracy. Please report problems involving teaching, language, assessment consent, source grounding, accessibility, or rendering. See [`RELEASE_NOTES.md`](RELEASE_NOTES.md) for beta details and [`docs/release-checklist.md`](docs/release-checklist.md) for the remaining stable-release gates.
 
 ## License
 

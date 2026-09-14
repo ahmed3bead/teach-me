@@ -1,6 +1,14 @@
-# Teach Me v1.0.0 release notes
+# Teach Me v1.0.0-beta.1 release notes
 
-These notes describe the final `v1.0.0` candidate. They do not claim that the tag or GitHub Release has already been published.
+`v1.0.0-beta.1` is a public beta. It is not the stable `v1.0.0` release and does not satisfy the stable behavioral-evidence gate.
+
+## Validation status
+
+- The complete deterministic validation suite passes.
+- The zero-knowledge Luma Arabic simulation passed.
+- The zero-knowledge Vela English simulation passed.
+- The previous 90-case behavioral report with a 25.5556% pass rate is invalid because its evaluation procedure was not trustworthy. It is retained only as failed historical evidence and is not release evidence.
+- The behavioral evaluator has been corrected and independently reviewed, but it has not yet been used for a complete exact-SHA model run. No behavioral release claim is made from the corrected evaluator in this beta.
 
 ## Highlights
 
@@ -15,6 +23,11 @@ These notes describe the final `v1.0.0` candidate. They do not claim that the ta
 - Validated bidirectional HTML for mixed Arabic/English material and an optional visually inspected PDF derivative.
 - Provider-neutral behavioral and teacher/learner simulation tooling, deterministic guards, and privacy-minimized feedback workflows.
 
+## Language support
+
+- Simplified Modern Standard Arabic (`ar-MSA`) and English (`en`) are supported.
+- Technical terms and proper names remain in their original language and script.
+
 ## Limitations
 
 - Optional research, document, PDF, audio, transcript, video-frame, rendering, storage, and scheduling capabilities depend on the host.
@@ -22,4 +35,8 @@ These notes describe the final `v1.0.0` candidate. They do not claim that the ta
 - Raw video bytes are not automatically treated as watched or understood; transcript and visual coverage are recorded separately.
 - Consequential, current, disputed, or high-stakes claims still require authoritative verification and may require qualified professional help.
 - Domain packs marked `needs-qualified-review` remain experimental and must not be presented as expert-reviewed.
-- Teach Me does not guarantee perfect accuracy or learning outcomes. It provides traceable evidence, explicit uncertainty, and correction paths.
+- Teach Me does not guarantee perfect factual accuracy or learning outcomes. It provides traceable evidence, explicit uncertainty, and correction paths.
+
+## Report beta problems
+
+Please report reproducible problems involving teaching behavior, language quality, assessment consent, source grounding, accessibility, or bidirectional and PDF rendering. Remove personal information and learner transcripts before filing a public issue.
