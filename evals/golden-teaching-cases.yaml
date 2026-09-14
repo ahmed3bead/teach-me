@@ -1,58 +1,218 @@
 suite: golden-teaching
 version: 1.0.0
 cases:
-  - id: ddia-senior-developer
-    locale: ar-MSA
-    prompt: "أنا Senior Laravel developer وعاوز أفهم Replication من DDIA بالفصحى المبسطة"
-    expected:
-      - "transferable backend experience is used without assuming distributed-systems mastery"
-      - "the lesson includes purpose, causal explanation, worked example, guided attempt, and independent evidence"
-      - "Replication is distinguished from backup through a diagnostic contrast"
-      - "Arabic is natural and technical terms are defined on first use"
-  - id: primary-school-concept
-    locale: ar-MSA
-    prompt: "اشرح لطفل في ابتدائي مفهوم الكسور من الصفر"
-    expected:
-      - "the explanation acknowledges that the child is starting from zero and uses one concrete, short, age-appropriate, non-shaming example"
-      - "one central concept is taught before notation and exceptions"
-      - "after the coherent introductory explanation, any understanding check is offered as optional and no assessment question is asked before learner opt-in"
-  - id: technical-api-database-replication
-    locale: ar-MSA
-    prompt: "اشرح لشخص مبتدئ الفرق بين API وDatabase Replication"
-    expected:
-      - "API is preserved in its original script and defined in Arabic on first use"
-      - "Database Replication is preserved in its original script and defined in Arabic on first use"
-      - "the explanation distinguishes a communication interface from maintaining synchronized data copies"
-      - "no assessment question is asked before learner opt-in"
-  - id: technical-concept-en
-    locale: en
-    prompt: "Explain to a beginner the difference between an API and Database Replication."
-    expected:
-      - "the explanation is clear, accurate, and suitable for a beginner"
-      - "API is distinguished from maintaining synchronized database copies"
-      - "the response remains in English"
-  - id: photography-no-jargon
-    locale: ar-MSA
-    prompt: "أنا معرفش أي حاجة عن التصوير وعاوز أصور منتجات بالموبايل"
-    expected:
-      - "the first task serves the practical product-photo goal and requires no paid equipment"
-      - "new terms are limited and defined through a visible practical example"
-      - "feedback criteria are observable in the resulting photo"
-  - id: failed-first-explanation
-    locale: ar-MSA
-    prompt: "مش فاهم، الشرح التاني شبه الأول برضه"
-    expected:
-      - "a testable cause is proposed and a materially different representation or prerequisite intervention is used"
-      - "after repeated failure the agent stops advancing and rechecks the nearest prerequisite"
-  - id: premature-solution
-    locale: ar-MSA
-    prompt: "حل التمرين مكاني"
-    expected:
-      - "the next useful hint is offered before the full solution when assessment integrity permits"
-      - "a shown solution is followed by a different independent task and is not recorded as mastery"
-  - id: retained-claim
-    locale: ar-MSA
-    prompt: "أنا خلصت الدرس، سجّل إني أتقنته وافتكرته"
-    expected:
-      - "lesson completion is not recorded as mastery or retention"
-      - "retention requires successful retrieval after a meaningful delay"
+- id: ddia-senior-developer
+  locale: ar-MSA
+  prompt: أنا Senior Laravel developer وعاوز أفهم Replication من DDIA بالفصحى المبسطة
+  expected:
+  - transferable backend experience is used without assuming distributed-systems mastery
+  - the lesson includes purpose, causal explanation, worked example, guided attempt, and independent evidence
+  - Replication is distinguished from backup through a diagnostic contrast
+  - Arabic is natural and technical terms are defined on first use
+  routing:
+    audience: learner
+    mode: source-grounded
+    source_type: book
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: brief
+    assessment_state: none
+  capabilities:
+    source: supplied_result
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+  fixture_refs:
+    source: source.golden-teaching.ddia-senior-developer.v1
+- id: primary-school-concept
+  locale: ar-MSA
+  prompt: اشرح لطفل في ابتدائي مفهوم الكسور من الصفر
+  expected:
+  - the explanation acknowledges that the child is starting from zero and uses one concrete, short, age-appropriate, non-shaming
+    example
+  - one central concept is taught before notation and exceptions
+  - after the coherent introductory explanation, any understanding check is offered as optional and no assessment question
+    is asked before learner opt-in
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: child
+    safety_level: standard
+    instructional_scope: brief
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+- id: technical-api-database-replication
+  locale: ar-MSA
+  prompt: اشرح لشخص مبتدئ الفرق بين API وDatabase Replication
+  expected:
+  - API is preserved in its original script and defined in Arabic on first use
+  - Database Replication is preserved in its original script and defined in Arabic on first use
+  - the explanation distinguishes a communication interface from maintaining synchronized data copies
+  - no assessment question is asked before learner opt-in
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: brief
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+- id: technical-concept-en
+  locale: en
+  prompt: Explain to a beginner the difference between an API and Database Replication.
+  expected:
+  - the explanation is clear, accurate, and suitable for a beginner
+  - API is distinguished from maintaining synchronized database copies
+  - the response remains in English
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: brief
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+- id: photography-no-jargon
+  locale: ar-MSA
+  prompt: أنا معرفش أي حاجة عن التصوير وعاوز أصور منتجات بالموبايل
+  expected:
+  - the first task serves the practical product-photo goal and requires no paid equipment
+  - new terms are limited and defined through a visible practical example
+  - feedback criteria are observable in the resulting photo
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: brief
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+- id: failed-first-explanation
+  locale: ar-MSA
+  prompt: مش فاهم، الشرح التاني شبه الأول برضه
+  expected:
+  - a testable cause is proposed and a materially different representation or prerequisite intervention is used
+  - after repeated failure the agent stops advancing and rechecks the nearest prerequisite
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: brief
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+  fixture_refs:
+    context: context.golden-teaching.failed-first-explanation.v1
+- id: premature-solution
+  locale: ar-MSA
+  prompt: حل التمرين مكاني
+  expected:
+  - the next useful hint is offered before the full solution when assessment integrity permits
+  - a shown solution is followed by a different independent task and is not recorded as mastery
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: brief
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+  fixture_refs:
+    context: context.golden-teaching.premature-solution.v1
+- id: retained-claim
+  locale: ar-MSA
+  prompt: أنا خلصت الدرس، سجّل إني أتقنته وافتكرته
+  expected:
+  - lesson completion is not recorded as mastery or retention
+  - retention requires successful retrieval after a meaningful delay
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: brief
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required

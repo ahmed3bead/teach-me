@@ -1,35 +1,85 @@
 suite: end-to-end-journeys
 version: 1.0.0
 cases:
-  - id: zero-knowledge-learner-complete-unit
-    locale: ar-MSA
-    turns:
-      - role: user
-        content: "أنا معرفش أي حاجة عن كتابة Prompt قوي. ابدأ معايا من الصفر بالفصحى المبسطة."
-      - role: user
-        content: "تمام، كمل الشرح من غير ما تحسسني إني في امتحان."
-      - role: user
-        content: "إحنا كده خلصنا الدرس الكامل."
-      - role: user
-        content: "أيوه، موافق على اختبار الفهم القصير."
-    expected:
-      - "the learner receives an explain-first coherent lesson with defined terms and a worked example"
-      - "no routine assessment questions appear before the complete-unit boundary and explicit opt-in"
-      - "the accepted check uses three to five purposeful items and adapts the next step without manufacturing a score"
-      - "the teaching remains clear simplified Modern Standard Arabic and preserves isolated English terminology"
-      - "progress claims distinguish explanation, supported practice, and independent evidence"
-  - id: educator-source-map-approval-lesson
-    locale: ar-MSA
-    turns:
-      - role: user
-        content: "ده منهج ابتدائي مصرح لي أستخدمه. حلله الأول قبل ما تعمل الحصة."
-      - role: user
-        content: "موافق على الخريطة دي. جهز أول حصة 45 دقيقة بالفصحى المبسطة للأطفال."
-      - role: user
-        content: "خلي النشاط بدون تكلفة، واعمل rubric منفصل للمدرس."
-    expected:
-      - "the supplied curriculum is mapped before student-facing material and inferred additions remain labeled"
-      - "educator approval occurs before the lesson plan is produced"
-      - "the 45-minute sequence contains an age-appropriate no-cost activity and observable outcome"
-      - "assessment and the educator rubric trace to objective and source identifiers"
-      - "child privacy and source authorization are preserved"
+- id: zero-knowledge-learner-complete-unit
+  locale: ar-MSA
+  turns:
+  - role: user
+    content: أنا معرفش أي حاجة عن كتابة Prompt قوي. ابدأ معايا من الصفر بالفصحى المبسطة.
+    assessment_intent: none
+  - role: user
+    content: تمام، كمل الشرح من غير ما تحسسني إني في امتحان.
+    assessment_intent: decline
+  - role: user
+    content: إحنا كده خلصنا الدرس الكامل.
+    assessment_intent: none
+  - role: user
+    content: أيوه، موافق على اختبار الفهم القصير.
+    assessment_intent: accept
+  expected:
+  - the learner receives an explain-first coherent lesson with defined terms and a worked example
+  - no routine assessment questions appear before the complete-unit boundary and explicit opt-in
+  - the accepted check uses three to five purposeful items and adapts the next step without manufacturing a score
+  - the teaching remains clear simplified Modern Standard Arabic and preserves isolated English terminology
+  - progress claims distinguish explanation, supported practice, and independent evidence
+  routing:
+    audience: learner
+    mode: source-grounded
+    source_type: book
+    artifact_type: chat
+    session_state: multi-turn
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: journey
+    assessment_state: accepted
+  capabilities:
+    source: supplied_result
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+  fixture_refs:
+    source: source.end-to-end-journeys.zero-knowledge-learner-complete-unit.v1
+- id: educator-source-map-approval-lesson
+  locale: ar-MSA
+  turns:
+  - role: user
+    content: ده منهج ابتدائي مصرح لي أستخدمه. حلله الأول قبل ما تعمل الحصة.
+    assessment_intent: none
+  - role: user
+    content: موافق على الخريطة دي. جهز أول حصة 45 دقيقة بالفصحى المبسطة للأطفال.
+    assessment_intent: none
+  - role: user
+    content: خلي النشاط بدون تكلفة، واعمل rubric منفصل للمدرس.
+    assessment_intent: none
+  expected:
+  - the supplied curriculum is mapped before student-facing material and inferred additions remain labeled
+  - educator approval occurs before the lesson plan is produced
+  - the 45-minute sequence contains an age-appropriate no-cost activity and observable outcome
+  - assessment and the educator rubric trace to objective and source identifiers
+  - child privacy and source authorization are preserved
+  routing:
+    audience: educator
+    mode: source-grounded
+    source_type: curriculum
+    artifact_type: curriculum
+    session_state: multi-turn
+    domain_pack: none
+    accessibility: child
+    safety_level: standard
+    instructional_scope: journey
+    assessment_state: offered
+  capabilities:
+    source: supplied_result
+    web: not_required
+    file: executable_temp
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+  fixture_refs:
+    source: source.end-to-end-journeys.educator-source-map-approval-lesson.v1
+    file: file.disposable-workspace.v1

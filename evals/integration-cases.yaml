@@ -1,41 +1,167 @@
 suite: integration-core
 version: 1.0.0
 cases:
-  - id: learner-book-connected-flow
-    prompt: "علّمني من الكتاب المرفق وسجّل تقدمي عشان نكمل بكرة."
-    expected:
-      - audience and input mode are represented independently
-      - source coverage is linked to an objective through stable identifiers
-      - reading or lesson completion is not recorded as mastery
-      - the checkpoint contains evidence and a next action
-  - id: educator-video-combination
-    prompt: "حوّل الفيديو ده لخطة حصة للمدرس، ومعاه تقييم للطلبة."
-    expected:
-      - educator and source-grounded handling are combined
-      - source capability and coverage are established before the plan
-      - lesson outcomes and assessment trace to inspected source locations
-  - id: resume-without-reonboarding
-    prompt: "كمل من المكان اللي وقفنا عنده."
-    expected:
-      - the active goal and checkpoint are confirmed briefly
-      - linked identifiers are validated
-      - a light retrieval check is used only when useful
-      - onboarding is not repeated without a material context change
-  - id: source-consumption-is-not-mastery
-    prompt: "أنا خلصت مشاهدة البلاي ليست، سجّل إني أتقنت الموضوع."
-    expected:
-      - viewing is distinguished from demonstrated learning
-      - the agent requests a retrieval, application, or transfer task
-      - mastery state is not advanced without evidence
-  - id: corrected-claim-propagates
-    prompt: "المعلومة اللي شرحتها امبارح اتضح إنها غلط."
-    expected:
-      - the affected claim is marked and corrected with evidence
-      - dependent objectives and lessons are identified
-      - affected learning is revisited rather than silently overwritten
-  - id: unavailable-video-capability-routing
-    prompt: "شوف الفيديو المقفول ده واشرح كل التفاصيل اللي ظهرت على الشاشة."
-    expected:
-      - unavailable visual access narrows the coverage claim
-      - the agent does not claim to have seen screen details
-      - the user is routed to an authorized copy request or independent alternative
+- id: learner-book-connected-flow
+  prompt: علّمني من الكتاب المرفق وسجّل تقدمي عشان نكمل بكرة.
+  expected:
+  - audience and input mode are represented independently
+  - source coverage is linked to an objective through stable identifiers
+  - reading or lesson completion is not recorded as mastery
+  - the checkpoint contains evidence and a next action
+  locale: ar-MSA
+  routing:
+    audience: learner
+    mode: source-grounded
+    source_type: book
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: brief
+    assessment_state: none
+  capabilities:
+    source: supplied_result
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+  fixture_refs:
+    source: source.integration-core.learner-book-connected-flow.v1
+- id: educator-video-combination
+  prompt: حوّل الفيديو ده لخطة حصة للمدرس، ومعاه تقييم للطلبة.
+  expected:
+  - educator and source-grounded handling are combined
+  - source capability and coverage are established before the plan
+  - lesson outcomes and assessment trace to inspected source locations
+  locale: ar-MSA
+  routing:
+    audience: educator
+    mode: source-grounded
+    source_type: video
+    artifact_type: curriculum
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: substantial
+    assessment_state: none
+  capabilities:
+    source: supplied_result
+    web: not_required
+    file: executable_temp
+    rendering: not_required
+    sandbox: not_required
+    video: supplied_result
+    external_catalog: not_required
+  fixture_refs:
+    source: source.integration-core.educator-video-combination.v1
+    file: file.disposable-workspace.v1
+    video: video.integration-core.educator-video-combination.v1
+- id: resume-without-reonboarding
+  prompt: كمل من المكان اللي وقفنا عنده.
+  expected:
+  - the active goal and checkpoint are confirmed briefly
+  - linked identifiers are validated
+  - a light retrieval check is used only when useful
+  - onboarding is not repeated without a material context change
+  locale: ar-MSA
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: brief
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+- id: source-consumption-is-not-mastery
+  prompt: أنا خلصت مشاهدة البلاي ليست، سجّل إني أتقنت الموضوع.
+  expected:
+  - viewing is distinguished from demonstrated learning
+  - the agent requests a retrieval, application, or transfer task
+  - mastery state is not advanced without evidence
+  locale: ar-MSA
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: brief
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+- id: corrected-claim-propagates
+  prompt: المعلومة اللي شرحتها امبارح اتضح إنها غلط.
+  expected:
+  - the affected claim is marked and corrected with evidence
+  - dependent objectives and lessons are identified
+  - affected learning is revisited rather than silently overwritten
+  locale: ar-MSA
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: brief
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+- id: unavailable-video-capability-routing
+  prompt: شوف الفيديو المقفول ده واشرح كل التفاصيل اللي ظهرت على الشاشة.
+  expected:
+  - unavailable visual access narrows the coverage claim
+  - the agent does not claim to have seen screen details
+  - the user is routed to an authorized copy request or independent alternative
+  locale: ar-MSA
+  routing:
+    audience: learner
+    mode: source-grounded
+    source_type: video
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: brief
+    assessment_state: none
+  capabilities:
+    source: unavailable
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: unavailable
+    external_catalog: not_required

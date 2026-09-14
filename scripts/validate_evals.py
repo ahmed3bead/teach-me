@@ -7,6 +7,8 @@ import json
 import sys
 from pathlib import Path
 
+from behavioral_eval_contract import REGISTRY_PATH, load_fixture_registry, validate_case_contract
+
 try:
     import yaml
     from jsonschema import Draft202012Validator, FormatChecker
@@ -24,6 +26,11 @@ def main() -> int:
     schema = json.loads((EVALS / "eval-suite.schema.json").read_text(encoding="utf-8"))
     Draft202012Validator.check_schema(schema)
     validator = Draft202012Validator(schema, format_checker=FormatChecker())
+    registry_schema = json.loads((ROOT / "schemas" / "eval-fixture-registry.schema.json").read_text(encoding="utf-8"))
+    Draft202012Validator.check_schema(registry_schema)
+    registry_data = yaml.safe_load(REGISTRY_PATH.read_text(encoding="utf-8"))
+    Draft202012Validator(registry_schema, format_checker=FormatChecker()).validate(registry_data)
+    registry = load_fixture_registry()
     suites: set[str] = set()
     case_keys: set[str] = set()
     case_count = 0
@@ -37,6 +44,7 @@ def main() -> int:
             raise AssertionError(f"duplicate suite name: {suite}")
         suites.add(suite)
         for case in data["cases"]:
+            validate_case_contract(case, registry)
             key = f"{suite}/{case['id']}"
             if key in case_keys:
                 raise AssertionError(f"duplicate case key: {key}")
@@ -52,6 +60,6 @@ def main() -> int:
 if __name__ == "__main__":
     try:
         raise SystemExit(main())
-    except (AssertionError, SchemaError, ValidationError, yaml.YAMLError) as exc:
+    except (AssertionError, ValueError, SchemaError, ValidationError, yaml.YAMLError) as exc:
         print(f"Eval validation failed: {exc}", file=sys.stderr)
         raise SystemExit(1)
