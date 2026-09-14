@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Any
 from urllib import error, parse, request
 
+from assessment_intent import intent_from_turn
 from locale_policy import canonical_locale, infer_locale, unicode_phrase_boundary
 
 
@@ -116,11 +117,16 @@ def child_lesson_requested(payload: dict[str, Any]) -> bool:
     return any(marker in combined for marker in ("طفل", "ابتدائي", "primary school", "child"))
 
 
+def learner_assessment_intent(payload: dict[str, Any]) -> str:
+    """Require the validated event used by the live simulation protocol."""
+    event = payload.get("learner_event")
+    if not isinstance(event, dict):
+        raise ValueError("simulation teacher payload requires a structured learner_event")
+    return intent_from_turn(event, allow_legacy=False)
+
+
 def learner_opted_in(payload: dict[str, Any]) -> bool:
-    message = str(payload.get("learner_message", "")).casefold()
-    if requested_locale(payload) == "ar-MSA":
-        return bool(re.search(unicode_phrase_boundary(r"(?:نعم|أجل|موافق|مستعد|حسنا)"), message))
-    return bool(re.search(unicode_phrase_boundary(r"(?:yes|sure|ready|okay|ok|please do|let's do it)"), message))
+    return learner_assessment_intent(payload) == "accept"
 
 
 def seed_for_payload(base_seed: int, payload: dict[str, Any]) -> int:
@@ -303,7 +309,8 @@ def teacher_output_contract(payload: dict[str, Any]) -> str:
 def simulation_teacher_contract(payload: dict[str, Any]) -> str:
     """Repeat the closed-book boundary after broad skill context so it remains authoritative."""
     first_turn = payload.get("turn_index") == 1
-    opted_in = learner_opted_in(payload)
+    assessment_intent = learner_assessment_intent(payload)
+    opted_in = assessment_intent == "accept"
     locale_rule = (
         "- Write learner-facing output only in natural simplified Modern Standard Arabic. Do not mirror dialectal "
         "function words, negation, or verb forms from learner messages. Keep foreign and technical terms in their "
@@ -312,12 +319,29 @@ def simulation_teacher_contract(payload: dict[str, Any]) -> str:
         else "- Write learner-facing output only in English."
     )
     structure = (
-        "- On turn one: state the system's purpose, list the decision steps in order, apply every step to one complete example, then offer an optional short check without including its first question."
+        "- On turn one: state the system's purpose, list the decision steps in order, apply every step to one complete example, and finish without offering an assessment."
         if first_turn
         else (
             "- The learner explicitly opted in; ask exactly one short application question grounded in the material, and do not declare mastery from the answer alone."
             if opted_in
-            else "- Address the learner's current confusion with a materially different representation that has not already appeared in the dialogue. A repeated or lightly paraphrased explanation is not a repair. Reconnect the new representation to the decision steps, then offer an optional short check without including its first question."
+            else (
+                "- The learner explicitly declined assessment. Acknowledge the choice without pressure, continue teaching, and do not offer or ask another assessment in this turn."
+                if assessment_intent == "decline"
+                else "- Address the learner's current confusion with a materially different representation that has not already appeared in the dialogue. A repeated or lightly paraphrased explanation is not a repair. Reconnect the new representation to the decision steps, then offer an optional short check without including its first question."
+            )
+        )
+    )
+    ending = (
+        "- Finish the first explanation without an assessment invitation, question, or task."
+        if first_turn
+        else (
+            "- After the short question, wait for the learner's answer."
+            if opted_in
+            else (
+                "- Respect the refusal and include no assessment invitation, question, or task in this turn."
+                if assessment_intent == "decline"
+                else "- End with a brief optional-check invitation in the output language; include no question or task."
+            )
         )
     )
     return "\n".join(
@@ -330,11 +354,7 @@ def simulation_teacher_contract(payload: dict[str, Any]) -> str:
             "- Apply every explicit exception or higher-priority constraint before the general rule it overrides.",
             locale_rule,
             "- Keep the response between 100 and 180 words. Use one worked scenario containing enough items to demonstrate every decision and precedence dimension.",
-            (
-                "- After the short question, wait for the learner's answer."
-                if opted_in
-                else "- End with a brief optional-check invitation in the output language; include no question or task."
-            ),
+            ending,
             structure,
         ]
     )
@@ -486,7 +506,7 @@ def messages_and_schema(payload: dict[str, Any], skill_context: str | None) -> t
             "Act only as the described learner. " + language_rule + " Never use hidden or outside knowledge and never "
             "guess a fictional rule. Perform each scripted confusion or clarification request at most once, acknowledge "
             "when a new explanation resolves it, and advance. Do not quote instructions or emit HTML, template markers, "
-            "evaluator commentary, drafts, corrections, role labels, or JSON syntax inside the answer/message string. "
+            "evaluator commentary, drafts, corrections, role labels, or JSON syntax inside the utterance string. "
             "The string must contain exactly one natural learner utterance.\n"
             f"Persona: {persona}\nBehaviors: {behaviors}"
         )
@@ -504,9 +524,14 @@ def messages_and_schema(payload: dict[str, Any], skill_context: str | None) -> t
         elif kind == "dialogue":
             current_behavior = payload.get("current_behavior")
             system += (
-                "\nONLY CURRENT BEHAVIOR: " + (str(current_behavior) if current_behavior else "No scripted behavior remains.")
+                "\nONLY CURRENT BEHAVIOR: "
+                + (json.dumps(current_behavior, ensure_ascii=False) if current_behavior else "No scripted behavior remains.")
                 + " Perform it at most once. If its condition did not occur, briefly acknowledge what is clear and move on. "
-                "When none remains and the teacher asks a check after your opt-in, answer from the transcript and set done=true."
+                "When none remains and the teacher asks a check after your opt-in, answer from the transcript and set done=true. "
+                "For each dialogue response, set assessment_intent to none when making no assessment choice, accept only "
+                "when explicitly accepting an offered assessment, or decline when explicitly refusing it. Negated consent "
+                "must always be decline, never accept. The utterance and assessment_intent must not contradict each other. "
+                "Keep done=false while any later scripted behavior remains; set it true only after the final required behavior."
             )
         if kind == "baseline":
             boundary = "The fictional material has not been taught. Do not solve or guess; clearly state in the required learner-facing language that you do not know its rules yet."
@@ -523,16 +548,23 @@ def messages_and_schema(payload: dict[str, Any], skill_context: str | None) -> t
                 ensure_ascii=False,
             )
             return [{"role": "system", "content": system}, {"role": "user", "content": user}], text_schema("answer"), 0.0
-        schema = text_schema("message")
+        schema = text_schema("utterance")
+        schema["properties"]["assessment_intent"] = {
+            "type": "string",
+            "enum": ["none", "accept", "decline"],
+        }
         schema["properties"]["done"] = {"type": "boolean"}
-        schema["required"].append("done")
+        schema["required"].extend(["assessment_intent", "done"])
         user = json.dumps(
             {
                 "instruction": payload.get("instruction"),
                 "dialogue": payload.get("history", []),
                 "turn": payload.get("turn_index"),
                 "maximum_turns": payload.get("max_turns"),
-                "task": "Write the learner's next natural message. Set done=true only at a natural endpoint.",
+                "task": (
+                    "Write the learner's next natural utterance and its assessment_intent event. "
+                    "Set done=true only at a natural endpoint."
+                ),
                 "current_behavior": payload.get("current_behavior"),
                 "completed_behaviors": payload.get("completed_behaviors", []),
             },

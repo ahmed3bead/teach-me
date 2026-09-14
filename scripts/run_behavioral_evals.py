@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import Any
 
 from locale_policy import canonical_locale, unicode_phrase_boundary
+from assessment_intent import intent_from_turn
 
 try:
     import yaml
@@ -41,15 +42,6 @@ TECHNICAL_TERMS = {
     "Prompt": ("برومبت",),
     "Database": ("داتابيز", "داتا بيز"),
 }
-ASSESSMENT_OPT_IN = re.compile(
-    unicode_phrase_boundary(
-        r"(?:اختبرني|اسألني|اديني\s+(?:سؤال|أسئلة|تمرين|تمارين)|"
-        r"(?:عايز|عاوز|جاهز|موافق)\s+(?:لل)?(?:أسئلة|تمارين|اختبار)|"
-        r"test\s+me|quiz\s+me|ask\s+me|give\s+me\s+(?:a\s+)?(?:question|exercise)|"
-        r"ready\s+for\s+(?:the\s+)?(?:questions|quiz|test))"
-    ),
-    flags=re.IGNORECASE,
-)
 DIRECT_ASSESSMENT = re.compile(
     r"(?:^|[.!؟?\n:]\s*|,\s*)"
     r"(?:لو\s+(?:حابب|عايز|عاوز)[،,]?\s*|if\s+you\s+want\s+to\s+practice[،,]?\s*)?"
@@ -247,17 +239,43 @@ def deterministic_api_replication_contrast_check(text: str, prompt: str) -> dict
     }
 
 
-def learner_opted_into_assessment(turns: list[dict[str, str]]) -> bool:
-    learner_text = "\n".join(
-        str(turn.get("content", "")) for turn in turns if turn.get("role") == "user"
-    )
-    return bool(ASSESSMENT_OPT_IN.search(learner_text))
+def learner_opted_into_assessment(turns: list[dict[str, Any]]) -> bool:
+    """Support old behavioral fixtures; new simulations pass structured intent."""
+    learner_turns = [turn for turn in turns if turn.get("role") in {"user", "learner"}]
+    state = "none"
+    for turn in learner_turns:
+        try:
+            intent = intent_from_turn(turn, allow_legacy=True)
+        except ValueError:
+            return False
+        if intent != "none":
+            state = intent
+    return state == "accept"
 
 
-def deterministic_assessment_check(text: str, turns: list[dict[str, str]]) -> dict[str, Any]:
+def deterministic_assessment_check(
+    text: str,
+    turns: list[dict[str, Any]],
+) -> dict[str, Any]:
     """Prevent the first test item or task from being bundled with its invitation."""
-    if learner_opted_into_assessment(turns):
-        return {"passed": True, "reason": "learner explicitly opted into assessment"}
+    current = next(
+        (turn for turn in reversed(turns) if turn.get("role") in {"user", "learner"}),
+        None,
+    )
+    if current is not None and "assessment_intent" in current:
+        try:
+            opted_in = intent_from_turn(current, allow_legacy=False) == "accept"
+        except ValueError:
+            return {
+                "passed": False,
+                "reason": "structured assessment intent is missing, malformed, or contradictory",
+            }
+        source = "structured learner assessment_intent"
+    else:
+        opted_in = learner_opted_into_assessment(turns)
+        source = "legacy learner text"
+    if opted_in:
+        return {"passed": True, "reason": f"learner explicitly opted into assessment via {source}"}
     match = DIRECT_ASSESSMENT.search(text) or ASSESSMENT_QUESTION.search(text)
     if match:
         excerpt = " ".join(match.group(0).split())[:120]

@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Run closed-book teacher/learner simulations through command adapters."""
+"""Run closed-book teacher/learner simulations through command adapters.
+
+Live dialogue adapters must return ``utterance``, ``assessment_intent``, and
+``done``. Missing structured fields are protocol failures. Conservative text
+classification exists only for reading stored legacy transcript content.
+"""
 
 from __future__ import annotations
 
@@ -13,6 +18,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from assessment_intent import ASSESSMENT_INTENTS, validate_assessment_intent
 from locale_policy import canonical_locale
 from run_behavioral_evals import (
     deterministic_assessment_check,
@@ -79,6 +85,35 @@ def required_text(result: dict[str, Any], field: str, key: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise RuntimeError(f"{key}: adapter returned no {field}")
     return value
+
+
+def required_learner_event(result: dict[str, Any], key: str) -> dict[str, str]:
+    """Validate one structured dialogue event without inferring permission from prose."""
+    utterance = result.get("utterance")
+    if not isinstance(utterance, str) or not utterance.strip():
+        raise RuntimeError(f"{key}: learner event requires a non-empty utterance")
+    try:
+        intent = validate_assessment_intent(utterance, result.get("assessment_intent"))
+    except ValueError as exc:
+        raise RuntimeError(f"{key}: invalid learner event: {exc}") from exc
+    return {"utterance": utterance, "assessment_intent": intent}
+
+
+def required_done(result: dict[str, Any], key: str) -> bool:
+    """Require the live adapter's explicit Boolean completion event."""
+    if "done" not in result or not isinstance(result["done"], bool):
+        raise RuntimeError(f"{key}: learner event requires boolean done")
+    return result["done"]
+
+
+def expected_behavior_intent(behavior: Any) -> str | None:
+    """Return an optional fixture expectation while retaining legacy string profiles."""
+    if not isinstance(behavior, dict):
+        return None
+    expected = behavior.get("expected_assessment_intent")
+    if expected not in ASSESSMENT_INTENTS:
+        raise RuntimeError("structured learner behavior has invalid expected_assessment_intent")
+    return expected
 
 
 def grade_results(grade: dict[str, Any], expected: list[dict[str, str]], key: str) -> list[dict[str, Any]]:
@@ -264,12 +299,13 @@ def main() -> int:
         baseline = ""
         transfer = ""
         learner_outputs: list[str] = []
-        history: list[dict[str, str]] = []
+        history: list[dict[str, Any]] = []
         teacher_models: list[str | None] = []
         learner_models: list[str | None] = []
         teacher_turn_checks: list[dict[str, Any]] = []
         teacher_adapter_calls: list[dict[str, Any]] = []
         learner_adapter_calls: list[dict[str, Any]] = []
+        remaining_lifecycle_events: list[Any] = []
         learner_payloads_closed_book = True
         deterministic_guards: list[dict[str, Any]] = []
         row: dict[str, Any] = {
@@ -290,6 +326,7 @@ def main() -> int:
             "learner_models": [],
             "teacher_adapter_calls": [],
             "learner_adapter_calls": [],
+            "remaining_lifecycle_events": [],
         }
         rows.append(row)
         write_report(args.output, report)
@@ -310,7 +347,10 @@ def main() -> int:
             baseline_result = invoke(args.learner_command, baseline_payload, args.timeout)
             baseline = required_text(baseline_result, "answer", key)
             learner_outputs = [baseline]
-            learner_message = simulation["initial_request"]
+            learner_event = {
+                "utterance": simulation["initial_request"],
+                "assessment_intent": "none",
+            }
             learner_models = [baseline_result.get("model")]
             learner_adapter_calls = [adapter_attempt_record(baseline_result, "baseline")]
 
@@ -320,17 +360,27 @@ def main() -> int:
                 teaching = invoke(args.teacher_command, {
                     "type": "teach", "simulation_id": key, "locale": simulation["locale"],
                     "teaching_material": simulation["teaching_material"], "history": history,
-                    "learner_message": learner_message, "turn_index": turn_index,
+                    "learner_message": learner_event["utterance"],
+                    "learner_event": learner_event,
+                    "turn_index": turn_index,
                     "max_turns": simulation["max_turns"], "skill_root": str(ROOT),
                 }, args.timeout)
                 teacher_response = required_text(teaching, "response", key)
                 teacher_models.append(teaching.get("model"))
                 teacher_adapter_calls.append(adapter_attempt_record(teaching, "teach", turn_index))
                 learner_turns = [
-                    {"role": "user", "content": item["content"]}
+                    {
+                        "role": "user",
+                        "content": item["content"],
+                        "assessment_intent": item["assessment_intent"],
+                    }
                     for item in history
                     if item["role"] == "learner"
-                ] + [{"role": "user", "content": learner_message}]
+                ] + [{
+                    "role": "user",
+                    "content": learner_event["utterance"],
+                    "assessment_intent": learner_event["assessment_intent"],
+                }]
                 teacher_turn_checks.append(
                     {
                         "turn_index": turn_index,
@@ -339,11 +389,18 @@ def main() -> int:
                         "completeness": deterministic_completeness_check(
                             teacher_response, simulation["initial_request"]
                         ),
-                        "assessment": deterministic_assessment_check(teacher_response, learner_turns),
+                        "assessment": deterministic_assessment_check(
+                            teacher_response,
+                            learner_turns,
+                        ),
                     }
                 )
                 history.extend([
-                    {"role": "learner", "content": learner_message},
+                    {
+                        "role": "learner",
+                        "content": learner_event["utterance"],
+                        "assessment_intent": learner_event["assessment_intent"],
+                    },
                     {"role": "teacher", "content": teacher_response},
                 ])
                 failure_stage = f"learner_turn_{turn_index}"
@@ -363,16 +420,41 @@ def main() -> int:
                 learner = invoke(args.learner_command, dialogue_payload, args.timeout)
                 learner_models.append(learner.get("model"))
                 learner_adapter_calls.append(adapter_attempt_record(learner, "dialogue", turn_index))
-                done = learner.get("done", False)
-                if not isinstance(done, bool):
-                    raise RuntimeError(f"{key}: learner done must be boolean")
-                next_learner_message = required_text(learner, "message", key)
-                learner_outputs.append(next_learner_message)
+                done = required_done(learner, key)
+                next_learner_event = required_learner_event(learner, key)
+                expected_intent = expected_behavior_intent(dialogue_payload["current_behavior"])
+                if expected_intent is not None and next_learner_event["assessment_intent"] != expected_intent:
+                    raise RuntimeError(
+                        f"{key}: learner assessment_intent {next_learner_event['assessment_intent']!r} "
+                        f"did not exercise expected intent {expected_intent!r}"
+                    )
+                learner_outputs.append(next_learner_event["utterance"])
                 if done or turn_index == simulation["max_turns"]:
-                    history.append({"role": "learner", "content": next_learner_message})
+                    history.append({
+                        "role": "learner",
+                        "content": next_learner_event["utterance"],
+                        "assessment_intent": next_learner_event["assessment_intent"],
+                    })
+                if done and turn_index < len(simulation["learner_behaviors"]):
+                    remaining_lifecycle_events = simulation["learner_behaviors"][turn_index:]
+                    row["remaining_lifecycle_events"] = remaining_lifecycle_events
+                    failure_stage = "lifecycle"
+                    raise RuntimeError(
+                        f"{key}: learner ended before all required behaviors were exercised"
+                    )
                 if done:
                     break
-                learner_message = next_learner_message
+                learner_event = next_learner_event
+
+            completed_behavior_count = min(turn_index, len(simulation["learner_behaviors"]))
+            if completed_behavior_count < len(simulation["learner_behaviors"]):
+                remaining_lifecycle_events = simulation["learner_behaviors"][completed_behavior_count:]
+                row["remaining_lifecycle_events"] = remaining_lifecycle_events
+                failure_stage = "lifecycle"
+                model_role = "learner"
+                raise RuntimeError(
+                    f"{key}: maximum turns reached with unexercised learner behaviors"
+                )
 
             failure_stage = "transfer"
             model_role = "learner"
@@ -452,6 +534,7 @@ def main() -> int:
                 "learner_models": learner_models,
                 "teacher_adapter_calls": teacher_adapter_calls,
                 "learner_adapter_calls": learner_adapter_calls,
+                "remaining_lifecycle_events": remaining_lifecycle_events,
                 "failure_stage": failure_stage,
             })
             report.update({

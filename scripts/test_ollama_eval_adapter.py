@@ -199,6 +199,10 @@ class AdapterTests(unittest.TestCase):
             "locale": "ar-MSA",
             "turn_index": 2,
             "learner_message": "ما زلت لا أفهم الفرق.",
+            "learner_event": {
+                "utterance": "ما زلت لا أفهم الفرق.",
+                "assessment_intent": "none",
+            },
             "history": [
                 {"role": "learner", "content": "اشرح الفكرة من البداية."},
                 {"role": "teacher", "content": "هذا هو التعريف الأساسي للفكرة."},
@@ -228,11 +232,44 @@ class AdapterTests(unittest.TestCase):
         self.assertIn("natural simplified Modern Standard Arabic", learner_contract)
         self.assertIn("Do not mirror dialectal function words", learner_contract)
         self.assertIn("technical terms in their original language", learner_contract)
+        self.assertIn("Negated consent must always be decline", learner_contract)
+        self.assertIn("Keep done=false while any later scripted behavior remains", learner_contract)
 
-        self.assertTrue(adapter.learner_opted_in({"locale": "ar-MSA", "learner_message": "نعم، أوافق."}))
-        self.assertFalse(adapter.learner_opted_in({"locale": "ar-MSA", "learner_message": "هذا مستعدون له."}))
-        self.assertTrue(adapter.learner_opted_in({"locale": "en", "learner_message": "Ready?"}))
-        self.assertFalse(adapter.learner_opted_in({"locale": "en", "learner_message": "Readying notes."}))
+        _messages, learner_schema, _temperature = adapter.messages_and_schema(learner_payload, None)
+        self.assertEqual(
+            learner_schema["properties"]["assessment_intent"]["enum"],
+            ["none", "accept", "decline"],
+        )
+        self.assertIn("utterance", learner_schema["required"])
+        self.assertIn("assessment_intent", learner_schema["required"])
+        self.assertNotIn("message", learner_schema["properties"])
+
+        self.assertTrue(adapter.learner_opted_in({
+            "locale": "ar-MSA",
+            "learner_event": {"utterance": "نعم، أوافق على الفحص.", "assessment_intent": "accept"},
+        }))
+        self.assertFalse(adapter.learner_opted_in({
+            "locale": "ar-MSA",
+            "learner_event": {"utterance": "لا أوافق.", "assessment_intent": "decline"},
+        }))
+        with self.assertRaises(ValueError):
+            adapter.learner_opted_in({
+                "locale": "en", "assessment_permission": True,
+                "learner_message": "Ready for the quiz.",
+            })
+        with self.assertRaises(ValueError):
+            adapter.learner_opted_in({
+                "locale": "ar-MSA",
+                "learner_event": {"utterance": "لا أوافق.", "assessment_intent": "accept"},
+            })
+
+        decline_payload = {
+            **teacher_payload,
+            "learner_event": {"utterance": "لا أريد الأسئلة الآن.", "assessment_intent": "decline"},
+        }
+        decline_contract = adapter.simulation_teacher_contract(decline_payload)
+        self.assertIn("explicitly declined assessment", decline_contract)
+        self.assertIn("include no assessment invitation, question, or task", decline_contract)
 
     def test_child_contract_teaches_equal_parts_before_one_symbol(self):
         payload = {
@@ -312,6 +349,7 @@ class AdapterTests(unittest.TestCase):
             "teaching_material": "Local rules run before global rules.",
             "history": [],
             "learner_message": "Teach me from zero.",
+            "learner_event": {"utterance": "Teach me from zero.", "assessment_intent": "none"},
             "turn_index": 1,
         }
         messages, _schema, temperature = adapter.messages_and_schema(payload, "skill")
@@ -320,7 +358,7 @@ class AdapterTests(unittest.TestCase):
         self.assertIn("labels have no implied real-world meaning", messages[0]["content"])
         self.assertIn("one complete example", messages[0]["content"])
         self.assertGreater(messages[0]["content"].index("CLOSED-BOOK SIMULATION BOUNDARY"), messages[0]["content"].index("skill"))
-        self.assertIn("brief optional-check invitation", messages[0]["content"])
+        self.assertIn("finish without offering an assessment", messages[0]["content"])
         content = json.loads(messages[1]["content"])
         self.assertIn("operational decision path", " ".join(content["response_requirements"]))
         self.assertEqual(temperature, 0.0)

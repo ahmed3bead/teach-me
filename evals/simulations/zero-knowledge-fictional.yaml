@@ -7,10 +7,14 @@ simulations:
     max_turns: 7
     learner_persona: "متعلم بالغ يبدأ بصفر معرفة عن نظام Luma الخيالي. لا تستخدم أي معرفة غير موجودة في كلام المدرس. تحدث بالفصحى المبسطة."
     learner_behaviors:
-      - "بعد أول شرح حقيقي، عبّر مرة واحدة عن أن الفرق بين القاعدة والاستثناء غير واضح."
-      - "إذا سألك المدرس أسئلة قبل أن يشرح وحدة كاملة، ارفض بلطف واطلب استكمال الشرح."
-      - "بعد شرح القواعد والأمثلة كوحدة كاملة، وافق على فحص فهم قصير."
-      - "أجب من المعلومات التي شرحها المدرس فقط، وأظهر أي نقطة ما زالت غير واضحة."
+      - instruction: "After the first explanation, say once that you are still unsure which rule should be used first and ask to see the idea another way. Do not propose or guess any route."
+        expected_assessment_intent: none
+      - instruction: "When the teacher first offers short questions, say once that you prefer to continue the explanation for now. Do not answer a question."
+        expected_assessment_intent: decline
+      - instruction: "After the idea has been shown in another form and the explanation has continued, explicitly choose the short check. Do not answer a question until the teacher asks it."
+        expected_assessment_intent: accept
+      - instruction: "Answer the accepted check using only information in the transcript, state any remaining uncertainty honestly, and end the dialogue."
+        expected_assessment_intent: none
     initial_request: "أنا معرفش أي حاجة عن نظام Luma. علّمني من الصفر بالفصحى المبسطة عشان أعرف أوجّه الصناديق صح."
     teaching_material: |
       نظام Luma خيالي ولا توجد عنه معرفة خارج هذا السيناريو.
