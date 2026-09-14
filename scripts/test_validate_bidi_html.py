@@ -16,6 +16,12 @@ def main() -> int:
     template = validate(ROOT / "templates" / "bidi-learning-pack.html", check_links=False)
     if template:
         raise AssertionError(f"bidi template failed: {template!r}")
+    valid_text = (ROOT / "fixtures" / "bidi" / "valid.html").read_text(encoding="utf-8")
+    if 'bdi[dir="ltr"] { white-space: nowrap; }' not in valid_text:
+        raise AssertionError("multiword LTR terms can wrap across PDF lines")
+    for term in ("API", "Replication", "Contract Test", "Prompt", "Database"):
+        if f'<bdi dir="ltr">{term}</bdi>' not in valid_text:
+            raise AssertionError(f"technical term lacks explicit LTR isolation: {term}")
     invalid = validate(ROOT / "fixtures" / "bidi" / "invalid-unisolated.html")
     if not any("unisolated" in error for error in invalid):
         raise AssertionError(f"unisolated LTR content was accepted: {invalid!r}")

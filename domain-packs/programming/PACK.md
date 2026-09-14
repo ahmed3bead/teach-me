@@ -14,7 +14,7 @@ Prefer executable tasks, code reading, prediction, repair, and requirement chang
 
 ## Arabic and accessibility
 
-Explain concepts naturally in the selected Arabic variety while preserving exact identifiers and code in left-to-right isolation. Never translate code tokens. Offer keyboard-light alternatives for concept checks, but do not replace the ability to write and run code when that is the target.
+Explain Arabic concepts in simplified Modern Standard Arabic while preserving exact identifiers and code in left-to-right isolation. Never translate or transliterate technical terms or code tokens. Offer keyboard-light alternatives for concept checks, but do not replace the ability to write and run code when that is the target.
 
 ## Safety and freshness
 

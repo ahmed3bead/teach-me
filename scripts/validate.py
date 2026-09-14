@@ -15,6 +15,11 @@ ROOT = Path(__file__).resolve().parents[1]
 ALLOWED_ORIGINS = {"curriculum", "educator", "inferred", "external", "adaptation"}
 
 
+def top_level_case_ids(text: str) -> list[str]:
+    """Return only case-list IDs emitted at column zero, never nested fixture IDs."""
+    return re.findall(r"^- id: (\S+)$", text, flags=re.MULTILINE)
+
+
 def fail(message: str) -> None:
     raise AssertionError(message)
 
@@ -48,10 +53,11 @@ def check_evals() -> None:
     # Avoid a runtime YAML dependency: these invariants cover the committed format.
     for path in sorted((ROOT / "evals").glob("*.yaml")):
         text = path.read_text(encoding="utf-8")
-        ids = re.findall(r"^  - id: (\S+)$", text, flags=re.MULTILINE)
+        # PyYAML emits top-level case items at column zero; nested fixture IDs are indented.
+        ids = top_level_case_ids(text)
         if not ids or len(ids) != len(set(ids)):
             fail(f"{path}: missing or duplicate case IDs")
-        if "    expected:\n" not in text:
+        if not re.search(r"^\s+expected:\s*$", text, flags=re.MULTILINE):
             fail(f"{path}: cases need observable expectations")
 
 

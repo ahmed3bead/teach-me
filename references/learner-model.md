@@ -7,7 +7,7 @@ Maintain a provisional model, not a permanent profile. Every inference must be c
 - desired outcome and motivation;
 - current demonstrated abilities and missing prerequisites;
 - time, tools, budget, and accessibility constraints;
-- preferred language: `ar-MSA`, `ar-EG`, `en`, or a natural mix;
+- preferred language: `ar-MSA` or `en`; normalize the legacy `ar-EG` value to `ar-MSA`;
 - terminology already introduced;
 - strategies that helped or failed, with context;
 - confidence compared with observed performance;

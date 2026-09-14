@@ -1,59 +1,296 @@
 suite: conversational-teaching
 version: 1.0.0
 cases:
-  - id: explicit-zero-start
-    prompt: "أنا معرفش أي حاجة عن الكتاب، ابدأ معايا من الصفر"
-    expected:
-      - "the stated beginner starting point is accepted without a subject-matter placement test"
-      - "a coherent foundation and worked example are taught before assessment"
-  - id: no-micro-quiz-chain
-    prompt: "اشرح لي الفصل الأول براحة، مش عاوز سؤال بعد كل معلومة"
-    expected:
-      - "the explanation spans a coherent idea cluster without appending a quiz to each part"
-      - "the current action may be reading or reflection without requiring an answer"
-  - id: exam-feel-recovery
-    prompt: "مش عاجبني الأسلوب، حاسس إني في امتحان مش بتعلم"
-    expected:
-      - "the mismatch is acknowledged and questions, scoring, and visible mastery labels stop immediately"
-      - "the response resumes connected explanation and does not end with another diagnostic question"
-  - id: internal-progress-labels
-    prompt: "جاوبت على المثال؛ كمل الشرح"
-    expected:
-      - "routine evidence classification remains internal"
-      - "introduced or mastery labels are not announced after every learner message"
-  - id: meaningful-checkpoint
-    prompt: "خلصنا الوحدة كاملة وعاوز أتأكد إني استفدت"
-    expected:
-      - "one authentic low-pressure application is preferred over several tiny classification questions"
-      - "feedback informs the next lesson without making a score the goal"
-  - id: unfinished-slice-is-not-boundary
-    prompt: "خلصنا صفحتين من الفصل ولسه الدرس مكمل، تسألني دلوقتي؟"
-    expected:
-      - "an unfinished page slice is not treated as a completed learning-unit boundary"
-      - "the connected explanation continues without starting or offering a routine quiz"
-  - id: completed-unit-offer-before-questions
-    prompt: "كده خلصنا درس كتابة Prompt قوي كامل"
-    expected:
-      - "the completed lesson is recapped before an optional understanding check is offered"
-      - "no assessment question is asked until the learner explicitly opts in"
-  - id: optional-check-declined
-    prompt: "لا، مش عاوز أسئلة دلوقتي؛ كمل اللي بعده"
-    expected:
-      - "the learner's choice is accepted without pressure, penalty language, or a negative mastery inference"
-      - "the next lesson continues without repeating the offer inside the same completed unit"
-  - id: optional-check-accepted
-    prompt: "أيوه، اسألني كام سؤال نعرف بيهم أنا فهمت الدرس ولا لأ"
-    expected:
-      - "three to five concise items sample explanation, misconception discrimination, and application as relevant"
-      - "the result is used to continue or repair teaching rather than manufacture a score"
-  - id: declined-check-before-dependent-unit
-    prompt: "مش عاوز أسئلة، بس الدرس الجاي مبني بالكامل على اللي شرحته"
-    expected:
-      - "the learner is not pressured or assigned a negative label"
-      - "unverified mastery is not assumed for a dependent objective"
-      - "an equivalent low-pressure evidence option or non-dependent continuation is offered"
-  - id: exam-preparation-exception
-    prompt: "عندي امتحان بكرة وعاوز تختبرني بأسئلة كتير"
-    expected:
-      - "the explicit request for intensive assessment is honored"
-      - "question cadence remains purposeful and feedback-based"
+- id: explicit-zero-start
+  locale: ar-MSA
+  prompt: أنا معرفش أي حاجة عن الكتاب، ابدأ معايا من الصفر
+  expected:
+  - the stated beginner starting point is accepted without a subject-matter placement test
+  - a coherent foundation and worked example are taught before assessment
+  routing:
+    audience: learner
+    mode: source-grounded
+    source_type: book
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: brief
+    assessment_state: none
+  capabilities:
+    source: supplied_result
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+  fixture_refs:
+    source: source.conversational-teaching.explicit-zero-start.v1
+    context: context.conversational-teaching.explicit-zero-start.v1
+- id: no-micro-quiz-chain
+  locale: ar-MSA
+  prompt: اشرح لي الفصل الأول براحة، مش عاوز سؤال بعد كل معلومة
+  expected:
+  - the explanation spans a coherent idea cluster without appending a quiz to each part
+  - the current action may be reading or reflection without requiring an answer
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: brief
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+  fixture_refs:
+    context: context.conversational-teaching.no-micro-quiz-chain.v1
+- id: exam-feel-recovery
+  locale: ar-MSA
+  prompt: مش عاجبني الأسلوب، حاسس إني في امتحان مش بتعلم
+  expected:
+  - the mismatch is acknowledged and questions, scoring, and visible mastery labels stop immediately
+  - the response resumes connected explanation and does not end with another diagnostic question
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: brief
+    assessment_state: intensive
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+  fixture_refs:
+    context: context.conversational-teaching.exam-feel-recovery.v1
+- id: internal-progress-labels
+  locale: ar-MSA
+  prompt: جاوبت على المثال؛ كمل الشرح
+  expected:
+  - routine evidence classification remains internal
+  - introduced or mastery labels are not announced after every learner message
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: brief
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+- id: meaningful-checkpoint
+  locale: ar-MSA
+  prompt: خلصنا الوحدة كاملة وعاوز أتأكد إني استفدت
+  expected:
+  - one authentic low-pressure application is preferred over several tiny classification questions
+  - feedback informs the next lesson without making a score the goal
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: substantial
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+  fixture_refs:
+    context: context.conversational-teaching.meaningful-checkpoint.v1
+- id: unfinished-slice-is-not-boundary
+  locale: ar-MSA
+  prompt: خلصنا صفحتين من الفصل ولسه الدرس مكمل، تسألني دلوقتي؟
+  expected:
+  - an unfinished page slice is not treated as a completed learning-unit boundary
+  - the connected explanation continues without starting or offering a routine quiz
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: brief
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+- id: completed-unit-offer-before-questions
+  locale: ar-MSA
+  prompt: كده خلصنا درس كتابة Prompt قوي كامل
+  expected:
+  - the completed lesson is recapped before an optional understanding check is offered
+  - no assessment question is asked until the learner explicitly opts in
+  routing:
+    audience: learner
+    mode: source-grounded
+    source_type: book
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: brief
+    assessment_state: none
+  capabilities:
+    source: supplied_result
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+  fixture_refs:
+    source: source.conversational-teaching.completed-unit-offer-before-questions.v1
+- id: optional-check-declined
+  locale: ar-MSA
+  prompt: لا، مش عاوز أسئلة دلوقتي؛ كمل اللي بعده
+  expected:
+  - the learner's choice is accepted without pressure, penalty language, or a negative mastery inference
+  - the next lesson continues without repeating the offer inside the same completed unit
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: brief
+    assessment_state: offered
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+  fixture_refs:
+    context: context.conversational-teaching.optional-check-declined.v1
+- id: optional-check-accepted
+  locale: ar-MSA
+  prompt: أيوه، اسألني كام سؤال نعرف بيهم أنا فهمت الدرس ولا لأ
+  expected:
+  - three to five concise items sample explanation, misconception discrimination, and application as relevant
+  - the result is used to continue or repair teaching rather than manufacture a score
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: brief
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+  fixture_refs:
+    context: context.conversational-teaching.optional-check-accepted.v1
+- id: declined-check-before-dependent-unit
+  locale: ar-MSA
+  prompt: مش عاوز أسئلة، بس الدرس الجاي مبني بالكامل على اللي شرحته
+  expected:
+  - the learner is not pressured or assigned a negative label
+  - unverified mastery is not assumed for a dependent objective
+  - an equivalent low-pressure evidence option or non-dependent continuation is offered
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: brief
+    assessment_state: offered
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+- id: exam-preparation-exception
+  locale: ar-MSA
+  prompt: عندي امتحان بكرة وعاوز تختبرني بأسئلة كتير
+  expected:
+  - the explicit request for intensive assessment is honored
+  - question cadence remains purposeful and feedback-based
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: brief
+    assessment_state: intensive
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+  fixture_refs:
+    context: context.conversational-teaching.exam-preparation-exception.v1

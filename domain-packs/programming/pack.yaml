@@ -1,7 +1,7 @@
 version: 1.0.0
 id: programming
 title: Programming from zero to independent problem solving
-languages: [ar-MSA, ar-EG, en]
+languages: [ar-MSA, en]
 reviewer_status: needs-qualified-review
 scope:
   - General programming foundations independent of one language

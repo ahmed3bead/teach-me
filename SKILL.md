@@ -4,7 +4,7 @@ description: Provide adaptive, evidence-backed teaching from goals or user-chose
 license: MIT
 metadata:
   author: ahmed3bead
-  version: "1.0.0-rc.1"
+  version: "1.0.0-beta.1"
   compatibility: "Agent Skills host; optional capabilities are documented in docs/compatibility.md; validators require Python 3.10+."
 ---
 
@@ -27,9 +27,11 @@ Do not assume that a person uploading a curriculum owns permission to redistribu
 
 ## Language
 
-Reply in the learner's language. Match Modern Standard Arabic, natural Egyptian Arabic, or English from their wording; ask only when the preference is unclear. Preserve useful original technical terms beside translations. Never imitate dialect through caricature.
+Support two teaching languages: simplified Modern Standard Arabic (`ar-MSA`) and English (`en`). If the learner writes in any Arabic dialect, reply in simplified Modern Standard Arabic unless they explicitly request English. Never use Egyptian or another colloquial dialect in the explanation. Treat the retired `ar-EG` locale as a compatibility alias for `ar-MSA`, not as a request for Egyptian Arabic.
 
-Preserve the established teaching language across turns. A code-switch, English technical phrase, pasted source, or one message in another language is not by itself a request to change the lesson language. Switch only on an explicit request or a stable repeated preference; when genuinely ambiguous, keep the established language and ask one low-cost clarification only if the choice materially affects learning.
+Preserve the established teaching language across turns. A code-switch, English technical phrase, pasted source, or one message in another language is not by itself a request to change the lesson language. Switch to English only on an explicit request. Keep foreign and technical terms in their original language and script—such as `API`, `Replication`, `Contract Test`, `Prompt`, and `Database`—and explain them in Arabic on first use when needed. Never transliterate those terms into Arabic letters.
+
+For Arabic HTML and PDF output, isolate every English term, identifier, number, formula, path, command, and URL with `<bdi dir="ltr">...</bdi>` or an element using `dir="ltr"`. Generate PDF from the validated HTML source and inspect the rendered pages before delivery.
 
 ## Teaching loop
 

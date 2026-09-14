@@ -5,7 +5,7 @@
 - Subject slug (safe identifier):
 - Audience: learner / educator
 - Input: topic-led / source-grounded
-- Language: ar-MSA / ar-EG / en / mixed
+- Language: ar-MSA / en
 - Practical goal:
 - Constraints:
 - Linked source IDs:

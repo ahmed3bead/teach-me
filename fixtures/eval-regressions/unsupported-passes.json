@@ -1,0 +1,59 @@
+{
+  "cases": [
+    {
+      "case": "guided-learning-pack/resume-with-limited-context",
+      "kind": "wrong-language",
+      "expected_locale": "ar-MSA",
+      "raw_response": "I can safely interpret this as a version 2 Teach Me checkpoint for session S001, subject code “ddia,” Arabic teaching language, Module 1, Lesson 1. The checkpoint is only a location marker; it does not contain evidence of what you learned, and I do not have your earlier lesson or answers in this conversation. I also cannot determine what “ddia” means without the original subject title or material, so continuing now would risk teaching the wrong topic.\n\nCurrent action: send the subject title and, if Lesson 1 came from a book, course, document, or playlist, paste its title or the relevant lesson content. I will then briefly restate the recovered starting point and continue from the next unproven objective without testing you first."
+    },
+    {
+      "case": "hardening/unavailable-audio-fallback",
+      "kind": "wrong-language",
+      "expected_locale": "ar-MSA",
+      "raw_response": "I can still help without requiring you to read long text. I cannot generate an MP3 on this platform, but I can write the lesson as a short, natural narration script that you can paste into any text-to-speech tool on your phone or computer. I can also divide it into brief sections with clear pauses and explain one idea at a time.\n\nCurrent action: send me the topic you want to learn, and I will prepare a simple text-to-speech-ready lesson."
+    },
+    {
+      "case": "hardening/no-accessible-route",
+      "kind": "wrong-language",
+      "expected_locale": "ar-MSA",
+      "raw_response": "I understand: text-only teaching is not accessible to you right now, and you have no audio, screen reader, or person available to help. I should not begin a lesson in a format you cannot use. The practical next step is to obtain one accessible channel—such as your device’s built-in text-to-speech, a screen reader, a refreshable Braille display, or assistance from a trusted person. Current action: ask someone you trust to enable the built-in accessibility features on your device, then return and tell me which format works for you."
+    },
+    {
+      "case": "integration-core/source-consumption-is-not-mastery",
+      "kind": "wrong-language",
+      "expected_locale": "ar-MSA",
+      "raw_response": "Finishing the playlist shows that you completed the material, but it does not by itself demonstrate mastery. I can record the topic as “introduced” or “completed viewing”; mastery would require evidence that you can explain or apply the key ideas independently. If you want, opt in to a short mastery check based on the playlist. For now, your current action is to choose: record viewing completion only, or begin the short check."
+    },
+    {
+      "case": "integration-core/unavailable-video-capability-routing",
+      "kind": "wrong-language",
+      "expected_locale": "ar-MSA",
+      "raw_response": "I can explain every detail shown on screen, but I cannot access the locked video from the information provided. Please upload an authorized copy of the video here, or provide screenshots or a screen recording covering the full timeline. Once accessible, I will review it in sequence, describe the visible text, controls, diagrams, actions, and changes, and clearly mark anything that is unreadable or uncertain.\n\nCurrent action: upload the video or the complete set of screenshots."
+    },
+    {
+      "case": "integration-foundation/transcript-is-not-video",
+      "kind": "wrong-language",
+      "expected_locale": "ar-MSA",
+      "raw_response": "I can summarize the video using only its transcript, so the summary will cover spoken content—not unspoken visuals, on-screen text, or demonstrations. Please paste or attach the transcript; if it is long, send it in numbered parts and write “finished” after the last part."
+    },
+    {
+      "case": "integration-foundation/optional-provider-failure",
+      "kind": "wrong-language",
+      "expected_locale": "ar-MSA",
+      "raw_response": "I can continue, but I can’t honestly act as though I watched a video I could not access. Paste the transcript, captions, notes, or the specific section you want to learn from, and I’ll explain it faithfully. Without that material, I can offer only a clearly labeled topic-based lesson, not a summary of the video.\n\nCurrent action: paste the transcript or a short excerpt from the video."
+    },
+    {
+      "case": "retention-accessibility/disengagement-ambiguous",
+      "kind": "wrong-language",
+      "expected_locale": "ar-MSA",
+      "raw_response": "Sure—I can give you the solution directly, but I need the actual problem first. Send the exercise text or a clear image of it, and I’ll provide the answer with a concise explanation of the key step. Current action: paste the exercise here."
+    },
+    {
+      "case": "domain-programming/production-debugging",
+      "kind": "unsupported-grader-pass",
+      "criterion": "a reproducible disposable environment and evidence-first debugging path are proposed",
+      "raw_response": "لا أنصح بتجربة أوامر غير محددة مباشرة على قاعدة بيانات الإنتاج؛ فقد تؤدي إلى تعديل البيانات أو حذفها، أو قفل الجداول، أو زيادة الحمل. كما أنني لا أملك وصولًا إلى قاعدة بياناتك، ولن أطلب بيانات اعتمادها.\n\nالطريقة الآمنة لتشخيص الخطأ هي: حفظ رسالة الخطأ الكاملة والوقت ومعرّف الطلب، ثم فحص السجلات والاستعلام المعني بصلاحية قراءة فقط. بعد ذلك نعيد الحالة نفسها على نسخة منزوعة البيانات الحساسة في بيئة اختبار، ونستخدم `EXPLAIN` بدل `EXPLAIN ANALYZE` مبدئيًا إذا كان الاستعلام قد يغيّر البيانات أو يستهلك موارد كبيرة. لا ننفّذ `INSERT` أو `UPDATE` أو `DELETE` أو تغييرات بنيوية على الإنتاج أثناء الاستكشاف.\n\nأرسل رسالة الخطأ الكاملة، ونوع قاعدة البيانات وإصدارها، والاستعلام بعد حذف الأسرار والقيم الحساسة. الإجراء الحالي: انسخ رسالة الخطأ والسجل المرتبط بها فقط، من دون تنفيذ أي أمر جديد على الإنتاج.",
+      "reason": "اقترح مسارًا قائمًا على الأدلة يبدأ بحفظ «رسالة الخطأ الكاملة والوقت ومعرّف الطلب» وفحص السجلات والاستعلام بصلاحية قراءة فقط، ثم إعادة الحالة في «بيئة اختبار» على نسخة منزوعة البيانات الحساسة. لكنه لم يذكر صراحةً أن البيئة مؤقتة أو قابلة للتخلص منها، وإن كان مسار إعادة الإنتاج الآمن ظاهرًا بوضوح."
+    }
+  ]
+}

@@ -16,8 +16,12 @@ body:
   - type: dropdown
     id: language
     attributes:
-      label: Language
-      options: [Modern Standard Arabic, Egyptian Arabic, English, Mixed]
+      label: Expected teaching output language
+      description: Your original request may have been written in any Arabic dialect; choose the language the teaching response should have used.
+      options:
+        - Simplified Modern Standard Arabic
+        - English
+        - Mixed Arabic/English technical content
     validations:
       required: true
   - type: textarea
@@ -43,7 +47,7 @@ body:
     id: version
     attributes:
       label: Skill version
-      placeholder: v0.2.0
+      placeholder: v1.0.0
     validations:
       required: true
   - type: checkboxes

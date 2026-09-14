@@ -1,6 +1,11 @@
 # Changelog
 
-## 1.0.0-rc.1 - Unreleased
+## 1.0.0-beta.1 - 2026-09-14
+
+- Publish a public beta, not the stable `v1.0.0` release.
+- Replace the invalid earlier behavioral evaluator procedure with a reproducible exact-SHA harness featuring a typed fixture registry, capability enforcement, credential isolation, chronological grader evidence, and fail-closed retry and checkpoint controls. Teaching behavior, protected evaluation data, thresholds, and release gates are unchanged.
+- Record that deterministic validation and the Luma Arabic and Vela English simulations passed, while the earlier 90-case behavioral report remains invalid and is not release evidence.
+- Defer stable release readiness until the corrected evaluator completes a full exact-SHA model run and the remaining stable gates are satisfied.
 
 - Derive progress from evidence type, support level, outcome, task identity, and time instead of accepting caller-selected mastery states.
 - Require a fresh unsupported retrieval at least 24 hours after distinct independent evidence before recording retention, and downgrade retained state after later failure.

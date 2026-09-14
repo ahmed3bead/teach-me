@@ -18,7 +18,15 @@ def main() -> int:
         details = render(
             ROOT / "fixtures" / "bidi" / "printable.html",
             output,
-            ["درس كتابة طلب واضح", "Prompt", "python3 scripts/validate.py"],
+            [
+                "درس كتابة طلب واضح",
+                "API",
+                "Replication",
+                "Contract Test",
+                "Prompt",
+                "Database",
+                "python3 scripts/validate.py",
+            ],
         )
         assert details["pages"] == 1, details
         assert output.read_bytes().startswith(b"%PDF-")

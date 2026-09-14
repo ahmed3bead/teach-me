@@ -84,7 +84,7 @@ def validate(path: Path, check_links: bool = True) -> list[str]:
     if not parser.has_main:
         errors.append("missing main landmark")
     css = "\n".join(parser.styles)
-    for rule in ("unicode-bidi", "isolate", "direction: ltr", "direction: rtl"):
+    for rule in ("unicode-bidi", "isolate", "direction: ltr", "direction: rtl", "white-space: nowrap"):
         if rule not in css:
             errors.append(f"missing direction CSS rule containing {rule!r}")
     if check_links:

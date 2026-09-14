@@ -13,7 +13,7 @@
       "required": ["age_band", "language"],
       "properties": {
         "age_band": {"type": "string", "minLength": 1},
-        "language": {"enum": ["ar-MSA", "ar-EG", "en", "mixed"]},
+        "language": {"description": "Canonical values are ar-MSA and en; ar-EG is a read-compatibility alias.", "enum": ["ar-MSA", "ar-EG", "en"]},
         "context": {"type": "string"}
       },
       "additionalProperties": false

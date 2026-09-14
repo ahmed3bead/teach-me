@@ -1,48 +1,203 @@
 suite: curriculum-delivery
 version: 1.0.0
 cases:
-  - id: whole-book-artifact-first
-    prompt: "اشرح لي الكتاب كله بالتفصيل بالعربي المصري"
-    expected:
-      - "a navigable Markdown or requested PDF curriculum is created before a long lesson"
-      - "the chat response is a short orientation rather than an unstructured lecture"
-      - "the curriculum is divided into modules and lessons with demonstrable outcomes"
-
-  - id: markdown-default-ltr
-    prompt: "Teach me this broad field from zero; I did not choose a file format."
-    expected:
-      - "an editable Markdown curriculum is the default artifact"
-      - "the learner is not blocked by an unnecessary format question"
-
-  - id: html-default-arabic-bidi
-    prompt: "اشرح لي distributed systems بالعربي وفيه المصطلحات الإنجليزية"
-    expected:
-      - "semantic HTML is the default learner-facing source"
-      - "English terms, identifiers, numbers, URLs, and code are directionally isolated"
-      - "the agent does not rely on Markdown backticks alone for bidirectional correctness"
-
-  - id: arabic-pdf-quality
-    prompt: "اعمل المنهج PDF عربي جاهز للطباعة"
-    expected:
-      - "the PDF uses readable right-to-left Arabic and preserves technical terms"
-      - "the rendered pages are inspected before delivery"
-      - "the PDF is generated from the validated bidirectional source rather than maintained as separate content"
-
-  - id: traceable-modular-course
-    prompt: "Turn this book and supporting videos into a detailed course."
-    expected:
-      - "stable curriculum, module, lesson, objective, and source identifiers connect the artifacts"
-      - "each lesson includes source references, practice, and assessment evidence"
-      - "large lesson prose is split into linked files instead of one oversized artifact"
-
-  - id: file-tools-unavailable
-    prompt: "Create a complete curriculum, but this environment cannot save files."
-    expected:
-      - "structured Markdown is provided in chat as a disclosed fallback"
-      - "the agent does not pretend a file was created"
-
-  - id: resume-curriculum
-    prompt: "كمل المنهج من آخر مرة"
-    expected:
-      - "the active module and lesson checkpoint is used"
-      - "completed content is not treated as demonstrated mastery"
+- id: whole-book-artifact-first
+  prompt: اشرح لي الكتاب كله بالتفصيل بالعربية الفصحى المبسطة
+  expected:
+  - a navigable Markdown or requested PDF curriculum is created before a long lesson
+  - the chat response is a short orientation rather than an unstructured lecture
+  - the curriculum is divided into modules and lessons with demonstrable outcomes
+  locale: ar-MSA
+  routing:
+    audience: learner
+    mode: source-grounded
+    source_type: book
+    artifact_type: curriculum
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: substantial
+    assessment_state: none
+  capabilities:
+    source: supplied_result
+    web: not_required
+    file: executable_temp
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+  fixture_refs:
+    source: source.curriculum-delivery.whole-book-artifact-first.v1
+    file: file.disposable-workspace.v1
+    context: context.curriculum-delivery.whole-book-artifact-first.v1
+- id: markdown-default-ltr
+  prompt: Teach me this broad field from zero; I did not choose a file format.
+  expected:
+  - an editable Markdown curriculum is the default artifact
+  - the learner is not blocked by an unnecessary format question
+  locale: en
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: curriculum
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: substantial
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: executable_temp
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+  fixture_refs:
+    file: file.disposable-workspace.v1
+- id: html-default-arabic-bidi
+  prompt: اشرح لي distributed systems بالعربي وفيه المصطلحات الإنجليزية
+  expected:
+  - semantic HTML is the default learner-facing source
+  - English terms, identifiers, numbers, URLs, and code are directionally isolated
+  - the agent does not rely on Markdown backticks alone for bidirectional correctness
+  locale: ar-MSA
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: html
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: substantial
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: executable_temp
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+  fixture_refs:
+    file: file.disposable-workspace.v1
+- id: arabic-pdf-quality
+  prompt: اعمل المنهج PDF عربي جاهز للطباعة
+  expected:
+  - the PDF uses readable right-to-left Arabic and preserves technical terms
+  - the rendered pages are inspected before delivery
+  - the PDF is generated from the validated bidirectional source rather than maintained as separate content
+  locale: ar-MSA
+  routing:
+    audience: learner
+    mode: source-grounded
+    source_type: curriculum
+    artifact_type: pdf
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: substantial
+    assessment_state: none
+  capabilities:
+    source: supplied_result
+    web: not_required
+    file: executable_temp
+    rendering: executable_temp
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+  fixture_refs:
+    source: source.curriculum-delivery.arabic-pdf-quality.v1
+    file: file.disposable-workspace.v1
+    rendering: rendering.pdf-from-html.v1
+- id: traceable-modular-course
+  prompt: Turn this book and supporting videos into a detailed course.
+  expected:
+  - stable curriculum, module, lesson, objective, and source identifiers connect the artifacts
+  - each lesson includes source references, practice, and assessment evidence
+  - large lesson prose is split into linked files instead of one oversized artifact
+  locale: en
+  routing:
+    audience: learner
+    mode: source-grounded
+    source_type: video
+    artifact_type: curriculum
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: substantial
+    assessment_state: none
+  capabilities:
+    source: supplied_result
+    web: not_required
+    file: executable_temp
+    rendering: not_required
+    sandbox: not_required
+    video: supplied_result
+    external_catalog: not_required
+  fixture_refs:
+    source: source.curriculum-delivery.traceable-modular-course.v1
+    file: file.disposable-workspace.v1
+    video: video.curriculum-delivery.traceable-modular-course.v1
+    context: context.curriculum-delivery.traceable-modular-course.v1
+- id: file-tools-unavailable
+  prompt: Create a complete curriculum, but this environment cannot save files.
+  expected:
+  - structured Markdown is provided in chat as a disclosed fallback
+  - the agent does not pretend a file was created
+  locale: en
+  routing:
+    audience: learner
+    mode: source-grounded
+    source_type: curriculum
+    artifact_type: curriculum
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: substantial
+    assessment_state: none
+  capabilities:
+    source: unavailable
+    web: not_required
+    file: unavailable
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+- id: resume-curriculum
+  prompt: كمل المنهج من آخر مرة
+  expected:
+  - the active module and lesson checkpoint is used
+  - completed content is not treated as demonstrated mastery
+  locale: ar-MSA
+  routing:
+    audience: learner
+    mode: source-grounded
+    source_type: curriculum
+    artifact_type: curriculum
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: substantial
+    assessment_state: none
+  capabilities:
+    source: supplied_result
+    web: not_required
+    file: executable_temp
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+  fixture_refs:
+    source: source.curriculum-delivery.resume-curriculum.v1
+    file: file.disposable-workspace.v1
+    context: context.curriculum-delivery.resume-curriculum.v1

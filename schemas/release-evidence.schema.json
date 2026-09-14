@@ -45,7 +45,7 @@
         "type": "object",
         "required": ["locale", "reviewer_role", "reviewed_at", "verdict"],
         "properties": {
-          "locale": {"enum": ["ar-MSA", "ar-EG", "en"]},
+          "locale": {"description": "Canonical values are ar-MSA and en; ar-EG is a read-compatibility alias.", "enum": ["ar-MSA", "ar-EG", "en"]},
           "reviewer_role": {"type": "string", "minLength": 1},
           "reviewed_at": {"type": "string", "format": "date-time"},
           "verdict": {"enum": ["pass", "fail"]},

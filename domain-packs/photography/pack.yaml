@@ -1,7 +1,7 @@
 version: 1.0.0
 id: photography
 title: Practical photography with available equipment
-languages: [ar-MSA, ar-EG, en]
+languages: [ar-MSA, en]
 reviewer_status: needs-qualified-review
 scope:
   - Phone and camera photography foundations for practical personal or product goals

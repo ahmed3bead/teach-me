@@ -14,12 +14,16 @@ Teach Me follows the Agent Skills layout and keeps core conversational teaching 
 | Persistent scheduler | Give a portable next-review plan | Schedule evidence-based review when the user authorizes it |
 | Python 3.10+ | Teaching still works | Bundled schemas, integrity checks, eval runner, and packaging tools work |
 
+## Language compatibility
+
+The canonical locales are `ar-MSA` and `en`. Arabic input in any dialect defaults to simplified Modern Standard Arabic. The retired `ar-EG` value is accepted only at compatibility boundaries and is normalized immediately to `ar-MSA`; it never requests Egyptian Arabic. New files and eval cases must write only canonical locale values.
+
 ## Cost model
 
 The repository and local validators are free. A host, model provider, web search service, transcription service, storage service, or PDF/video tool may have its own price. Teach Me must not silently select a paid dependency or imply that every optional capability is free.
 
 ## Behavioral eval adapter protocol
 
-`scripts/run_behavioral_evals.py` is provider-neutral. The response command receives a JSON object containing the suite, case, prompt, locale, and skill root, then returns `{"response": "...", "model": "..."}`. The grader command receives that response and the observable criteria, then returns one boolean result per criterion. A release run fails below the configured case threshold or when any case marked `critical` fails.
+`scripts/run_behavioral_evals.py` is provider-neutral. Every case declares canonical routing metadata, a seven-capability state manifest, and stable references into the typed, content-addressed synthetic fixture registry. `supplied_result` is an observation only. `executable_temp` file output is accepted only as structured artifact content, materialized without overwrite in a disposable workspace, hashed, and—when requested—rendered from that actual artifact. The response and isolated grader must return model identity, settings, adapter version, raw result, invocation ID, and timing. Grader PASS evidence names the exact assistant turn or generated artifact containing its quote; FAIL may identify an absent requirement. Deterministic guards remain authoritative. Guard failures never trigger response regeneration; only bounded transport or malformed-protocol retries are allowed and recorded.
 
 The repository's reference PDF path uses the exact versions in `requirements-dev.txt` and may additionally need the platform libraries required by WeasyPrint. The HTML remains the accessible source of truth if the renderer is unavailable. Dynamic teacher/learner evaluation uses the separate protocol in [`model-evaluation.md`](model-evaluation.md).

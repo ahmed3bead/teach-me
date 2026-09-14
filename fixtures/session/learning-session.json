@@ -5,7 +5,7 @@
   "subject_slug": "prompt-writing",
   "audience": "learner",
   "input_mode": "source-grounded",
-  "language": "ar-EG",
+  "language": "ar-MSA",
   "goal": "كتابة Prompt واضح وقابل للتقييم",
   "constraints": ["شرح بدون افتراض معرفة مسبقة"],
   "source_ids": ["SRC1"],

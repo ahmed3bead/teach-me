@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 from pathlib import Path
 
@@ -24,8 +25,10 @@ def inspect_pdf(path: Path, expected: list[str]) -> dict[str, object]:
     if not reader.pages:
         raise ValueError("generated PDF has no pages")
     text = "\n".join(page.extract_text() or "" for page in reader.pages)
+    compact_text = re.sub(r"(?<=[A-Za-z])\s+(?=[A-Za-z])", "", text)
     for value in expected:
-        if value not in text:
+        compact_value = re.sub(r"(?<=[A-Za-z])\s+(?=[A-Za-z])", "", value)
+        if value not in text and compact_value not in compact_text:
             raise ValueError(f"generated PDF is missing expected text: {value!r}")
     title = (reader.metadata or {}).get("/Title")
     if not title:

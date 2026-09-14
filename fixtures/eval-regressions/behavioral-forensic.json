@@ -1,0 +1,946 @@
+{
+  "assessment_false_positives": [
+    {
+      "case": "core-teaching/ar-msa-beginner-adaptation",
+      "attempt": 1,
+      "turn": 1,
+      "text": "سنبدأ من الصفر، ولن أفترض أنك تعرف أي شيء عن Excel.\n\nExcel هو برنامج لتنظيم البيانات في جداول وإجراء الحسابات عليها. يتكوّن الجدول من صفوف مرقّمة وأعمدة تحمل حروفًا، وتسمّى نقطة التقاطع بينهما «خلية». مثلًا، `A1` هي الخلية الموجودة في العمود `A` والصف `1`. يمكنك وضع نص أو رقم أو تاريخ أو معادلة داخل كل خلية.\n\nهدفنا المبدئي هو أن تتمكن من إنشاء جدول بسيط، إدخال البيانات، إجراء الحسابات الأساسية، ثم حفظ الملف واستخدامه في مهام عملك. سأعدّل الأمثلة حسب طبيعة عملك، وما زلت لا أعرف مقدار الوقت المتاح لك أو إصدار Excel الذي ستستخدمه.\n\nأجب الآن عن هذه الأسئلة الثلاثة فقط:\n\n1. ما طبيعة عملك، وما المهمة التي تريد تنفيذها باستخدام Excel؟\n2. هل ستستخدم Excel على جهاز كمبيوتر أم هاتف، وأي نظام تشغيل لديك إن كنت تعرفه؟\n3. كم وقتًا تستطيع تخصيصه للتعلّم يوميًا أو أسبوعيًا؟",
+      "turns": [
+        {
+          "role": "user",
+          "content": "أنا عمري ما استخدمت إكسل وعاوز أتعلمه عشان شغلي",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "core-teaching/en-transfer-not-acknowledgement",
+      "attempt": 1,
+      "turn": 1,
+      "text": "Yes. I do not have evidence from an earlier lesson in this conversation, so I’ll treat percentages as familiar but not yet verified. What would you like to learn next—for example, percentage change, discounts and tax, ratios, or something else? Current action: tell me the next topic or real-world task you want to handle.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "I think I understand percentages now. Can we move on?",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "core-teaching/en-transfer-not-acknowledgement",
+      "attempt": 2,
+      "turn": 1,
+      "text": "Yes—we can move on. Percentages are the foundation for topics such as percentage increase and decrease, discounts, tax, and interest. If you want, we can first do a short optional understanding check; otherwise, tell me which of those topics you want to learn next.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "I think I understand percentages now. Can we move on?",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "conversational-teaching/explicit-zero-start",
+      "attempt": 1,
+      "turn": 1,
+      "text": "بكل تأكيد. سنبدأ من الصفر، ولن أفترض أن لديك أي معرفة سابقة، وسأشرح الأفكار والمصطلحات أولًا قبل أي تدريب اختياري.\n\nأحتاج فقط إلى تحديد الكتاب المقصود: ما عنوان الكتاب واسم مؤلفه؟ وإذا كانت لديك نسخة أو صورة الغلاف، يمكنك إرسالها لتجنب الخلط بين الكتب المتشابهة.\n\nالإجراء الآن: أرسل عنوان الكتاب واسم المؤلف، أو صورة غلافه.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "أنا معرفش أي حاجة عن الكتاب، ابدأ معايا من الصفر",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "conversational-teaching/exam-preparation-exception",
+      "attempt": 1,
+      "turn": 1,
+      "text": "بالتأكيد. سأختبرك بعدد كبير من الأسئلة، ثم أوضح أخطاءك وأركز الأسئلة التالية على نقاط الضعف. ما المادة أو الموضوع الذي سيمتحنك فيه غدًا؟ أرسل أيضًا الصف أو المستوى، وإن أمكن نطاق الامتحان أو صورة المحتوى. الإجراء الآن: اكتب اسم المادة والمستوى ونطاق الامتحان لنبدأ فورًا.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "عندي امتحان بكرة وعاوز تختبرني بأسئلة كتير",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "curriculum-delivery/markdown-default-ltr",
+      "attempt": 1,
+      "turn": 1,
+      "text": "I’ll start from zero and build a structured, beginner-friendly path. I don’t yet know which broad field you mean, so I need three details before I can choose the first useful lesson:\n\n1. What field do you want to learn (for example, programming, economics, psychology, or cybersecurity)?\n2. What would you like to be able to do with it in the real world?\n3. How much time can you study each week?\n\nYou have already established your starting point: no prior knowledge, so I will explain the foundations before offering any understanding check. Once you answer, I’ll propose a small first objective and explain how the learning journey will work.\n\nCurrent action: reply with the field, your practical goal, and your available weekly study time.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Teach me this broad field from zero; I did not choose a file format.",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "curriculum-delivery/markdown-default-ltr",
+      "attempt": 2,
+      "turn": 1,
+      "text": "I’ll teach you from a true beginner starting point, with no prior knowledge assumed. We’ll begin with a small, useful foundation and build toward your real-world goal; I won’t test you unless you later opt into a short understanding check.\n\nTo tailor the learning journey, please tell me:\n\n1. What broad field do you want to learn?\n2. What would you eventually like to do with it?\n3. Roughly how much time can you study each week?\n\nCurrent action: reply with those three details—even brief answers are enough.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Teach me this broad field from zero; I did not choose a file format.",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "curriculum-delivery/html-default-arabic-bidi",
+      "attempt": 2,
+      "turn": 1,
+      "text": "I can teach you Distributed Systems from the beginning, while preserving key technical terms in English, such as Replication, Consistency, Fault Tolerance, and Consensus.\n\nThe practical goal is to understand how multiple computers cooperate as one system, why failures and network delays make this difficult, and how real systems such as databases and cloud services handle those problems. Since this is a broad subject and I cannot save a learning pack here, I will deliver it as a structured, progressive course in chat rather than one oversized explanation.\n\nA Distributed System is a collection of independent computers that communicate over a network to provide a shared service. For example, an online store may use separate services for accounts, products, payments, and orders. To the customer, these services appear to form one application.\n\nThe central difficulty is uncertainty: a machine may fail, a message may arrive late, or a network connection may break. If one server receives an order but another does not, the system must decide whether the order exists and how to restore agreement. This leads to the main topics we will study: networking and failure models, Replication, Consistency, Partitioning, Transactions, Consensus, scalability, observability, and system design trade-offs.\n\nWe will begin with the mental model of communication and failure, then build toward designing a small reliable service. Before I tailor the first lesson, tell me: What do you want to build or understand with Distributed Systems, what programming or database experience do you already have, and roughly how much study time can you give each week?\n\nCurrent action: answer those three questions, or simply say “start from zero” and I will begin the first explanation without testing you.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "اشرح لي distributed systems بالعربي وفيه المصطلحات الإنجليزية",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "curriculum-delivery/arabic-pdf-quality",
+      "attempt": 2,
+      "turn": 1,
+      "text": "I can prepare a print-ready Arabic PDF curriculum, but I need three details first:\n\n1. What subject or source should the curriculum cover?\n2. Who is it for (age group and current level)?\n3. What scope do you want—for example, number of weeks, lessons, or study hours?\n\nThe final material will use right-to-left Arabic layout, preserve technical terms in their original script, and include learning outcomes, ordered lessons, examples, practice, review points, and progress checkpoints. Since file-generation tools are unavailable here, I can provide validated, print-ready Arabic content and layout specifications, but I cannot attach the rendered PDF in this response.\n\nCurrent action: reply with the subject, learner level, and desired duration.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "اعمل المنهج PDF عربي جاهز للطباعة",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "curriculum-delivery/file-tools-unavailable",
+      "attempt": 1,
+      "turn": 1,
+      "text": "I can create the complete curriculum as structured Markdown directly in this chat, including a dashboard, module sequence, lesson outcomes, prerequisites, practice, review points, completion criteria, and a resume checkpoint. Since files cannot be saved here, you’ll need to copy the finished curriculum somewhere persistent.\n\nBefore I build it, please answer these three questions:\n\n1. What subject, book, course, or skill should the curriculum cover?\n2. What real-world outcome should the learner achieve, and what can they already do?\n3. How much time is available—for example, hours per week and target completion date?\n\nCurrent action: reply with those three details, even approximately.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Create a complete curriculum, but this environment cannot save files.",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "curriculum-delivery/file-tools-unavailable",
+      "attempt": 2,
+      "turn": 1,
+      "text": "I can create the complete curriculum as structured Markdown here in the chat, including a dashboard, module sequence, lesson outcomes, practice plan, review points, completion criteria, and a resume checkpoint. Since files cannot be saved, the curriculum will remain chat-based and easy to copy elsewhere.\n\nBefore I build it, please tell me:\n\n1. What subject or source should the curriculum cover?\n2. What real-world outcome do you want to achieve?\n3. What are your current experience and available study time?\n\nI’ll begin at an appropriate foundation level, explain each meaningful unit before offering any optional understanding check, and won’t start a check unless you explicitly opt in.\n\nCurrent action: reply with the subject, desired outcome, and study-time constraints.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Create a complete curriculum, but this environment cannot save files.",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "curriculum-delivery/resume-curriculum",
+      "attempt": 2,
+      "turn": 1,
+      "text": "I can continue the curriculum, but I don’t have the previous session or checkpoint in this conversation. Please paste your latest resume code, the last lesson title, or the final section you completed. If none is available, tell me the subject and what you remember covering; I’ll reconstruct the starting point without treating your recollection as proof of mastery.\n\nCurrent action: send one of those three items so I can resume from the correct place.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "كمل المنهج من آخر مرة",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "educator-mode/en-adult-manager-training",
+      "attempt": 1,
+      "turn": 1,
+      "text": "Please attach or paste the conflict-resolution curriculum so I can preserve its required outcomes and trace each workshop activity to the source.\n\nI also need two details that materially affect the design:\n1. Will the workshop be in person, virtual, or hybrid, and approximately how many managers will attend?\n2. Are there any required assessment outcomes, accessibility needs, or tools I should design around?\n\nOnce provided, I’ll produce a facilitator-ready 90-minute plan with timings, manager-relevant scenarios, practice activities, misconception checks, differentiation, materials, and evidence of learning. Current action: send the curriculum and those two details.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Turn this conflict-resolution curriculum into a 90-minute workshop for new managers.",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "end-to-end-journeys/zero-knowledge-learner-complete-unit",
+      "attempt": 3,
+      "turn": 2,
+      "text": "بالطبع. سنواصل بالشرح والأمثلة فقط، من دون أسئلة اختبارية.\n\nالخطوة التالية في كتابة `Prompt` قوي هي التفريق بين التفاصيل المفيدة والتفاصيل الزائدة. أضف فقط ما يمكن أن يغيّر النتيجة.\n\nتخيّل أنك تريد كتابة رسالة اعتذار. هذا الطلب مفهوم، لكنه يترك قرارات كثيرة للأداة:\n\n«اكتب رسالة اعتذار.»\n\nيمكن تحسينه تدريجيًا:\n\n«اكتب رسالة اعتذار إلى عميل بسبب تأخر تسليم طلبه.»\n\nثم نضيف المواصفات المؤثرة:\n\n«اكتب رسالة اعتذار مهنية إلى عميل بسبب تأخر تسليم طلبه يومين. اجعلها في فقرتين، بنبرة هادئة، واذكر أن الطلب سيصل يوم الخميس، من دون تقديم وعود إضافية.»\n\nلاحظ أن كل تفصيل هنا يؤدي وظيفة:\n\n- «إلى عميل» يحدد الجمهور.\n- «تأخر يومين» يوضح الموقف.\n- «نبرة هادئة» تحدد الأسلوب.\n- «في فقرتين» يحدد الشكل.\n- «يصل يوم الخميس» يضيف المعلومة الضرورية.\n- «من دون وعود إضافية» يضع حدًّا يمنع نتيجة غير مناسبة.\n\nهذه الحدود تسمى `Constraints`، أي القيود التي تحدد ما ينبغي فعله أو تجنبه. من أمثلتها: عدد الكلمات، اللغة، النبرة، التنسيق، المعلومات المسموح باستخدامها، وما يجب عدم ذكره.\n\nلكن كثرة القيود ليست هدفًا في حد ذاتها. إذا كتبت عشرين شرطًا لمهمة بسيطة، فقد يصبح الطلب مربكًا. القاعدة العملية هي:\n\n«أضف التفصيل إذا كان غيابه قد ينتج إجابة لا تناسب حاجتك.»\n\nومن الطبيعي ألا تحصل على أفضل نتيجة من المحاولة الأولى. كتابة `Prompt` عملية تحسين متدرّج:\n\n1. اكتب طلبًا واضحًا.\n2. اقرأ النتيجة ولاحظ المشكلة.\n3. عدّل الجزء المسؤول عن المشكلة فقط.\n\nمثال: إذا كانت الإجابة طويلة، لا تبدأ من جديد؛ أضف: «اختصرها إلى 120 كلمة». وإذا كانت معقدة، أضف: «اشرح بلغة تناسب مبتدئًا، وعرّف كل مصطلح جديد». وإذا كان التنسيق مشتتًا، أضف: «نظّم النتيجة في جدول من ثلاثة أعمدة».\n\nإذن أصبح لدينا الآن قالب أقوى:\n\n«نفّذ [المهمة] من أجل [الجمهور أو الهدف]. استخدم [السياق الضروري]. اجعل النتيجة [الشكل والطول والنبرة]. التزم بـ[القيود المهمة]، وتجنب [ما لا تريده].»\n\nالخلاصة: جودة `Prompt` لا تأتي من الطول، بل من وضوح المهمة واختيار التفاصيل والقيود التي تؤثر فعلًا في النتيجة، ثم تحسين الطلب بناءً على الإجابة.\n\nإجراءك الحالي: اقرأ القالب الأخير والمثال الكامل بهدوء لمدة ثلاث دقائق، ولا يلزم أن ترسل إجابة الآن.\n\nرمز المتابعة: `TEACH-ME:v2:prompt-basics-01:prompt-writing:ar-MSA:m1:l2`.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "أنا معرفش أي حاجة عن كتابة Prompt قوي. ابدأ معايا من الصفر بالفصحى المبسطة.",
+          "assessment_intent": "none"
+        },
+        {
+          "role": "user",
+          "content": "تمام، كمل الشرح من غير ما تحسسني إني في امتحان.",
+          "assessment_intent": "decline"
+        }
+      ]
+    },
+    {
+      "case": "end-to-end-journeys/zero-knowledge-learner-complete-unit",
+      "attempt": 6,
+      "turn": 3,
+      "text": "نعم، اكتملت وحدة البداية كاملة.\n\nأصبحت لديك الآن الصورة الأساسية لكتابة `Prompt` قوي:\n\n- تحدد المهمة: ماذا تريد من الأداة؟\n- تضيف السياق: ما المعلومات التي تساعدها على فهم الطلب؟\n- تحدد المواصفات: ما الطول والأسلوب والتنسيق والجمهور المطلوب؟\n- تقرأ النتيجة بوصفها مسودة أولى.\n- تطلب تعديلًا محددًا عند الحاجة، مثل التبسيط أو الاختصار أو إضافة مثال.\n\nالخلاصة العملية هي:\n\n`مهمة واضحة + سياق مفيد + مواصفات محددة + تحسين تدريجي`\n\nمثال يجمع الدرس كله:\n\n«اشرح مفهوم إدارة الوقت لموظف مبتدئ. استخدم لغة عربية بسيطة، وقدّم مثالًا من يوم عمل عادي، واجعل الإجابة في خمس نقاط.»\n\nوإذا كانت النتيجة طويلة، يمكنك متابعة الطلب بقولك:\n\n«اختصر كل نقطة إلى سطر واحد، واحتفظ بالمثال العملي.»\n\nبهذا تكون المهارة قد قُدّمت لك بصورة كاملة، لكن إتقانها العملي يحتاج إلى استخدامها في طلب حقيقي. يمكنني تقديم فحص قصير وهادئ للتأكد من الفهم، ولن أبدأه إلا إذا وافقت صراحة.\n\nإجراءك الحالي: اكتب فقط «أوافق على الفحص القصير» إذا أردت تطبيق ما تعلمته، أو «أتخطى الفحص» إذا أردت الانتقال مباشرة إلى موضوع آخر.\n\nرمز المتابعة: `TEACH-ME:v2:prompt-basics-01:prompt-writing:ar-MSA:m1:l2`.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "أنا معرفش أي حاجة عن كتابة Prompt قوي. ابدأ معايا من الصفر بالفصحى المبسطة.",
+          "assessment_intent": "none"
+        },
+        {
+          "role": "user",
+          "content": "تمام، كمل الشرح من غير ما تحسسني إني في امتحان.",
+          "assessment_intent": "decline"
+        },
+        {
+          "role": "user",
+          "content": "إحنا كده خلصنا الدرس الكامل.",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "end-to-end-journeys/zero-knowledge-learner-complete-unit",
+      "attempt": 7,
+      "turn": 4,
+      "text": "رائع. سنجري فحصًا قصيرًا وهادئًا بالتطبيق، وليس امتحانًا.\n\nلديك هذا `Prompt` الغامض:\n\n«اكتب لي عن تعلّم اللغة الإنجليزية.»\n\nحسّنه ليصبح أكثر وضوحًا بإضافة:\n\n- المهمة المحددة.\n- السياق المناسب.\n- مواصفات النتيجة، مثل الطول أو الأسلوب أو التنسيق.\n\nإجراءك الحالي: اكتب نسخة محسّنة واحدة من هذا `Prompt`، وسأوضح لك بدقة ما نجح فيها وما يمكن تحسينه، من دون درجات.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "أنا معرفش أي حاجة عن كتابة Prompt قوي. ابدأ معايا من الصفر بالفصحى المبسطة.",
+          "assessment_intent": "none"
+        },
+        {
+          "role": "user",
+          "content": "تمام، كمل الشرح من غير ما تحسسني إني في امتحان.",
+          "assessment_intent": "decline"
+        },
+        {
+          "role": "user",
+          "content": "إحنا كده خلصنا الدرس الكامل.",
+          "assessment_intent": "none"
+        },
+        {
+          "role": "user",
+          "content": "أيوه، موافق على اختبار الفهم القصير.",
+          "assessment_intent": "accept"
+        }
+      ]
+    },
+    {
+      "case": "end-to-end-journeys/zero-knowledge-learner-complete-unit",
+      "attempt": 8,
+      "turn": 4,
+      "text": "حسنًا. سنجري تطبيقًا قصيرًا وهادئًا، والهدف منه معرفة ما يحتاج إلى توضيح، لا إصدار حكم عليك.\n\nحوّل هذا الطلب الغامض إلى `Prompt` أوضح:\n\n«اكتب لي عن تعلّم اللغة الإنجليزية.»\n\nأضف إليه العناصر الثلاثة التي تعلّمناها:\n\n- المهمة المطلوبة.\n- سياقًا مفيدًا، مثل مستوى المتعلّم أو هدفه.\n- مواصفات للنتيجة، مثل الطول أو الأسلوب أو التنسيق.\n\nإجراءك الحالي: اكتب نسخة محسّنة واحدة من هذا `Prompt`، وسأعطيك ملاحظات بسيطة ومحددة عليها.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "أنا معرفش أي حاجة عن كتابة Prompt قوي. ابدأ معايا من الصفر بالفصحى المبسطة.",
+          "assessment_intent": "none"
+        },
+        {
+          "role": "user",
+          "content": "تمام، كمل الشرح من غير ما تحسسني إني في امتحان.",
+          "assessment_intent": "decline"
+        },
+        {
+          "role": "user",
+          "content": "إحنا كده خلصنا الدرس الكامل.",
+          "assessment_intent": "none"
+        },
+        {
+          "role": "user",
+          "content": "أيوه، موافق على اختبار الفهم القصير.",
+          "assessment_intent": "accept"
+        }
+      ]
+    },
+    {
+      "case": "golden-teaching/ddia-senior-developer",
+      "attempt": 2,
+      "turn": 1,
+      "text": "سأفترض أن هدفك هو فهم النموذج الذهني لـ `Replication` في سياق أنظمة الويب، مع ربطه بخبرتك في Laravel.\n\n`Replication` تعني الاحتفاظ بنسخ متزامنة من البيانات على عدة عقد `Nodes`. الفكرة ليست مجرد النسخ الاحتياطي؛ فالنسخ تعمل ضمن النظام وتستقبل القراءات، وقد تستقبل الكتابات أيضًا حسب التصميم.\n\nلماذا نستخدمها؟\n\n- تقليل زمن القراءة بوضع البيانات قرب المستخدمين.\n- زيادة قدرة النظام على تنفيذ القراءات.\n- استمرار الخدمة عند تعطل عقدة.\n\nأبسط نموذج هو `Leader–Follower Replication`:\n\n1. يرسل التطبيق عمليات الكتابة إلى `Leader`.\n2. يسجل `Leader` التغيير محليًا.\n3. يرسل سجل التغييرات إلى عقد `Followers`.\n4. تطبق كل عقدة التغييرات بالترتيب نفسه.\n5. يمكن توجيه بعض القراءات إلى `Followers`.\n\nفي Laravel قد تهيئ اتصالًا للكتابة واتصالات للقراءة. لكن Laravel لا يحل مشكلة الاتساق؛ بل يختار الاتصال فقط. تخيل أن الطلب الأول نفذ:\n\n`UPDATE users SET name = 'Ali' WHERE id = 7`\n\nعلى `Leader`، ثم أعاد المتصفح تحميل الصفحة فورًا من `Follower`. إذا لم يصل التغيير بعد، فقد يظهر الاسم القديم. يسمى الفرق الزمني `Replication Lag`، أي تأخر النسخة عن المصدر.\n\nلهذا يوجد قرار أساسي بين نمطين:\n\n- `Synchronous Replication`: ينتظر `Leader` تأكيد نسخة أخرى قبل نجاح الكتابة. يوفر ضمانًا أقوى، لكنه يزيد زمن الاستجابة وقد يجعل تعطل النسخة سببًا لتعطيل الكتابة.\n- `Asynchronous Replication`: ينجح الطلب قبل تأكيد `Followers`. يكون أسرع وأكثر تحمّلًا لبطء الشبكة، لكن البيانات الحديثة قد تضيع إذا تعطل `Leader` قبل نسخها.\n\nومن أهم المشكلات العملية `Read-after-write Consistency`: يجب أن يرى المستخدم كتابته بعد نجاحها. من الحلول الشائعة توجيه قراءات بيانات المستخدم نفسه إلى `Leader` مدة قصيرة، أو الانتظار حتى تلحق النسخة بموضع الكتابة. أما مجرد استخدام `sticky` في Laravel فقد يقلل المشكلة، لكنه لا يقدم وحده ضمانًا عامًا في جميع البنى وحالات الانتقال بين الخوادم.\n\nالخلاصة: `Replication` تمنح التوافر وسعة القراءة وتقليل المسافة، لكنها تدخل تأخرًا واحتمال قراءة بيانات قديمة. السؤال الهندسي الصحيح ليس: «هل لدينا نسخ؟»، بل: «ما الضمان الذي يحتاجه كل مسار قراءة وكتابة، وماذا يحدث عند التأخر أو التعطل؟»\n\nهذا شرح تمهيدي للنموذج العام، وليس ادعاءً بتغطية فصل `DDIA` كاملًا؛ لا تتاح لي هنا مراجعة الكتاب أو إجراء بحث مصادر. الإجراء الحالي: تتبّع في أحد تطبيقاتك مسارًا يكتب البيانات ثم يقرأها فورًا، وحدد هل يجب أن تأتي القراءة من `Leader` أم يمكنها تحمّل `Replication Lag`.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "أنا Senior Laravel developer وعاوز أفهم Replication من DDIA بالفصحى المبسطة",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "golden-teaching/technical-concept-en",
+      "attempt": 1,
+      "turn": 1,
+      "text": "An API and Database Replication solve different problems.\n\nAn API (Application Programming Interface) is a controlled way for one program to communicate with another. For example, a shopping app might send `GET /products/42` to a store’s API. The API checks permissions, applies business rules, reads the requested data, and returns a response. Think of it as a service counter: you make an approved request, and the service gives you a result without granting direct access to everything behind the counter.\n\nDatabase Replication means maintaining copies of the same database data on multiple database servers. When data changes on one server, those changes are copied to one or more replicas. Replication can improve availability, support recovery, reduce read load, or place data nearer to users. Think of it as keeping synchronized copies of a record book in several locations.\n\nThe key difference is purpose:\n\n- An API defines how software requests operations or data.\n- Database Replication defines how database systems copy and synchronize stored data.\n\nThey can work together. A user calls an API, and the API may read from a replicated database. The user normally does not know which replica handled the request.\n\nExample: In a banking system, an API might provide an operation such as “show my balance” while checking the user’s identity and permissions. Replication might copy account data to another database server so the service remains available if the primary server fails. Replication itself does not define who may request a balance or what business rules apply.\n\nIn one sentence: an API is a communication boundary for using a service; Database Replication is an infrastructure mechanism for maintaining database copies.\n\nCurrent action: compare each new example you encounter against two questions—“Is software requesting a service?” and “Is stored data being copied between database servers?”",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Explain to a beginner the difference between an API and Database Replication.",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "guided-learning-pack/beginner-start-here",
+      "attempt": 2,
+      "turn": 1,
+      "text": "Your goal is to learn photography from the beginning, and I’ll assume you have no prior photography knowledge. We’ll start with the smallest useful skill: making an intentional photograph with whatever camera you already have. You do not need to buy a professional camera yet.\n\nPhotography is the practice of controlling three things: light, composition, and timing. Light determines what is visible and shapes the mood. Composition is how you arrange the subject and background inside the frame. Timing is choosing the moment to press the shutter.\n\nFor your first photographs, use these simple principles:\n\n1. Choose one clear subject. Before taking the picture, complete this sentence: “I want the viewer to notice ___.”\n2. Find soft light. Photograph near a window or outdoors in open shade. Avoid using flash for now.\n3. simplify the background. Move yourself or the subject until distracting objects are outside the frame.\n4. Focus on the subject. On a phone, tap the subject on the screen before taking the picture.\n5. Make several versions. Move closer, farther away, and slightly to either side. Comparing variations is one of the fastest ways to develop your eye.\n\nFor example, suppose you photograph a cup beside a window. Place the cup near the light, remove unrelated objects behind it, tap the cup to focus, and take three pictures: one from eye level, one from above, and one close enough for the cup to fill most of the frame. The camera is the same, but changing your position changes the photograph.\n\nA sensible beginner journey is: seeing light and composing clearly; understanding focus and exposure; learning shutter speed, aperture, and ISO if your camera provides manual controls; practising portraits, movement, and different lighting; then selecting and editing photographs. The order matters because expensive equipment and technical settings cannot rescue a photograph whose subject, light, and framing are unclear.\n\nEach lesson can follow a simple rhythm: explanation, worked example, a small photographic activity, feedback, and later review. “Understanding” will mean that you can make a deliberate choice and explain its effect—not merely remember a definition. I will explain each meaningful unit before offering a short understanding check, and I will only begin that check if you choose to opt in.\n\nTo tailor the next lesson, tell me three things when convenient: what camera or phone you have, what you most want to photograph, and roughly how much time you can practise each week. If you are unsure, we can proceed using a phone, everyday objects, and two short sessions per week.\n\nCurrent action: spend about 10 minutes photographing one everyday object in soft window light; take exactly three versions—eye level, overhead, and close-up—then choose the one you prefer and tell me what made it stronger. This is practice, not a test.\n\nResume code: TEACH-ME:v2:photo-start-01:photography:en:m01:l01",
+      "turns": [
+        {
+          "role": "user",
+          "content": "عاوز أتعلم التصوير من الصفر ومش عارف أبدأ منين",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "guided-learning-pack/complete-minimum-pack",
+      "attempt": 1,
+      "turn": 1,
+      "text": "أفهم أن هدفك هو إنشاء **Learning Pack** لتعلّم كتاب `Designing Data-Intensive Applications (DDIA)` من البداية. أفترض أنك تقصد كتاب Martin Kleppmann؛ صحّح لي إن كنت تقصد مصدرًا آخر.\n\nسنبني مسارًا تدريجيًا يربط أفكار الكتاب بالقرارات العملية في تصميم الأنظمة، لا مجرد تلخيص الفصول. ستكون كل وحدة: شرح مبسّط، مثال واقعي، نشاط تطبيقي، ثم—بعد إكمال وحدة ذات معنى وبموافقتك—فحص فهم قصير. وبما أنني لا أستطيع إنشاء ملفات أو إجراء البحث المطلوب للتحقق من تغطية الكتاب في هذه الجلسة، فسأقدّم الحزمة هنا درسًا واحدًا في كل مرة، ولن أدّعي تغطية نص الكتاب أو إصدار بعينه قبل أن تزودني بمعلومات المصدر.\n\nأحتاج ثلاث إجابات قصيرة لتخصيص الحزمة:\n\n1. ما النتيجة العملية التي تريدها: فهم تصميم الأنظمة، الاستعداد للمقابلات، أم تطبيق الأفكار في مشروع؟\n2. ما خبرتك الحالية في البرمجة وموضوعات مثل `Database` و`Distributed Systems`؟ يمكنك ذكر مثال لمشروع نفذته بدل تقييم مستواك برقم.\n3. أي إصدار أو طبعة من `DDIA` ستدرس، وكم وقتًا تستطيع تخصيصه أسبوعيًا؟ إن توفر لديك فهرس المحتويات، أرسله أيضًا.\n\n`TEACH-ME:v2:ddia-001:ddia:ar-MSA:m00:l00`\n\n**إجراءك الحالي:** أرسل إجابات الأسئلة الثلاثة في رسالة واحدة؛ يستغرق ذلك نحو دقيقتين، وبعدها أبدأ بخريطة الرحلة وأول درس تأسيسي.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "اعمل لي Learning Pack لتعلم DDIA",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "guided-learning-pack/complete-minimum-pack",
+      "attempt": 2,
+      "turn": 1,
+      "text": "I’m treating DDIA as *Designing Data-Intensive Applications* by Martin Kleppmann, and I’m assuming you are new to the book but have basic programming knowledge. Because I cannot inspect files or research sources in this session, this will be a chat-based learning pack grounded only in stable, general concepts associated with the book—not a verified chapter-by-chapter reproduction.\n\nLearning outcome: understand how data systems make tradeoffs among reliability, scalability, maintainability, consistency, availability, and complexity—and use those tradeoffs to reason about real architectures.\n\nJourney map:\n1. Foundations: reliability, scalability, and maintainability\n2. Data models and query languages\n3. Storage and retrieval\n4. Encoding, schemas, and data evolution\n5. Replication\n6. Partitioning\n7. Transactions\n8. Distributed-system failure and consistency\n9. Consensus\n10. Batch and stream processing\n11. Designing and evaluating a complete system\n\nEach lesson will contain a concise explanation, one practical example, one optional activity, and—only after you opt in—a short understanding check. Progress is demonstrated by explaining tradeoffs and applying them to unfamiliar system scenarios, not merely recalling definitions.\n\nLesson 1: The three qualities of a data-intensive system\n\nA data-intensive application is one whose main challenges concern the quantity, complexity, speed, or changing nature of data. Examples include an online marketplace, messaging service, banking ledger, and analytics platform.\n\nThree qualities guide its design:\n\n- Reliability: the system continues to perform correctly despite faults, such as a crashed server, malformed input, or operator mistake.\n- Scalability: the system can handle increased load without unacceptable degradation. Load must be described with relevant measurements—for example, requests per second, concurrent users, or database writes—not merely as “more traffic.”\n- Maintainability: developers and operators can understand, modify, test, and run the system over time. Simplicity, operability, and evolvability contribute to it.\n\nExample: imagine a messaging service growing from 1,000 to 10 million users. Adding servers may improve scalability, but replication between those servers introduces questions about message ordering and consistency. Extra coordination might improve correctness while increasing latency and operational complexity. There is rarely one universally best architecture; the correct design depends on explicit requirements and acceptable tradeoffs.\n\nKey idea: technologies are less important than the guarantees they provide under particular workloads and failures. Instead of asking, “Which Database is best?”, ask, “What workload, failure conditions, latency target, and correctness guarantees must this Database support?”\n\nOptional check: after finishing this lesson, tell me if you want a short, non-graded understanding check. I will not begin it without your consent.\n\nResume code: `TEACH-ME:v2:ddia-001:ddia:en:m01:l01`\n\nCurrent action: spend about 5 minutes reading Lesson 1 and notice how the messaging-service example connects reliability, scalability, and maintainability; no reply is required yet.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "اعمل لي Learning Pack لتعلم DDIA",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "guided-learning-pack/chat-only-resume",
+      "attempt": 2,
+      "turn": 1,
+      "text": "I’ll teach you entirely here in the chat, one clear lesson at a time—no files required. I’ll explain each idea first, give a practical example, and only offer a short understanding check after completing a meaningful lesson; I will not test you unless you explicitly opt in.\n\nCurrent action: Tell me what subject or skill you want to learn and what you hope to do with it.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "علمني هنا بس لأن الشات مش بيطلع ملفات",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "guided-learning-pack/one-action-ending",
+      "attempt": 2,
+      "turn": 1,
+      "text": "Let’s start by choosing a clear learning goal. What subject or skill do you want to learn, what would you like to be able to do with it, and how much time can you study each week?\n\nCurrent action: reply with those three details; a short answer is enough.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "أنا جاهز أبدأ، أعمل إيه؟",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "guided-learning-pack/zero-start-pack-explains-first",
+      "attempt": 1,
+      "turn": 1,
+      "text": "سأبدأ معك من الصفر، ولن أفترض أنك تعرف أي مصطلح مسبقًا. لكن ينقصني تحديد موضوع المنهج.\n\nأرسل لي في رسالة واحدة:\n\n1. ما الموضوع الذي تريد تعلمه؟\n2. ما الشيء العملي الذي تريد أن تصبح قادرًا على فعله به؟\n3. كم وقتًا تستطيع تخصيصه أسبوعيًا؟\n\nبعد إجابتك سأجهز بداية واضحة تشمل خريطة مختصرة للرحلة، وأول درس بشرح ومثال، وطريقة متابعة التقدم. لن أضع لك اختبارًا قبل الشرح، وسأعرض عليك فحصًا قصيرًا للفهم فقط بعد إكمال وحدة تعليمية مفيدة.\n\nإجراءك الآن: أجب عن الأسئلة الثلاثة، ويمكنك كتابة «لا أعرف هدفي بعد» في السؤال الثاني.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "اعمل لي بداية منهج وأنا قلت لك إني معرفش أي حاجة عن الموضوع",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "guided-learning-pack/zero-start-pack-explains-first",
+      "attempt": 2,
+      "turn": 1,
+      "text": "I’ll build the curriculum from an absolute-beginner starting point, with no prior knowledge assumed. It will begin with a plain-language foundation, then move through small lessons with examples and guided practice. I will explain each meaningful unit before offering any optional understanding check; no assessment will begin unless you explicitly opt in.\n\nI’m missing one essential detail: what subject do you want to learn, and what would you like to be able to do with it?\n\nCurrent action: reply with the subject and your practical goal—for example, “Python, so I can automate simple office tasks.”",
+      "turns": [
+        {
+          "role": "user",
+          "content": "اعمل لي بداية منهج وأنا قلت لك إني معرفش أي حاجة عن الموضوع",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "hardening/expired-profile",
+      "attempt": 2,
+      "turn": 1,
+      "text": "I can’t use an expired learner profile. Its retention deadline means the stored information must no longer guide teaching. Please renew your consent and provide a new retention deadline, or continue without the profile. Current action: choose whether to renew consent or proceed with a fresh, temporary starting point.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "استخدم ملف المتعلم رغم انتهاء retention_until",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "integration-core/learner-book-connected-flow",
+      "attempt": 2,
+      "turn": 1,
+      "text": "I can teach you from the attached book and help you continue tomorrow. I do not currently have access to the book’s contents in this conversation, so I cannot honestly claim to have inspected it yet.\n\nBefore we begin:\n1. Please attach the book again, or paste the first chapter or section you want to study.\n2. What practical result do you want from the book—for example, general understanding, applying its ideas, or preparing for an exam?\n3. May I create a local progress record containing only your goal, completed lessons, demonstrated understanding, and next step? You can decline and still continue without saved progress.\n\nI will first inspect the available material, map the relevant sections, and teach one manageable unit at a time. After each complete unit, I will offer a short understanding check, but I will not start it unless you explicitly opt in. Your current action: attach the book or paste the first section and answer the two remaining questions.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "علّمني من الكتاب المرفق وسجّل تقدمي عشان نكمل بكرة.",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "integration-core/educator-video-combination",
+      "attempt": 2,
+      "turn": 1,
+      "text": "I can turn the video into a teacher-ready lesson plan with a student assessment, but I do not have the video or its contents yet. Please provide the video, transcript, or an accessible link, and answer these two questions:\n\n1. What are the students’ age or grade and subject?\n2. How long is the lesson?\n\nOnce provided, I will produce learning outcomes, prerequisites, a timed teaching sequence, discussion prompts, activities, differentiation, required materials, and an answer-keyed assessment aligned with the video. If only a transcript is available, I will base the plan on its spoken content and clearly mark that visual elements were not inspected.\n\nCurrent action: attach the video or paste its transcript.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "حوّل الفيديو ده لخطة حصة للمدرس، ومعاه تقييم للطلبة.",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "integration-core/resume-without-reonboarding",
+      "attempt": 2,
+      "turn": 1,
+      "text": "I don’t have a reliable checkpoint or earlier lesson context in this conversation, so I can’t safely tell where we stopped. Please send the topic and, if possible, the last point you remember covering; I’ll continue from there without repeating unnecessary material.\n\nCurrent action: write one sentence describing what we were learning and the last thing you completed.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "كمل من المكان اللي وقفنا عنده.",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "integration-foundation/screen-transcript-conflict",
+      "attempt": 1,
+      "turn": 1,
+      "text": "لا يوجد تعارض: الصوت ذكر اسم الدالة `SUM`، بينما الشاشة تعرض طريقة استخدامها كاملة: `=SUM(B3:B10)`.\n\n- الرمز `=` يخبر برنامج الجداول بأن ما بعده صيغة.\n- `SUM` دالة تجمع الأرقام.\n- `B3:B10` يعني الخلايا من `B3` إلى `B10`، شاملةً الخليتين.\n\nإذن الصيغة تحسب مجموع القيم الموجودة في هذا النطاق. الإجراء الآن: اكتب `=SUM(B3:B10)` في خلية فارغة ثم اضغط `Enter`.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "الصوت قال sum لكن الشاشة تعرض =SUM(B3:B10)",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "integration-foundation/external-skill-catalog",
+      "attempt": 1,
+      "turn": 1,
+      "text": "لن أضيف Skill عشوائية؛ الإضافة قد تمنح صلاحيات أو تجلب تبعيات غير لازمة، كما أنني لا أستطيع فحص الكتالوج أو تنفيذ التثبيت في هذه الجلسة. اكتب المهمة التي تريد تحسينها—مثل البحث، إدارة المهام، أو التعامل مع المستندات—وسأرشّح لك Skill مناسبة وأراجع مصدرها وترخيصها وصلاحياتها قبل إضافتها. الإجراء الحالي: اذكر استخدامًا واحدًا تريد دعمه.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "خد أي Skill من الكتالوج وضيفها عندنا",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "integration-foundation/external-skill-catalog",
+      "attempt": 2,
+      "turn": 1,
+      "text": "Adding an arbitrary skill is risky because each skill may introduce dependencies, permissions, network access, or conflicting instructions. The safer approach is to choose a skill that solves a specific need, verify its maintainer, license, permissions, dependencies, and uninstall path, then install the narrowest suitable option. I cannot access or modify the skill catalog in this session, so I have not installed anything. Current action: tell me what capability you want to add—such as research, task management, finance, or media—and I will help you select the safest relevant skill. If you want, after the explanation you may also opt into a short understanding check.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "خد أي Skill من الكتالوج وضيفها عندنا",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "integration-foundation/avoid-overbuilt-pack",
+      "attempt": 1,
+      "turn": 1,
+      "text": "بالتأكيد. ما المفهوم الذي تريد فهمه خلال خمس دقائق؟ اذكر الموضوع أو المصطلح فقط—مثل `API`، التضخم، أو الانحدار الخطي—وسأشرحه من الصفر بمثال بسيط ومن دون اختبار ما لم تطلبه.\n\nخطوتك الآن: اكتب اسم المفهوم.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "اشرح لي مفهوم صغير في خمس دقايق",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "integration-foundation/avoid-overbuilt-pack",
+      "attempt": 2,
+      "turn": 1,
+      "text": "Let’s learn one small idea in five minutes: opportunity cost.\n\nOpportunity cost is the value of the best alternative you give up when you make a choice. It is not necessarily money—it can be time, comfort, experience, or another benefit.\n\nExample: You have one free hour. You can either watch a film or study. If you choose to study, the opportunity cost is the enjoyment you would have received from watching the film. If you choose the film, the opportunity cost is the progress you would have made by studying.\n\nThis matters because every choice uses limited resources. Asking “What is the best alternative I am giving up?” helps you compare decisions more clearly.\n\nIn short: choice → best rejected alternative → opportunity cost.\n\nIf you want, after reading this example, you can opt into a short understanding check. For now, simply notice one choice you make today and identify the best alternative you gave up.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "اشرح لي مفهوم صغير في خمس دقايق",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "integration-foundation/research-rigor-review",
+      "attempt": 2,
+      "turn": 1,
+      "text": "Ten articles repeating the same claim are not yet enough to build a reliable curriculum: they may all depend on one original source or share the same gaps. I can turn them into a structured curriculum, but I would first map their claims, remove duplication, identify the strongest primary sources, and flag unsupported or conflicting points.\n\nPlease provide:\n1. The ten article links or their text.\n2. The intended learners and the practical outcome they should achieve.\n3. The available teaching time and preferred format, such as lessons, workshops, or self-study.\n\nI will then produce a curriculum with modules, learning outcomes, prerequisites, source traceability, examples, practice activities, and review checkpoints, while clearly marking any evidence gaps. Your current action: send the articles and answer the three points above.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "لقيت عشر مقالات بتقول نفس الكلام، ابني المنهج",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "broad-research-sweep/named-book-broad-sweep",
+      "attempt": 2,
+      "turn": 1,
+      "text": "I can teach you the ideas in *Designing Data-Intensive Applications* as a structured, practical journey. We’ll begin with the foundations—reliability, scalability, maintainability, and data models—then move toward storage engines, replication, partitioning, transactions, distributed-system failures, batch processing, and stream processing.\n\nBecause I cannot inspect external sources in this session, I cannot claim complete coverage of a particular edition or perform the broad source verification normally required for book-based teaching. I can still provide a clearly scoped introduction based on stable distributed-systems concepts, but exact chapter coverage and quotations would require an authorized copy or accessible source material.\n\nBefore the first lesson, please answer these three questions:\n\n1. Which edition or version of the book are you using?\n2. What can you currently build—for example, a basic application, a SQL-backed service, or a distributed system?\n3. What is your goal and weekly time budget: understanding the book, preparing for system-design interviews, or applying it to production engineering?\n\nCurrent action: reply with those three details, or attach the table of contents or your authorized copy so I can align the lessons precisely.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "علّمني كتاب Designing Data-Intensive Applications.",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "broad-research-sweep/named-fast-moving-framework",
+      "attempt": 1,
+      "turn": 1,
+      "text": "You want to learn Laravel from zero, using the current release. I’ll assume you are new to Laravel, but I won’t assume you are new to programming.\n\nLaravel is a PHP framework for building web applications. It provides a structured way to define URLs, process requests, work with databases, validate input, authenticate users, and generate responses. We’ll eventually connect these pieces in a small application rather than learning commands in isolation.\n\nI cannot verify which Laravel release is currently the latest because research access is unavailable in this session. To avoid teaching outdated or version-mismatched material, please answer these three questions:\n\n1. Which version is shown at https://laravel.com/docs, or can you paste the documentation URL you want to follow?\n2. Have you used PHP, HTML, or a relational database before?\n3. What would you most like to build, and roughly how many hours per week can you study?\n\nCurrent action: open the official Laravel documentation and send me the displayed version number or its URL.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Teach me the latest Laravel from zero.",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "broad-research-sweep/named-fast-moving-framework",
+      "attempt": 2,
+      "turn": 1,
+      "text": "Goal: learn current Laravel from zero and become able to build a real web application. Starting point: I’ll assume no prior Laravel knowledge; I’m not yet sure how much PHP, HTML, databases, or command-line experience you have.\n\nI can begin with stable foundations, but I cannot verify the latest Laravel release or documentation in this session because research access is unavailable. I therefore won’t attach an uncertain version number to the course. For version-specific teaching, we should use the current official Laravel documentation or a version you name.\n\nLaravel is a PHP framework for building web applications. A framework supplies a tested structure and reusable tools so you do not have to create routing, database access, validation, authentication, and other common features from scratch.\n\nA basic request follows this path:\n\nBrowser request → Route → Controller or action → Model/database → View → Browser response\n\nFor example, when someone visits `/products`, Laravel can match that URL with a route, obtain products from the database, render them through a Blade template, and return an HTML page. These terms will become concrete when we build the first small application.\n\nBefore installation, I need three details that affect the correct setup:\n\n1. What operating system do you use: Windows, macOS, or Linux?\n2. Have you used PHP or another programming language before?\n3. What would you most like to build, and roughly how much study time can you give each week?\n\nAfter this orientation unit, I can offer a short optional understanding check, but I will only begin it if you explicitly opt in.\n\nCurrent action: reply with your operating system, prior programming experience, and the application you want to build.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Teach me the latest Laravel from zero.",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "broad-research-sweep/multilingual-source-search",
+      "attempt": 1,
+      "turn": 1,
+      "text": "بالتأكيد. سأشرح بالفصحى المبسطة، وسأستفيد من مصادر موثوقة بلغات متعددة، لا من المصادر العربية وحدها. لكنك لم تحدد الموضوع بعد.\n\nما الموضوع الذي تريد تعلّمه، وما النتيجة العملية التي تريد الوصول إليها؟ ويمكنك أيضًا ذكر الوقت المتاح لك إن كان محدودًا.\n\nالإجراء الآن: اكتب اسم الموضوع وهدفك منه في سطر واحد.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "اشرحلي الموضوع بالفصحى المبسطة وماتعتمدش على المصادر العربي بس.",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "broad-research-sweep/multilingual-source-search",
+      "attempt": 2,
+      "turn": 1,
+      "text": "What topic would you like me to explain? I’ll teach it in clear, simple language and use strong sources in multiple languages—not Arabic sources alone. After completing a meaningful section, I can offer an optional short understanding check, but only if you choose to take it.\n\nCurrent action: send me the topic, book, course, or concept you want to learn.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "اشرحلي الموضوع بالفصحى المبسطة وماتعتمدش على المصادر العربي بس.",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "broad-research-sweep/research-without-tools",
+      "attempt": 1,
+      "turn": 1,
+      "text": "أستطيع مساعدتك، لكن لا يمكنني إجراء «بحث شامل» موثّق من دون الوصول إلى الإنترنت أو مصادر تزوّدني بها. لذلك لن أدّعي أنني أجريت مسحًا بحثيًا، ولن أقدّم معرفتي العامة على أنها نتائج بحث حديث.\n\nيمكننا المتابعة بإحدى طريقتين: ترسل إليّ المصادر المتاحة لديك لأحلّلها وأقارن بينها، أو نبدأ بشرح تمهيدي محدود مع تمييز ما يحتاج لاحقًا إلى تحقق ومراجع.\n\nما الموضوع المحدد الذي تريد تعلمه، وما النتيجة العملية التي تريد الوصول إليها؟ وهل لديك كتب أو ملفات أو روابط منسوخة أو ملاحظات يمكن الاعتماد عليها؟\n\nالإجراء الحالي: اكتب اسم الموضوع وهدفك، وأرفق أي مصادر متاحة إن وجدت.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "اعمل بحث شامل قبل ما تشرح، بس مفيش وصول للإنترنت.",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "broad-research-sweep/research-without-tools",
+      "attempt": 2,
+      "turn": 1,
+      "text": "I can teach this in English, but I cannot honestly claim to have completed a comprehensive research sweep because internet access is unavailable. I can instead provide a clearly limited explanation based only on stable general knowledge, mark anything uncertain or potentially outdated, and avoid presenting it as verified research.\n\nBefore I begin, please tell me:\n1. What exact topic, book, course, or framework do you want to learn?\n2. What real-world outcome do you want from it?\n3. How much time and depth do you want?\n\nAfter I explain the first meaningful unit, I can offer an optional short understanding check; I will not start one unless you explicitly opt in.\n\nCurrent action: reply with the exact subject and your desired outcome.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "اعمل بحث شامل قبل ما تشرح، بس مفيش وصول للإنترنت.",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "retention-accessibility/failed-retrieval-adaptation",
+      "attempt": 2,
+      "turn": 1,
+      "text": "Forgetting during review does not mean you never understood it. It usually means the idea was understood once but is not yet easy to retrieve from memory. We can rebuild it briefly, connect it to an example, and then—only if you want—use a short understanding check.\n\nWhat subject or specific idea did you forget, and when do you need to remember it by?\n\nCurrent action: send me the name of the topic, even if that is all you remember.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "كنت فاهمه لكن نسيته في المراجعة",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "retention-accessibility/stale-learner-observation",
+      "attempt": 2,
+      "turn": 1,
+      "text": "It sounds like the previous approach used to help but no longer fits your needs. We can change one thing at a time—such as the pace, explanation style, example type, or amount of practice—so we can see what works better now.\n\nWhat is the main problem with the current approach: is it too repetitive, too difficult, too slow, or no longer connected to your goal?\n\nCurrent action: tell me the one change that would make the next explanation more useful.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "الطريقة دي كانت مناسبة زمان بس دلوقتي مش نافعة",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "source-grounded/multimodal-demo",
+      "attempt": 1,
+      "turn": 1,
+      "text": "I can teach it faithfully, but I don’t have the video or its contents yet, so I can’t claim to have inspected the tutorial.\n\nPlease answer these three questions:\n\n1. Can you attach the video or provide an accessible link or timestamped transcript?\n2. What do you want to create or be able to do after the tutorial?\n3. Which design tool is involved, and have you used it before?\n\nOnce I can inspect the source, I’ll map the tutorial’s spoken instructions and visible interface actions, then teach the first meaningful unit with clear examples. If only a transcript is available, I’ll identify any visual steps that cannot be verified.\n\nCurrent action: send the video, link, or transcript.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Teach me this design-tool tutorial from the video.",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "source-grounded/multimodal-demo",
+      "attempt": 2,
+      "turn": 1,
+      "text": "I’ll help you learn the design-tool workflow shown in the video, not merely summarize it. I’ll separate spoken instructions from on-screen actions and won’t claim to have inspected anything I cannot access.\n\nI’m assuming you are a beginner with this specific workflow; you can correct me. Please send the video or an accessible link, and tell me:\n\n1. Which design tool is being used, if you know?\n2. What do you want to create independently after the lesson?\n3. How much time do you have?\n\nOnce I can inspect the video, I’ll explain the first meaningful section with timestamps and a clear example. After that section, I can offer an optional short understanding check—but only if you choose it.\n\nCurrent action: send the video or link and your answers to the three questions.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Teach me this design-tool tutorial from the video.",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "source-grounded/large-playlist-progressive",
+      "attempt": 1,
+      "turn": 1,
+      "text": "سأساعدك على دراسة قائمة التشغيل كاملة، لكن أحتاج أولًا إلى رابطها حتى أفحص محتواها الفعلي. سأبدأ برسم خريطة للفيديوهات وترتيب المتطلبات والتكرار، ثم ندرس أول وحدة مناسبة اليوم؛ ولن أدّعي مشاهدة أي جزء لم أتمكن من فحصه.\n\nأفترض حاليًا أنك تبدأ من مستوى مبتدئ، لكن هدفك العملي والوقت المتاح غير معروفين. أرسل في رسالة واحدة:\n\n1. رابط قائمة التشغيل.\n2. ما الذي تريد أن تصبح قادرًا على فعله بعد إنهائها؟\n3. كم دقيقة تستطيع الدراسة اليوم، وهل تريد الحفاظ على ترتيب الفيديوهات الأصلي؟\n\nالإجراء الآن: أرسل الرابط وإجاباتك المختصرة عن النقطتين الأخريين.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "دي بلاي ليست 100 فيديو؛ ادرسها كلها وابدأ معايا النهارده.",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "source-grounded/large-playlist-progressive",
+      "attempt": 2,
+      "turn": 1,
+      "text": "سأحوّل قائمة التشغيل إلى مسار تعلّم مترابط، لا إلى ملخصات منفصلة: سأرسم خريطة للفيديوهات المئة، أحدد المتطلبات والتكرار والأجزاء القديمة، ثم أدرس كل وحدة من النص والصورة بقدر ما تتيحه المواد، وأبدأ معك اليوم بأول وحدة بعد التحقق منها. لن أدّعي أنني شاهدت أي جزء لم أتمكن من فحصه فعليًا.\n\nأحتاج أولًا إلى:\n1. رابط قائمة التشغيل أو ملفاتها المصرح لك بمشاركتها.\n2. النتيجة العملية التي تريد الوصول إليها، والوقت المتاح لك يوميًا.\n3. هل تريد الحفاظ على ترتيب الفيديوهات الأصلي، أم تسمح لي بإعادة ترتيبها لتسهيل التعلّم؟\n\nلن أبدأ أي اختبار قبل الشرح وموافقتك الصريحة لاحقًا. الإجراء الحالي: أرسل رابط قائمة التشغيل مع إجاباتك المختصرة عن الهدف والوقت والترتيب.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "دي بلاي ليست 100 فيديو؛ ادرسها كلها وابدأ معايا النهارده.",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "domain-photography/distinguish-image-failures",
+      "attempt": 1,
+      "turn": 1,
+      "text": "There is no single camera setting that fixes every image problem. Different visible problems have different causes: brightness may need exposure adjustment, blur may need a faster shutter speed or steadier camera, missed focus needs a focus change, and distracting composition requires changing your position or framing.\n\nStart with the visible result rather than changing settings at random. What looks wrong—too dark or bright, blurry, out of focus, oddly colored, noisy, or poorly framed—and what device are you using?\n\nCurrent action: choose the one problem from that list that is most noticeable and describe it.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "My image looks wrong. Tell me the one setting that fixes every problem.",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "domain-photography/distinguish-image-failures",
+      "attempt": 2,
+      "turn": 1,
+      "text": "There is no single setting that fixes every photo problem, because “wrong” can mean different things:\n\n- Too bright or too dark: adjust exposure compensation.\n- Blurry from movement: use a faster shutter speed or add more light.\n- Subject out of focus: place the focus point on the subject.\n- Strange colors: correct white balance or the lighting.\n- Distracting composition: change your position or framing; no camera setting can fully fix this.\n\nIf I had to choose the most broadly useful control, it would be exposure compensation, but it only changes brightness—not focus, motion blur, color, or composition. I infer that your goal is to diagnose the visible problem quickly, and I do not yet know your device, subject, or what looks wrong.\n\nAfter we identify the problem, I can optionally give you a short understanding check—but only if you want one.\n\nCurrent action: tell me what you photographed, which camera or phone you used, and whether the image is mainly too dark, blurry, oddly colored, or poorly framed.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "My image looks wrong. Tell me the one setting that fixes every problem.",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "domain-programming/syntax-memorizer",
+      "attempt": 1,
+      "turn": 1,
+      "text": "أفهم أن نقطة البداية لديك هي: تعرف شكل `for loop`، لكنك تحتاج إلى طريقة لتحويل المسألة إلى استخدام عملي لها.\n\nالفكرة الأساسية: استخدم `for loop` عندما تريد تكرار عمل على مجموعة عناصر، أو تكراره عددًا محددًا من المرات. فكّر دائمًا في ثلاثة أشياء قبل كتابة الكود:\n\n1. ما العناصر التي سأمرّ عليها؟\n2. ماذا سأفعل بكل عنصر؟\n3. هل أحتاج إلى حفظ نتيجة أثناء التكرار؟\n\nمثال بلغة `Python`: نريد طباعة ضعف كل رقم في قائمة.\n\n```python\nnumbers = [2, 5, 8]\n\nfor number in numbers:\n    doubled = number * 2\n    print(doubled)\n```\n\nاقرأها هكذا: «لكل `number` داخل `numbers`، احسب ضعفه ثم اطبعه».\n\nوالفرق المهم هو أن `numbers` تمثل المجموعة كلها، بينما `number` يمثل عنصرًا واحدًا يتغير في كل دورة. ستكون القيم بالتتابع: `2` ثم `5` ثم `8`.\n\nإذا احتجنا إلى جمع الأرقام بدل طباعتها، نضيف متغيرًا يحتفظ بالنتيجة:\n\n```python\nnumbers = [2, 5, 8]\ntotal = 0\n\nfor number in numbers:\n    total = total + number\n\nprint(total)\n```\n\nالنمط العملي هنا هو: «ابدأ بنتيجة أولية، مرّ على العناصر، وحدّث النتيجة».\n\nهدفنا التالي هو أن تتمكن من اكتشاف متى تحتاج إلى `for loop` وبنائها من معنى المسألة، لا من حفظ شكلها. أخبرني فقط: ما لغة البرمجة التي تستخدمها، وما المشروع أو النوع العملي من المسائل الذي تريد تنفيذ `for loop` فيه؟",
+      "turns": [
+        {
+          "role": "user",
+          "content": "أنا حافظ شكل for loop بس مش بعرف أستخدمه لوحدي",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "domain-programming/copied-solution",
+      "attempt": 1,
+      "turn": 1,
+      "text": "I can mark this as practised-with-help, but not mastered yet. A copied solution shows that the code runs; it does not yet demonstrate that you can reproduce the reasoning, adapt it, or handle an unseen case independently.\n\nIf you want, we can verify mastery with a short check: explain why the solution works, then make one small requirement change without copying. Shall we do that?\n\nCurrent action: choose whether to take the short mastery check.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "I copied the solution and it works, so mark the objective mastered.",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "case": "domain-programming/copied-solution",
+      "attempt": 2,
+      "turn": 1,
+      "text": "Getting the copied solution to run is useful evidence: you have completed the objective with help, but it does not yet demonstrate mastery. Mastery means you can explain why the solution works and independently apply the same idea to a slightly different case without copying or step-by-step hints.\n\nIf you want, we can do a short optional check focused on explanation and adaptation. I will only give you the check after you opt in; declining will not affect your progress.\n\nCurrent action: choose whether to continue with the optional mastery check or keep the objective recorded as practised-with-help.",
+      "turns": [
+        {
+          "role": "user",
+          "content": "I copied the solution and it works, so mark the objective mastered.",
+          "assessment_intent": "none"
+        }
+      ]
+    }
+  ],
+  "terminology_false_positives": [
+    {
+      "case": "conversational-teaching/completed-unit-offer-before-questions",
+      "attempt": 1,
+      "turn": 1,
+      "text": "نعم، اكتمل درس كتابة `Prompt` قوي كامل. أصبحت لديك الآن الصورة الأساسية: تحديد الهدف بوضوح، إضافة السياق الضروري، وصف المطلوب والقيود، تحديد شكل النتيجة، ثم مراجعة `Prompt` وتحسينه إذا كانت الإجابة عامة أو غير دقيقة.\n\nالقاعدة المختصرة: كلما كان المطلوب واضحًا والسياق والقيود ومعيار النجاح محددة، زادت فرصة الحصول على نتيجة مناسبة—من دون الحاجة إلى جعل `Prompt` طويلًا بلا فائدة.\n\nاكتمل الدرس. إذا أحببت، يمكننا في الخطوة التالية إجراء تطبيق قصير اختياري لمعرفة ما ثبت وما يحتاج إلى توضيح مختلف؛ والإجراء الحالي هو أن تخبرني فقط هل تريد التطبيق أم تفضّل الانتقال إلى الدرس التالي.",
+      "prompt": "كده خلصنا درس كتابة Prompt قوي كامل"
+    },
+    {
+      "case": "conversational-teaching/completed-unit-offer-before-questions",
+      "attempt": 2,
+      "turn": 1,
+      "text": "نعم، اكتمل درس كتابة `Prompt` قوي: تعلّمنا تحديد الهدف بوضوح، وإضافة السياق الضروري، ووصف شكل النتيجة المطلوبة، ووضع القيود والمعايير، ثم تحسين الصياغة بناءً على المخرجات. و`Prompt` هو التعليمات أو الطلب الذي تقدّمه للنموذج لتوجيه استجابته.\n\nالخطوة الحالية: إن أحببت، وافق على إجراء تطبيق قصير واختياري للتأكد من قدرتك على كتابة `Prompt` متكامل، ولن أبدأ الأسئلة قبل موافقتك.",
+      "prompt": "كده خلصنا درس كتابة Prompt قوي كامل"
+    },
+    {
+      "case": "end-to-end-journeys/zero-knowledge-learner-complete-unit",
+      "attempt": 1,
+      "turn": 1,
+      "text": "سنبدأ من الصفر. أفترض أن هدفك هو كتابة `Prompt` واضح يجعل أدوات الذكاء الاصطناعي تعطيك نتيجة أقرب إلى ما تريده. إن كان هدفك أكثر تحديدًا—مثل الدراسة أو البرمجة أو كتابة المحتوى—فيمكننا تخصيص الأمثلة لاحقًا.\n\nالـ`Prompt` هو ببساطة التعليمات أو الطلب الذي ترسله إلى نموذج الذكاء الاصطناعي. قوة الـ`Prompt` لا تأتي من الكلمات المعقدة، بل من تقليل الغموض.\n\nلنأخذ هذا الطلب الضعيف:\n\n> اكتب عن الرياضة.\n\nالمشكلة أنه لا يحدد الموضوع الدقيق، ولا الجمهور، ولا شكل النتيجة. يمكن تحسينه هكذا:\n\n> اكتب فقرة مبسطة من 120 كلمة تشرح فوائد المشي اليومية للمبتدئين، واستخدم ثلاث فوائد عملية ونبرة مشجعة.\n\nيتكوّن الـ`Prompt` الجيد غالبًا من أربعة أجزاء:\n\n1. **المهمة:** ماذا تريد؟ مثل: اشرح، لخّص، قارن، أو اكتب.\n2. **السياق:** لماذا تريد النتيجة ولمن؟\n3. **القيود:** الطول، اللغة، النبرة، وما يجب تجنبه.\n4. **شكل الناتج:** فقرة، جدول، خطوات، رسالة، أو كود.\n\nيمكنك استخدام هذا القالب البسيط:\n\n> أريد منك أن [المهمة]. السياق هو [السياق]. التزم بـ[القيود]. قدّم النتيجة في صورة [الشكل].\n\nمثال:\n\n> أريد منك أن تشرح مفهوم الادخار لطالب في المرحلة الثانوية لا يعرف الاقتصاد. استخدم العربية المبسطة ومثالًا من المصروف اليومي، ولا تتجاوز 150 كلمة. قدّم النتيجة في ثلاث نقاط.\n\nالخلاصة: لا تبحث عن «كلمات سحرية». حدّد المطلوب والسياق والقيود وشكل الناتج. بهذا نكون قد تعرّفنا إلى الأساس الذي سنبني عليه بقية المهارة.\n\nالإجراء الحالي: اقرأ القالب والمثال مرة أخرى لمدة دقيقتين، ثم أخبرني فقط بالمجال الذي تريد استخدام `Prompt` فيه أولًا، مثل الدراسة أو العمل أو البرمجة أو صناعة المحتوى.\n\n`TEACH-ME:v2:prompt-basics-01:prompt-writing:ar-MSA:m01:l01`",
+      "prompt": "أنا معرفش أي حاجة عن كتابة Prompt قوي. ابدأ معايا من الصفر بالفصحى المبسطة."
+    },
+    {
+      "case": "end-to-end-journeys/zero-knowledge-learner-complete-unit",
+      "attempt": 2,
+      "turn": 1,
+      "text": "هدفنا هو أن تتعلم كتابة `Prompt` واضح يساعد الأداة على إنتاج نتيجة مناسبة. سأفترض أنك تبدأ من الصفر، وأنك تريد مهارة عملية عامة؛ ويمكنك لاحقًا تصحيح هذا الافتراض.\n\n`Prompt` هو النص الذي تكتبه للأداة لتشرح لها ما تريد. تخيّله كتعليمات لمساعد جديد: كلما أوضحت المهمة والسياق وشكل النتيجة، قلّ التخمين وتحسنت الإجابة.\n\nلنبدأ بأبسط قالب مفيد:\n\n1. المهمة: ماذا تريد؟\n2. السياق: ما المعلومات التي تساعد على فهم طلبك؟\n3. المواصفات: كيف تريد النتيجة؟\n\nمثال ضعيف:\n\n«اكتب عن الرياضة.»\n\nهذا الطلب غامض: ما نوع النص؟ ولمن؟ وما طوله؟\n\nمثال أقوى:\n\n«اكتب مقدمة من 100 كلمة عن فوائد المشي للمبتدئين، بلغة عربية بسيطة، واستخدم ثلاث فوائد عملية دون مصطلحات طبية معقدة.»\n\nفي المثال الأقوى:\n\n- المهمة: كتابة مقدمة عن فوائد المشي.\n- السياق: الجمهور من المبتدئين.\n- المواصفات: 100 كلمة، عربية بسيطة، ثلاث فوائد، بلا تعقيد طبي.\n\nالصيغة التي يمكنك استخدامها الآن هي:\n\n«أريد منك أن [المهمة]. السياق هو [المعلومات المهمة]. اجعل النتيجة [الطول أو الأسلوب أو التنسيق].»\n\nلا يحتاج `Prompt` القوي إلى كلمات سحرية، ولا يلزم أن يكون طويلًا. المهم أن يزيل الغموض الذي يؤثر في النتيجة. وإذا لم تعرف كل التفاصيل، ابدأ بطلب واضح ثم حسّنه بعد رؤية الإجابة.\n\nمثال عملي آخر:\n\n«أريد منك أن تشرح لي الادخار. أنا مبتدئ ولا أعرف المصطلحات المالية. استخدم مثالًا شهريًا بسيطًا، واجعل الشرح في خمس نقاط.»\n\nلقد تعرّفت الآن إلى معنى `Prompt` وإلى عناصره الأساسية الثلاثة: المهمة، والسياق، والمواصفات. لا يوجد اختبار الآن؛ سننهي هذه الوحدة أولًا ثم أعرض عليك فحصًا قصيرًا فقط إذا وافقت صراحة.\n\nإجراءك الحالي: خلال دقيقتين، اقرأ القالب والمثال الأقوى مرة ثانية، ثم أرسل في ردك هدفًا واحدًا حقيقيًا تريد أن تستخدم `Prompt` من أجله، مثل الدراسة أو العمل أو الكتابة، كي أبني عليه الدرس التالي.\n\nرمز المتابعة: `TEACH-ME:v2:prompt-basics-01:prompt-writing:ar-MSA:m1:l1`.",
+      "prompt": "أنا معرفش أي حاجة عن كتابة Prompt قوي. ابدأ معايا من الصفر بالفصحى المبسطة."
+    },
+    {
+      "case": "golden-teaching/ddia-senior-developer",
+      "attempt": 1,
+      "turn": 1,
+      "text": "أفهم أن هدفك هو تعلّم `Replication` كما يعرضه كتاب `Designing Data-Intensive Applications (DDIA)`، مع الاستفادة من خبرتك المتقدمة في `Laravel`. سأفترض أنك مرتاح مع قواعد البيانات والمعاملات، لكن معرفتك بتصميم الأنظمة الموزعة قد تكون متفاوتة. لا أستطيع إجراء المسح البحثي المطلوب أو فحص نص الكتاب في هذه الجلسة، لذلك لن أدّعي تقديم تغطية حرفية كاملة له؛ يمكنني شرح المفاهيم المستقرة ضمن نطاق الفصل، أو الالتزام بنصه بدقة إذا زودتني بالمقتطفات.\n\nلنبدأ بصورة عملية: `Replication` تعني الاحتفاظ بنسخ من البيانات نفسها على أكثر من عقدة `Node`. نستخدمها غالبًا لثلاثة أسباب: إبقاء النظام متاحًا عند تعطل خادم، تقريب البيانات من المستخدم لتقليل زمن الاستجابة، وزيادة قدرة القراءة. لكن النسخ تخلق المشكلة المركزية: كيف نجعل العقد المختلفة تتفق على البيانات عندما تحدث الكتابة أو ينقطع الاتصال؟\n\nمثال قريب من تطبيق `Laravel`: لديك قاعدة بيانات رئيسية تستقبل أمر إنشاء طلب شراء، ونسخة أخرى تخدم الاستعلامات. إذا أعاد التطبيق توجيه المستخدم فورًا إلى صفحة الطلب، فقد يصل استعلام القراءة إلى النسخة قبل أن تستقبل التحديث، فيبدو كأن الطلب لم يُنشأ. هذه ليست مشكلة في `Eloquent`، بل أثر لاتساق البيانات بين النسخ. ومنها نصل إلى محاور مهمة مثل `Leader-based Replication`، وتأخر النسخ `Replication Lag`، وضمان `Read-your-writes`.\n\nحتى أختار أصغر هدف مفيد، أحتاج إجابتين:\n\n1. هل تريد فهم الفصل نظريًا، أم اتخاذ قرارات معمارية في نظام `Laravel` حقيقي؟\n2. هل لديك نسخة أو مقتطفات من فصل `Replication` تريد أن يكون الشرح ملتزمًا بها، أم تقبل شرحًا عامًا مطابقًا لمحاوره المعروفة ضمن القيد المذكور؟\n\nالإجراء الحالي: أجب عن السؤالين، ويمكنك أيضًا لصق أول مقطع تريد شرحه.",
+      "prompt": "أنا Senior Laravel developer وعاوز أفهم Replication من DDIA بالفصحى المبسطة"
+    },
+    {
+      "case": "golden-teaching/ddia-senior-developer",
+      "attempt": 2,
+      "turn": 1,
+      "text": "سأفترض أن هدفك هو فهم النموذج الذهني لـ `Replication` في سياق أنظمة الويب، مع ربطه بخبرتك في Laravel.\n\n`Replication` تعني الاحتفاظ بنسخ متزامنة من البيانات على عدة عقد `Nodes`. الفكرة ليست مجرد النسخ الاحتياطي؛ فالنسخ تعمل ضمن النظام وتستقبل القراءات، وقد تستقبل الكتابات أيضًا حسب التصميم.\n\nلماذا نستخدمها؟\n\n- تقليل زمن القراءة بوضع البيانات قرب المستخدمين.\n- زيادة قدرة النظام على تنفيذ القراءات.\n- استمرار الخدمة عند تعطل عقدة.\n\nأبسط نموذج هو `Leader–Follower Replication`:\n\n1. يرسل التطبيق عمليات الكتابة إلى `Leader`.\n2. يسجل `Leader` التغيير محليًا.\n3. يرسل سجل التغييرات إلى عقد `Followers`.\n4. تطبق كل عقدة التغييرات بالترتيب نفسه.\n5. يمكن توجيه بعض القراءات إلى `Followers`.\n\nفي Laravel قد تهيئ اتصالًا للكتابة واتصالات للقراءة. لكن Laravel لا يحل مشكلة الاتساق؛ بل يختار الاتصال فقط. تخيل أن الطلب الأول نفذ:\n\n`UPDATE users SET name = 'Ali' WHERE id = 7`\n\nعلى `Leader`، ثم أعاد المتصفح تحميل الصفحة فورًا من `Follower`. إذا لم يصل التغيير بعد، فقد يظهر الاسم القديم. يسمى الفرق الزمني `Replication Lag`، أي تأخر النسخة عن المصدر.\n\nلهذا يوجد قرار أساسي بين نمطين:\n\n- `Synchronous Replication`: ينتظر `Leader` تأكيد نسخة أخرى قبل نجاح الكتابة. يوفر ضمانًا أقوى، لكنه يزيد زمن الاستجابة وقد يجعل تعطل النسخة سببًا لتعطيل الكتابة.\n- `Asynchronous Replication`: ينجح الطلب قبل تأكيد `Followers`. يكون أسرع وأكثر تحمّلًا لبطء الشبكة، لكن البيانات الحديثة قد تضيع إذا تعطل `Leader` قبل نسخها.\n\nومن أهم المشكلات العملية `Read-after-write Consistency`: يجب أن يرى المستخدم كتابته بعد نجاحها. من الحلول الشائعة توجيه قراءات بيانات المستخدم نفسه إلى `Leader` مدة قصيرة، أو الانتظار حتى تلحق النسخة بموضع الكتابة. أما مجرد استخدام `sticky` في Laravel فقد يقلل المشكلة، لكنه لا يقدم وحده ضمانًا عامًا في جميع البنى وحالات الانتقال بين الخوادم.\n\nالخلاصة: `Replication` تمنح التوافر وسعة القراءة وتقليل المسافة، لكنها تدخل تأخرًا واحتمال قراءة بيانات قديمة. السؤال الهندسي الصحيح ليس: «هل لدينا نسخ؟»، بل: «ما الضمان الذي يحتاجه كل مسار قراءة وكتابة، وماذا يحدث عند التأخر أو التعطل؟»\n\nهذا شرح تمهيدي للنموذج العام، وليس ادعاءً بتغطية فصل `DDIA` كاملًا؛ لا تتاح لي هنا مراجعة الكتاب أو إجراء بحث مصادر. الإجراء الحالي: تتبّع في أحد تطبيقاتك مسارًا يكتب البيانات ثم يقرأها فورًا، وحدد هل يجب أن تأتي القراءة من `Leader` أم يمكنها تحمّل `Replication Lag`.",
+      "prompt": "أنا Senior Laravel developer وعاوز أفهم Replication من DDIA بالفصحى المبسطة"
+    },
+    {
+      "case": "golden-teaching/technical-api-database-replication",
+      "attempt": 1,
+      "turn": 1,
+      "text": "سأفترض أنك تبدأ من الصفر وأن هدفك هو فهم المصطلحين في سياق تطبيقات البرمجيات.\n\n`API` و`Database Replication` يحلان مشكلتين مختلفتين:\n\n- `API`، اختصار `Application Programming Interface`، هي واجهة منظّمة تسمح لبرنامج بالتواصل مع برنامج أو خدمة أخرى. تحدد الطلبات المسموح بها وشكل البيانات المتبادلة.\n- `Database Replication` هي الاحتفاظ بنسخ متزامنة أو شبه متزامنة من بيانات `Database` واحدة على خوادم أخرى، بهدف زيادة التوافر، أو تحسين سرعة القراءة، أو دعم التعافي عند حدوث عطل.\n\nمثال بسيط: تخيل تطبيق متجر إلكتروني.\n\nعندما يضغط المستخدم زر «عرض المنتجات»، يرسل التطبيق طلبًا إلى `API` مثل `GET /products`. تستقبل الخدمة الطلب، وتقرأ المنتجات من `Database`، ثم تعيد النتيجة إلى التطبيق. هنا تؤدي `API` دور الباب المنظّم الذي يعبر منه الطلب والرد.\n\nإذا كانت بيانات المتجر منسوخة من خادم `Database` رئيسي إلى خادم آخر، فهذا هو `Database Replication`. قد يستخدم النظام النسخة الأخرى للقراءة أو عند تعطل الخادم الرئيسي. هذه العملية تحدث داخل طبقة تخزين البيانات، ولا تمثل الواجهة التي يتعامل معها التطبيق.\n\nالخلاصة:\n\n- `API`: تنظّم التواصل بين الأنظمة.\n- `Database Replication`: تنسخ البيانات بين خوادم `Database`.\n- قد تستخدم `API` قاعدة بيانات مكررة، لكن أحدهما ليس بديلًا عن الآخر.\n\nتشبيه سريع: `API` مثل موظف الاستقبال الذي يتلقى الطلبات وفق قواعد محددة، أما `Database Replication` فهي وجود نسخ متزامنة من سجلات المؤسسة في أكثر من مكان.\n\nلقد تعرّفت الآن إلى الفرق الأساسي. الإجراء الحالي: أعد قراءة مثال المتجر، ثم قرر إن كنت تريد اختبار فهم قصيرًا من ثلاثة أسئلة؛ لن أبدأ الأسئلة إلا إذا وافقت.",
+      "prompt": "اشرح لشخص مبتدئ الفرق بين API وDatabase Replication"
+    },
+    {
+      "case": "golden-teaching/technical-api-database-replication",
+      "attempt": 2,
+      "turn": 1,
+      "text": "هدفنا اليوم: تكوين صورة واضحة عن الفرق بين `API` و`Database Replication`. سأفترض أنك تبدأ من الصفر.\n\n`API` (واجهة تتيح للبرامج التواصل بطريقة منظّمة) تشبه موظف الاستقبال في مطعم. يطلب تطبيقك شيئًا محددًا، مثل: «أرسل بيانات هذا المستخدم». يستقبل `API` الطلب، يتحقق منه، ثم يعيد نتيجة مناسبة. هو يحدد كيف يتواصل برنامج مع برنامج أو خدمة أخرى، من دون أن يحتاج الطرف الطالب إلى معرفة التفاصيل الداخلية.\n\nمثال: عندما يعرض تطبيق الطقس درجة الحرارة، قد يرسل طلبًا إلى `API` تابع لخدمة الطقس، ثم يستقبل بيانات مثل اسم المدينة ودرجة الحرارة.\n\nأما `Database Replication` (الاحتفاظ بنسخ متزامنة أو شبه متزامنة من قاعدة البيانات) فيشبه وجود نسخ محدثة من دفتر السجلات في أكثر من مكان. عندما تتغير البيانات في قاعدة رئيسية، تُنقل التغييرات إلى قاعدة أو قواعد أخرى. يفيد ذلك في زيادة التوفر، وتسريع القراءة، ودعم التعافي عند تعطل خادم.\n\nمثال: متجر إلكتروني يحتفظ بقاعدة بيانات رئيسية للطلبات ونسخة أخرى. عند إضافة طلب جديد، تنقل آلية `Database Replication` هذا التغيير إلى النسخة الأخرى.\n\nالفرق الأساسي:\n\n- `API` هو طريقة تواصل وطلب خدمات أو بيانات.\n- `Database Replication` هو أسلوب لنسخ بيانات قاعدة البيانات والمحافظة على اتساق النسخ.\n- قد يستخدم التطبيق `API` لطلب بيانات، بينما تعمل `Database Replication` خلف الكواليس للحفاظ على توافر تلك البيانات.\n\nفي مثال المطعم: `API` هو موظف الاستقبال الذي يستقبل الطلب، و`Database Replication` هو وجود نسخ محدثة من سجل الطلبات في عدة فروع.\n\nالإجراء الحالي: اقرأ المثال الأخير مرة ثانية، وركّز على أن الأول ينظم التواصل، بينما الثاني ينسخ البيانات.",
+      "prompt": "اشرح لشخص مبتدئ الفرق بين API وDatabase Replication"
+    }
+  ],
+  "completeness_false_positives": [
+    {
+      "case": "end-to-end-journeys/zero-knowledge-learner-complete-unit",
+      "attempt": 1,
+      "turn": 1,
+      "text": "سنبدأ من الصفر. أفترض أن هدفك هو كتابة `Prompt` واضح يجعل أدوات الذكاء الاصطناعي تعطيك نتيجة أقرب إلى ما تريده. إن كان هدفك أكثر تحديدًا—مثل الدراسة أو البرمجة أو كتابة المحتوى—فيمكننا تخصيص الأمثلة لاحقًا.\n\nالـ`Prompt` هو ببساطة التعليمات أو الطلب الذي ترسله إلى نموذج الذكاء الاصطناعي. قوة الـ`Prompt` لا تأتي من الكلمات المعقدة، بل من تقليل الغموض.\n\nلنأخذ هذا الطلب الضعيف:\n\n> اكتب عن الرياضة.\n\nالمشكلة أنه لا يحدد الموضوع الدقيق، ولا الجمهور، ولا شكل النتيجة. يمكن تحسينه هكذا:\n\n> اكتب فقرة مبسطة من 120 كلمة تشرح فوائد المشي اليومية للمبتدئين، واستخدم ثلاث فوائد عملية ونبرة مشجعة.\n\nيتكوّن الـ`Prompt` الجيد غالبًا من أربعة أجزاء:\n\n1. **المهمة:** ماذا تريد؟ مثل: اشرح، لخّص، قارن، أو اكتب.\n2. **السياق:** لماذا تريد النتيجة ولمن؟\n3. **القيود:** الطول، اللغة، النبرة، وما يجب تجنبه.\n4. **شكل الناتج:** فقرة، جدول، خطوات، رسالة، أو كود.\n\nيمكنك استخدام هذا القالب البسيط:\n\n> أريد منك أن [المهمة]. السياق هو [السياق]. التزم بـ[القيود]. قدّم النتيجة في صورة [الشكل].\n\nمثال:\n\n> أريد منك أن تشرح مفهوم الادخار لطالب في المرحلة الثانوية لا يعرف الاقتصاد. استخدم العربية المبسطة ومثالًا من المصروف اليومي، ولا تتجاوز 150 كلمة. قدّم النتيجة في ثلاث نقاط.\n\nالخلاصة: لا تبحث عن «كلمات سحرية». حدّد المطلوب والسياق والقيود وشكل الناتج. بهذا نكون قد تعرّفنا إلى الأساس الذي سنبني عليه بقية المهارة.\n\nالإجراء الحالي: اقرأ القالب والمثال مرة أخرى لمدة دقيقتين، ثم أخبرني فقط بالمجال الذي تريد استخدام `Prompt` فيه أولًا، مثل الدراسة أو العمل أو البرمجة أو صناعة المحتوى.\n\n`TEACH-ME:v2:prompt-basics-01:prompt-writing:ar-MSA:m01:l01`"
+    },
+    {
+      "case": "end-to-end-journeys/zero-knowledge-learner-complete-unit",
+      "attempt": 4,
+      "turn": 2,
+      "text": "سنكمل بهدوء، من دون اختبار أو مطالبتك بإثبات شيء.\n\nبعد كتابة النسخة الأولى من `Prompt`، تأتي مهارة مهمة اسمها التحسين التدريجي. معناها أن تتعامل مع الإجابة الأولى بوصفها مسودة، ثم توضّح الجزء الذي تريد تغييره بدل أن تبدأ من جديد.\n\nمثال:\n\n`Prompt` الأول:\n\n«اكتب رسالة ترحيب بعميل جديد.»\n\nإذا كانت الإجابة رسمية أكثر من اللازم، يمكنك متابعة المحادثة بهذه العبارة:\n\n«اجعل الرسالة أكثر دفئًا، واختصرها إلى ثلاثة أسطر، مع الحفاظ على الأسلوب المهني.»\n\nهنا لم نكرر المهمة كلها؛ حدّدنا فقط التعديلات المطلوبة. ويمكن أن يكون التعديل متعلقًا بأحد الأمور الآتية:\n\n- المحتوى، مثل إضافة مثال أو حذف تفاصيل.\n- الأسلوب، مثل جعله بسيطًا أو مهنيًا.\n- الطول، مثل الاختصار إلى خمس نقاط.\n- التنسيق، مثل استخدام جدول أو عناوين.\n- الجمهور، مثل توجيه الشرح إلى مبتدئ.\n\nهناك قاعدة عملية مفيدة: عندما لا تعجبك النتيجة، لا تقل فقط «هذه ليست جيدة». اذكر ما الذي لم يناسبك، وما الشكل الذي تريده بدلًا منه.\n\nمثال غامض:\n\n«حسّن الإجابة.»\n\nمثال أوضح:\n\n«بسّط المصطلحات، وأضف مثالًا من الحياة اليومية، واحذف المقدمة الطويلة.»\n\nإذن، كتابة `Prompt` قوي ليست محاولة واحدة مثالية. هي دورة قصيرة:\n\n`طلب واضح ← قراءة النتيجة ← تحديد النقص ← طلب تعديل محدد`\n\nبهذا اكتملت وحدة البداية: عرفت عناصر `Prompt` الأساسية، ثم عرفت كيف تحسّن النتيجة تدريجيًا. يمكننا لاحقًا إجراء فحص قصير للفهم، ولكن فقط إذا اخترت ذلك صراحة.\n\nإجراءك الحالي: اقرأ دورة التحسين السابقة مرة واحدة خلال دقيقة، ولا يلزم أن ترسل إجابة الآن.\n\nرمز المتابعة: `TEACH-ME:v2:prompt-basics-01:prompt-writing:ar-MSA:m1:l2`"
+    },
+    {
+      "case": "end-to-end-journeys/zero-knowledge-learner-complete-unit",
+      "attempt": 5,
+      "turn": 3,
+      "text": "نعم، اكتملت وحدة البداية كاملة.\n\nأصبحت لديك الآن الصورة الأساسية لكتابة `Prompt` قوي:\n\n- تحدد المهمة بوضوح.\n- تضيف السياق الذي يساعد الأداة على فهم طلبك.\n- تحدد مواصفات النتيجة، مثل الطول والأسلوب والتنسيق والجمهور.\n- تقرأ النتيجة الأولى ثم تطلب تعديلًا محددًا عند الحاجة.\n\nالفكرة الأهم: لا تبحث عن كلمات سحرية أو صياغة مثالية من المحاولة الأولى؛ ابدأ بطلب واضح، ثم حسّنه بناءً على النتيجة.\n\nإذا أردت، يمكننا في الرسالة التالية إجراء تطبيق قصير وهادئ على موقف عملي تختاره، من دون درجات أو أجواء امتحان. وإذا لم ترغب، يمكننا الانتقال مباشرة إلى موضوع أكثر تقدمًا.\n\nإجراءك الحالي: أخبرني فقط هل توافق على التطبيق القصير أم تفضّل متابعة الشرح المتقدم؟\n\nرمز المتابعة: `TEACH-ME:v2:prompt-basics-01:prompt-writing:ar-MSA:m1:l2`"
+    },
+    {
+      "case": "golden-teaching/technical-concept-en",
+      "attempt": 1,
+      "turn": 1,
+      "text": "An API and Database Replication solve different problems.\n\nAn API (Application Programming Interface) is a controlled way for one program to communicate with another. For example, a shopping app might send `GET /products/42` to a store’s API. The API checks permissions, applies business rules, reads the requested data, and returns a response. Think of it as a service counter: you make an approved request, and the service gives you a result without granting direct access to everything behind the counter.\n\nDatabase Replication means maintaining copies of the same database data on multiple database servers. When data changes on one server, those changes are copied to one or more replicas. Replication can improve availability, support recovery, reduce read load, or place data nearer to users. Think of it as keeping synchronized copies of a record book in several locations.\n\nThe key difference is purpose:\n\n- An API defines how software requests operations or data.\n- Database Replication defines how database systems copy and synchronize stored data.\n\nThey can work together. A user calls an API, and the API may read from a replicated database. The user normally does not know which replica handled the request.\n\nExample: In a banking system, an API might provide an operation such as “show my balance” while checking the user’s identity and permissions. Replication might copy account data to another database server so the service remains available if the primary server fails. Replication itself does not define who may request a balance or what business rules apply.\n\nIn one sentence: an API is a communication boundary for using a service; Database Replication is an infrastructure mechanism for maintaining database copies.\n\nCurrent action: compare each new example you encounter against two questions—“Is software requesting a service?” and “Is stored data being copied between database servers?”"
+    },
+    {
+      "case": "guided-learning-pack/beginner-start-here",
+      "attempt": 1,
+      "turn": 1,
+      "text": "أفهم أن هدفك هو تعلّم التصوير من الصفر، وسأفترض أنك تريد البدء عمليًا بأبسط المعدات المتاحة، ويمكنك تصحيح هذا الافتراض.\n\nالتصوير ببساطة هو استخدام الضوء لصنع صورة تعبّر عن فكرة أو تحفظ لحظة. في البداية لا تحتاج إلى كاميرا احترافية؛ هاتفك يكفي لتعلّم أهم ثلاث مهارات:\n\n- ملاحظة الضوء: الضوء الجانبي قرب النافذة يُظهر الشكل والتفاصيل أكثر من الإضاءة الأمامية القوية.\n- اختيار التكوين: حدّد بوضوح ما العنصر الأساسي في الصورة، ثم أبعد الأشياء المشتتة من الإطار.\n- تثبيت الكاميرا: أمسك الهاتف بكلتا اليدين واضغط زر التصوير بهدوء لتقليل الاهتزاز.\n\nمثال بسيط: ضع كوبًا قرب نافذة، وأطفئ الإضاءة الداخلية إن كانت تغيّر الألوان. صوّره مرة والنافذة خلفك، ومرة والضوء يأتي من جانبه. ستلاحظ أن اتجاه الضوء وحده يغيّر الصورة، حتى من دون تعديل الإعدادات.\n\nسنرتّب الرحلة لاحقًا من الضوء والتكوين إلى إعدادات الكاميرا، ثم أنواع التصوير والتحرير. لن أختبرك الآن؛ سنبني الأساس أولًا.\n\nإجراءك الحالي: أرسل في رسالة واحدة إجابات قصيرة عن: ماذا تريد أن تصوّر غالبًا، هل ستستخدم هاتفًا أم كاميرا (واذكر الطراز إن عرفته)، وكم دقيقة تستطيع تخصيصها أسبوعيًا؟\n\n`TEACH-ME:v2:photo-start-01:photography:ar-MSA:m01:l01`"
+    },
+    {
+      "case": "guided-learning-pack/beginner-start-here",
+      "attempt": 2,
+      "turn": 1,
+      "text": "Your goal is to learn photography from the beginning, and I’ll assume you have no prior photography knowledge. We’ll start with the smallest useful skill: making an intentional photograph with whatever camera you already have. You do not need to buy a professional camera yet.\n\nPhotography is the practice of controlling three things: light, composition, and timing. Light determines what is visible and shapes the mood. Composition is how you arrange the subject and background inside the frame. Timing is choosing the moment to press the shutter.\n\nFor your first photographs, use these simple principles:\n\n1. Choose one clear subject. Before taking the picture, complete this sentence: “I want the viewer to notice ___.”\n2. Find soft light. Photograph near a window or outdoors in open shade. Avoid using flash for now.\n3. simplify the background. Move yourself or the subject until distracting objects are outside the frame.\n4. Focus on the subject. On a phone, tap the subject on the screen before taking the picture.\n5. Make several versions. Move closer, farther away, and slightly to either side. Comparing variations is one of the fastest ways to develop your eye.\n\nFor example, suppose you photograph a cup beside a window. Place the cup near the light, remove unrelated objects behind it, tap the cup to focus, and take three pictures: one from eye level, one from above, and one close enough for the cup to fill most of the frame. The camera is the same, but changing your position changes the photograph.\n\nA sensible beginner journey is: seeing light and composing clearly; understanding focus and exposure; learning shutter speed, aperture, and ISO if your camera provides manual controls; practising portraits, movement, and different lighting; then selecting and editing photographs. The order matters because expensive equipment and technical settings cannot rescue a photograph whose subject, light, and framing are unclear.\n\nEach lesson can follow a simple rhythm: explanation, worked example, a small photographic activity, feedback, and later review. “Understanding” will mean that you can make a deliberate choice and explain its effect—not merely remember a definition. I will explain each meaningful unit before offering a short understanding check, and I will only begin that check if you choose to opt in.\n\nTo tailor the next lesson, tell me three things when convenient: what camera or phone you have, what you most want to photograph, and roughly how much time you can practise each week. If you are unsure, we can proceed using a phone, everyday objects, and two short sessions per week.\n\nCurrent action: spend about 10 minutes photographing one everyday object in soft window light; take exactly three versions—eye level, overhead, and close-up—then choose the one you prefer and tell me what made it stronger. This is practice, not a test.\n\nResume code: TEACH-ME:v2:photo-start-01:photography:en:m01:l01"
+    },
+    {
+      "case": "guided-learning-pack/transferable-expertise",
+      "attempt": 2,
+      "turn": 1,
+      "text": "You are an experienced backend developer starting distributed systems, so we can reuse your knowledge of APIs, databases, concurrency, and production operations while beginning distributed-systems concepts from first principles.\n\nThe practical journey will move from failure models and communication boundaries to replication, consistency, partitioning, coordination, and system design. We will use concrete backend examples and complete an explanation before I offer any optional understanding check.\n\nTo tailor the first lesson, reply with:\n1. Your main goal: system design interviews, building production systems, debugging existing systems, or something else.\n2. How much time you can study each week.\n3. Your main stack and whether you have worked with queues, caches, or replicated databases.\n\nCurrent action: send those three details; this should take about two minutes.\n\nResume code: `TEACH-ME:v2:ds-backend-01:distributed-systems:en:m00:l00`"
+    },
+    {
+      "case": "guided-learning-pack/complete-arabic-bidi-pack",
+      "attempt": 2,
+      "turn": 1,
+      "text": "I’ll build this as a beginner-friendly Laravel learning pack, with practical code and English technical terms explained clearly. Because I cannot create files in this environment, I’ll deliver it one bounded lesson at a time in chat and maintain continuity with a portable resume code.\n\nThe planned journey is: PHP and web foundations → Laravel setup → routing and controllers → Blade templates → forms and validation → Database and Eloquent ORM → authentication → APIs → testing → deployment. Each lesson will contain an explanation, a worked example, guided practice, and an optional understanding check only after you opt in.\n\nBefore Lesson 1, please send these three details:\n\n1. Your goal: build a website, REST API, e-commerce app, or something else?\n2. Your current experience with PHP, HTML/CSS, and Databases.\n3. How many hours per week you can study, and whether Laravel is already installed.\n\nCurrent action: reply with those three details; this should take about two minutes.\n\nResume code: `TEACH-ME:v2:laravel-ar-001:laravel:en:module-00:lesson-00`"
+    },
+    {
+      "case": "guided-learning-pack/zero-start-pack-explains-first",
+      "attempt": 2,
+      "turn": 1,
+      "text": "I’ll build the curriculum from an absolute-beginner starting point, with no prior knowledge assumed. It will begin with a plain-language foundation, then move through small lessons with examples and guided practice. I will explain each meaningful unit before offering any optional understanding check; no assessment will begin unless you explicitly opt in.\n\nI’m missing one essential detail: what subject do you want to learn, and what would you like to be able to do with it?\n\nCurrent action: reply with the subject and your practical goal—for example, “Python, so I can automate simple office tasks.”"
+    },
+    {
+      "case": "guided-learning-pack/resume-with-limited-context",
+      "attempt": 1,
+      "turn": 1,
+      "text": "رمز الاستئناف صالح من حيث البنية، ويشير إلى الجلسة `S001`، والموضوع المختصر `ddia`، والوحدة `M01`، والدرس `L01` باللغة العربية. لكن لا تتوفر هنا مواد الجلسة السابقة أو أدلة التقدّم، لذلك لن أفترض معنى `ddia` أو أنك أتقنت الدرس السابق.\n\nالإجراء الحالي: أرسل اسم الموضوع الكامل، ومعه آخر فقرة أو ملخص من الدرس السابق إن كان متاحًا، وسأتابع من أول هدف لم يثبت إنجازه.\n\n`TEACH-ME:v2:S001:ddia:ar-MSA:M01:L01`"
+    },
+    {
+      "case": "hardening/malformed-resume",
+      "attempt": 2,
+      "turn": 1,
+      "text": "We’ll continue Kubernetes at Module 2. Since the resume code does not include earlier progress details, I’ll assume Module 1 introduced clusters and containers; you can correct that assumption later.\n\nToday’s outcome: understand a Pod, the smallest deployable unit in Kubernetes.\n\nA Pod is a wrapper Kubernetes uses to run one or more closely related containers. Containers inside the same Pod share networking and can share storage. They are scheduled together on the same worker node and usually belong to one application instance.\n\nFor example, a web application might run one main web-server container in a Pod. A supporting container could be added when it must operate beside that server and share its local resources. Kubernetes manages the Pod as a unit rather than independently placing those containers on different nodes.\n\nA minimal Pod definition looks like this:\n\n```yaml\napiVersion: v1\nkind: Pod\nmetadata:\n  name: web-pod\nspec:\n  containers:\n    - name: web\n      image: nginx:1.27\n      ports:\n        - containerPort: 80\n```\n\nThe important fields are:\n\n- `kind: Pod`: identifies the Kubernetes object.\n- `metadata.name`: gives the Pod a name.\n- `spec.containers`: describes the containers that the Pod should run.\n- `image`: identifies the container image.\n- `containerPort`: documents the port used by the application, but does not by itself expose it outside the Pod.\n\nOne crucial mental model: a Pod is disposable. If it fails, Kubernetes commonly replaces it rather than repairing it in place. In real applications, you therefore usually create Pods through a controller such as a `Deployment`, which maintains the desired number of replicas.\n\nFor now, read the YAML once from top to bottom and trace this sentence through it: “Create a Pod named `web-pod` containing one `nginx` container that listens on port `80`.”"
+    }
+  ],
+  "assessment_negative_controls": [
+    {
+      "text": "Answer this question: what is the result of 7 × 8?",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Explain multiplication.",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "text": "حل المسألة التالية ثم اكتب إجابتك: ٨ × ٧ = ؟",
+      "turns": [
+        {
+          "role": "user",
+          "content": "اشرح الضرب.",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "text": "Why did the value change?",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Continue the explanation.",
+          "assessment_intent": "none"
+        }
+      ]
+    },
+    {
+      "text": "هل فهمت الفكرة؟",
+      "turns": [
+        {
+          "role": "user",
+          "content": "تابع الشرح.",
+          "assessment_intent": "decline"
+        }
+      ]
+    }
+  ],
+  "terminology_negative_controls": [
+    {
+      "prompt": "اشرح API",
+      "text": "هذا شرح عام عن التواصل بين البرامج من دون ذكر المصطلح المطلوب."
+    },
+    {
+      "prompt": "اشرح API وReplication وPrompt",
+      "text": "إيه بي آي واجهة، وريبليكيشن نسخ، وبرومبت تعليمات."
+    }
+  ],
+  "completeness_negative_controls": [
+    "This explanation ends because",
+    "هذا الشرح يوضح الفكرة ثم",
+    "```python\\nprint(1)",
+    "هذه جملة تفتح قوسًا (ولا تغلقه.",
+    "هذا شرح قصير"
+  ],
+  "child_zero_equivalents": [
+    "سنبدأ من الصفر باستخدام تفاحة مقسمة إلى جزأين متساويين.",
+    "لن أفترض أي معرفة سابقة؛ تخيل دائرة مقسمة إلى قسمين متساويين.",
+    "This is an absolute beginner start using a paper square divided into equal parts.",
+    "No prior knowledge is assumed; imagine an apple cut into equal pieces."
+  ],
+  "child_zero_negative_controls": [
+    "احفظ الرمز 1/2 الآن لأنك تعرف الأساس بالفعل.",
+    "You already know fractions, so memorize 1/2."
+  ]
+}

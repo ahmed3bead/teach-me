@@ -1,48 +1,227 @@
 suite: guided-learning-pack
 version: 1.0.0
 cases:
-  - id: beginner-start-here
-    prompt: "عاوز أتعلم التصوير من الصفر ومش عارف أبدأ منين"
-    expected:
-      - "the learner is given a plain-language journey summary and one exact starting action"
-      - "new subject terms are explained on first use"
-      - "the learner is not asked to design the course"
-  - id: transferable-expertise
-    prompt: "أنا Senior backend developer بس جديد في distributed systems"
-    expected:
-      - "topic knowledge begins safely while transferable engineering expertise is respected"
-      - "a tiny diagnostic avoids unnecessary beginner programming explanations"
-  - id: complete-minimum-pack
-    prompt: "اعمل لي Learning Pack لتعلم DDIA"
-    expected:
-      - "START-HERE, curriculum, first real lesson, practice, and progress are delivered"
-      - "every delivered link resolves and empty module scaffolding is not created"
-  - id: complete-arabic-bidi-pack
-    prompt: "اعمل لي Learning Pack عربي لتعلم Laravel وفيه كود ومصطلحات إنجليزية"
-    expected:
-      - "the learner-facing pack uses consistent HTML files"
-      - "START-HERE is the only entry point and links to the existing curriculum, lesson, practice, and progress artifacts"
-      - "English terms and code remain left-to-right without disrupting Arabic order"
-  - id: chat-only-resume
-    prompt: "علمني هنا بس لأن الشات مش بيطلع ملفات"
-    expected:
-      - "one bounded lesson is taught and no file creation is claimed"
-      - "a valid non-sensitive TEACH-ME v2 resume code with a session identifier is included"
-      - "the resume code is not treated as mastery evidence"
-  - id: one-action-ending
-    prompt: "أنا جاهز أبدأ، أعمل إيه؟"
-    expected:
-      - "the response ends with one exact action and expected time"
-      - "a requested reply appears only when the action genuinely requires learner input"
-      - "the learner is not left with several competing next steps"
-  - id: zero-start-pack-explains-first
-    prompt: "اعمل لي بداية منهج وأنا قلت لك إني معرفش أي حاجة عن الموضوع"
-    expected:
-      - "START-HERE begins with explanation rather than a subject-matter test"
-      - "only materially relevant transferable prerequisites may receive a tiny informal diagnostic"
-  - id: resume-with-limited-context
-    prompt: "TEACH-ME:v2:S001:ddia:ar-EG:M01:L01 كمل من هنا"
-    expected:
-      - "the checkpoint is interpreted and restated before continuing"
-      - "missing evidence or source context is requested only when necessary"
-      - "access to unavailable prior answers is not claimed"
+- id: beginner-start-here
+  prompt: عاوز أتعلم التصوير من الصفر ومش عارف أبدأ منين
+  expected:
+  - the learner is given a plain-language journey summary and one exact starting action
+  - new subject terms are explained on first use
+  - the learner is not asked to design the course
+  locale: ar-MSA
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: learning-pack
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: substantial
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: executable_temp
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+  fixture_refs:
+    file: file.disposable-workspace.v1
+- id: transferable-expertise
+  prompt: أنا Senior backend developer بس جديد في distributed systems
+  expected:
+  - topic knowledge begins safely while transferable engineering expertise is respected
+  - a tiny diagnostic avoids unnecessary beginner programming explanations
+  locale: ar-MSA
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: learning-pack
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: substantial
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: executable_temp
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+  fixture_refs:
+    file: file.disposable-workspace.v1
+- id: complete-minimum-pack
+  prompt: اعمل لي Learning Pack لتعلم DDIA
+  expected:
+  - START-HERE, curriculum, first real lesson, practice, and progress are delivered
+  - every delivered link resolves and empty module scaffolding is not created
+  locale: ar-MSA
+  routing:
+    audience: learner
+    mode: source-grounded
+    source_type: book
+    artifact_type: learning-pack
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: substantial
+    assessment_state: none
+  capabilities:
+    source: supplied_result
+    web: not_required
+    file: executable_temp
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+  fixture_refs:
+    source: source.guided-learning-pack.complete-minimum-pack.v1
+    file: file.disposable-workspace.v1
+- id: complete-arabic-bidi-pack
+  prompt: اعمل لي Learning Pack عربي لتعلم Laravel وفيه كود ومصطلحات إنجليزية
+  expected:
+  - the learner-facing pack uses consistent HTML files
+  - START-HERE is the only entry point and links to the existing curriculum, lesson, practice, and progress artifacts
+  - English terms and code remain left-to-right without disrupting Arabic order
+  locale: ar-MSA
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: html
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: substantial
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: executable_temp
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+  fixture_refs:
+    file: file.disposable-workspace.v1
+- id: chat-only-resume
+  prompt: علمني هنا بس لأن الشات مش بيطلع ملفات
+  expected:
+  - one bounded lesson is taught and no file creation is claimed
+  - a valid non-sensitive TEACH-ME v2 resume code with a session identifier is included
+  - the resume code is not treated as mastery evidence
+  locale: ar-MSA
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: learning-pack
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: substantial
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: unavailable
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+- id: one-action-ending
+  prompt: أنا جاهز أبدأ، أعمل إيه؟
+  expected:
+  - the response ends with one exact action and expected time
+  - a requested reply appears only when the action genuinely requires learner input
+  - the learner is not left with several competing next steps
+  locale: ar-MSA
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: learning-pack
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: substantial
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: executable_temp
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+  fixture_refs:
+    file: file.disposable-workspace.v1
+    context: context.guided-learning-pack.one-action-ending.v1
+- id: zero-start-pack-explains-first
+  prompt: اعمل لي بداية منهج وأنا قلت لك إني معرفش أي حاجة عن الموضوع
+  expected:
+  - START-HERE begins with explanation rather than a subject-matter test
+  - only materially relevant transferable prerequisites may receive a tiny informal diagnostic
+  locale: ar-MSA
+  routing:
+    audience: learner
+    mode: source-grounded
+    source_type: curriculum
+    artifact_type: learning-pack
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: substantial
+    assessment_state: none
+  capabilities:
+    source: supplied_result
+    web: not_required
+    file: executable_temp
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+  fixture_refs:
+    source: source.guided-learning-pack.zero-start-pack-explains-first.v1
+    file: file.disposable-workspace.v1
+    context: context.guided-learning-pack.zero-start-pack-explains-first.v1
+- id: resume-with-limited-context
+  prompt: TEACH-ME:v2:S001:ddia:ar-MSA:M01:L01 كمل من هنا
+  expected:
+  - the checkpoint is interpreted and restated before continuing
+  - missing evidence or source context is requested only when necessary
+  - access to unavailable prior answers is not claimed
+  locale: ar-MSA
+  routing:
+    audience: learner
+    mode: source-grounded
+    source_type: book
+    artifact_type: learning-pack
+    session_state: resume
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: journey
+    assessment_state: none
+  capabilities:
+    source: supplied_result
+    web: not_required
+    file: executable_temp
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+  fixture_refs:
+    source: source.guided-learning-pack.resume-with-limited-context.v1
+    file: file.disposable-workspace.v1
