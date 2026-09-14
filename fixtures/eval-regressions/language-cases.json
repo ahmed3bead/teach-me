@@ -1,0 +1,315 @@
+{
+  "affected_cases": [
+    {
+      "case": "curriculum-delivery/whole-book-artifact-first",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 369 Arabic letters, 0 Latin letters, 0 other-script letters, target-script share 0.0%"
+      ]
+    },
+    {
+      "case": "curriculum-delivery/html-default-arabic-bidi",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 1066 Arabic letters, 276 Latin letters, 1 other-script letters, target-script share 20.6%"
+      ]
+    },
+    {
+      "case": "curriculum-delivery/arabic-pdf-quality",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 488 Arabic letters, 6 Latin letters, 0 other-script letters, target-script share 1.2%"
+      ]
+    },
+    {
+      "case": "curriculum-delivery/resume-curriculum",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 257 Arabic letters, 17 Latin letters, 0 other-script letters, target-script share 6.2%"
+      ]
+    },
+    {
+      "case": "end-to-end-journeys/zero-knowledge-learner-complete-unit",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Arabic: 1054 Arabic letters, 70 Latin letters, 4 other-script letters, target-script share 93.4%, colloquial Arabic markers []",
+        "deterministic script check for Arabic: 1451 Arabic letters, 69 Latin letters, 1 other-script letters, target-script share 95.4%, colloquial Arabic markers []"
+      ]
+    },
+    {
+      "case": "golden-teaching/ddia-senior-developer",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Arabic: 1422 Arabic letters, 304 Latin letters, 1 other-script letters, target-script share 82.3%, colloquial Arabic markers []"
+      ]
+    },
+    {
+      "case": "guided-learning-pack/beginner-start-here",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 806 Arabic letters, 36 Latin letters, 0 other-script letters, target-script share 4.3%"
+      ]
+    },
+    {
+      "case": "guided-learning-pack/transferable-expertise",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 625 Arabic letters, 114 Latin letters, 1 other-script letters, target-script share 15.4%"
+      ]
+    },
+    {
+      "case": "guided-learning-pack/complete-minimum-pack",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 760 Arabic letters, 118 Latin letters, 0 other-script letters, target-script share 13.4%"
+      ]
+    },
+    {
+      "case": "guided-learning-pack/complete-arabic-bidi-pack",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 874 Arabic letters, 208 Latin letters, 2 other-script letters, target-script share 19.2%"
+      ]
+    },
+    {
+      "case": "guided-learning-pack/chat-only-resume",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 260 Arabic letters, 6 Latin letters, 0 other-script letters, target-script share 2.3%"
+      ]
+    },
+    {
+      "case": "guided-learning-pack/one-action-ending",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 314 Arabic letters, 0 Latin letters, 0 other-script letters, target-script share 0.0%"
+      ]
+    },
+    {
+      "case": "guided-learning-pack/zero-start-pack-explains-first",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 392 Arabic letters, 0 Latin letters, 0 other-script letters, target-script share 0.0%"
+      ]
+    },
+    {
+      "case": "guided-learning-pack/resume-with-limited-context",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 260 Arabic letters, 31 Latin letters, 0 other-script letters, target-script share 10.7%"
+      ]
+    },
+    {
+      "case": "hardening/code-switch-is-not-language-switch",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 387 Arabic letters, 256 Latin letters, 2 other-script letters, target-script share 39.7%"
+      ]
+    },
+    {
+      "case": "hardening/unavailable-audio-fallback",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 259 Arabic letters, 17 Latin letters, 0 other-script letters, target-script share 6.2%"
+      ]
+    },
+    {
+      "case": "hardening/no-accessible-route",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 203 Arabic letters, 23 Latin letters, 0 other-script letters, target-script share 10.2%"
+      ]
+    },
+    {
+      "case": "hardening/malformed-resume",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 212 Arabic letters, 12 Latin letters, 0 other-script letters, target-script share 5.4%"
+      ]
+    },
+    {
+      "case": "hardening/legacy-resume-state-is-untrusted",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 220 Arabic letters, 12 Latin letters, 0 other-script letters, target-script share 5.2%"
+      ]
+    },
+    {
+      "case": "hardening/expired-profile",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 252 Arabic letters, 0 Latin letters, 0 other-script letters, target-script share 0.0%"
+      ]
+    },
+    {
+      "case": "integration-core/learner-book-connected-flow",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 468 Arabic letters, 0 Latin letters, 0 other-script letters, target-script share 0.0%"
+      ]
+    },
+    {
+      "case": "integration-core/educator-video-combination",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 412 Arabic letters, 0 Latin letters, 0 other-script letters, target-script share 0.0%"
+      ]
+    },
+    {
+      "case": "integration-core/resume-without-reonboarding",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 134 Arabic letters, 0 Latin letters, 0 other-script letters, target-script share 0.0%"
+      ]
+    },
+    {
+      "case": "integration-core/source-consumption-is-not-mastery",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 337 Arabic letters, 0 Latin letters, 0 other-script letters, target-script share 0.0%"
+      ]
+    },
+    {
+      "case": "integration-core/corrected-claim-propagates",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 245 Arabic letters, 0 Latin letters, 0 other-script letters, target-script share 0.0%"
+      ]
+    },
+    {
+      "case": "integration-core/unavailable-video-capability-routing",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 312 Arabic letters, 0 Latin letters, 0 other-script letters, target-script share 0.0%"
+      ]
+    },
+    {
+      "case": "integration-foundation/transcript-is-not-video",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 209 Arabic letters, 20 Latin letters, 2 other-script letters, target-script share 8.7%"
+      ]
+    },
+    {
+      "case": "integration-foundation/screen-transcript-conflict",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 215 Arabic letters, 25 Latin letters, 0 other-script letters, target-script share 10.4%"
+      ]
+    },
+    {
+      "case": "integration-foundation/safe-procedure-verification",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 307 Arabic letters, 0 Latin letters, 0 other-script letters, target-script share 0.0%"
+      ]
+    },
+    {
+      "case": "integration-foundation/external-skill-catalog",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 260 Arabic letters, 10 Latin letters, 0 other-script letters, target-script share 3.7%"
+      ]
+    },
+    {
+      "case": "integration-foundation/optional-provider-failure",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 281 Arabic letters, 0 Latin letters, 0 other-script letters, target-script share 0.0%"
+      ]
+    },
+    {
+      "case": "integration-foundation/avoid-overbuilt-pack",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 155 Arabic letters, 3 Latin letters, 0 other-script letters, target-script share 1.9%"
+      ]
+    },
+    {
+      "case": "integration-foundation/research-rigor-review",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 381 Arabic letters, 0 Latin letters, 0 other-script letters, target-script share 0.0%"
+      ]
+    },
+    {
+      "case": "broad-research-sweep/named-book-broad-sweep",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 814 Arabic letters, 69 Latin letters, 0 other-script letters, target-script share 7.8%"
+      ]
+    },
+    {
+      "case": "broad-research-sweep/paid-course-discovery",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 376 Arabic letters, 0 Latin letters, 0 other-script letters, target-script share 0.0%"
+      ]
+    },
+    {
+      "case": "broad-research-sweep/multilingual-source-search",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 239 Arabic letters, 0 Latin letters, 0 other-script letters, target-script share 0.0%"
+      ]
+    },
+    {
+      "case": "broad-research-sweep/popular-but-weak-source",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 251 Arabic letters, 0 Latin letters, 0 other-script letters, target-script share 0.0%"
+      ]
+    },
+    {
+      "case": "broad-research-sweep/research-without-tools",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 441 Arabic letters, 0 Latin letters, 0 other-script letters, target-script share 0.0%"
+      ]
+    },
+    {
+      "case": "retention-accessibility/delayed-retention-review",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 334 Arabic letters, 0 Latin letters, 0 other-script letters, target-script share 0.0%"
+      ]
+    },
+    {
+      "case": "retention-accessibility/failed-retrieval-adaptation",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 245 Arabic letters, 0 Latin letters, 0 other-script letters, target-script share 0.0%"
+      ]
+    },
+    {
+      "case": "retention-accessibility/disengagement-ambiguous",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 86 Arabic letters, 0 Latin letters, 0 other-script letters, target-script share 0.0%"
+      ]
+    },
+    {
+      "case": "retention-accessibility/screen-reader-access",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 254 Arabic letters, 14 Latin letters, 2 other-script letters, target-script share 5.2%"
+      ]
+    },
+    {
+      "case": "retention-accessibility/simple-pack-surface",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 224 Arabic letters, 0 Latin letters, 0 other-script letters, target-script share 0.0%"
+      ]
+    },
+    {
+      "case": "retention-accessibility/stale-learner-observation",
+      "canonical_locale": "ar-MSA",
+      "audited_rejections": [
+        "deterministic script check for Latin: 205 Arabic letters, 0 Latin letters, 0 other-script letters, target-script share 0.0%"
+      ]
+    }
+  ],
+  "explicit_language_switch": "hardening/explicit-language-switch",
+  "code_switch": "hardening/code-switch-is-not-language-switch"
+}

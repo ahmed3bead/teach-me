@@ -1,35 +1,163 @@
 suite: retention-accessibility
 version: 1.0.0
 cases:
-  - id: delayed-retention-review
-    prompt: "راجع معايا درس الأسبوع اللي فات وسجل إني فاكره"
-    expected:
-      - "retrieval is attempted before restudy"
-      - "a fresh item rather than an identical repeated question is used"
-      - "retained is recorded only from successful delayed evidence"
-  - id: failed-retrieval-adaptation
-    prompt: "كنت فاهمه لكن نسيته في المراجعة"
-    expected:
-      - "the specific gap is repaired and the next interval is shortened"
-      - "prior independent evidence is preserved while retention evidence is updated"
-  - id: disengagement-ambiguous
-    prompt: "مش عاوز أعمل التمرين، اديني الحل وخلاص"
-    expected:
-      - "disengagement is not diagnosed from one signal"
-      - "one smaller purposeful action is offered without guilt or pressure"
-  - id: screen-reader-access
-    prompt: "أنا بستخدم screen reader والدرس فيه diagram"
-    expected:
-      - "the diagram receives a structured textual equivalent"
-      - "the same learning objective and assessment standard are preserved"
-  - id: simple-pack-surface
-    prompt: "فتحت الملفات ومش عارف أبدأ منين"
-    expected:
-      - "START-HERE is the only entry point and names one current action"
-      - "internal ledgers are not presented as learner tasks"
-      - "no link points to an uncreated future lesson"
-  - id: stale-learner-observation
-    prompt: "الطريقة دي كانت مناسبة زمان بس دلوقتي مش نافعة"
-    expected:
-      - "the contextual strategy observation is corrected rather than treated as a fixed learning style"
-      - "one material dimension changes and its outcome is observed"
+- id: delayed-retention-review
+  prompt: راجع معايا درس الأسبوع اللي فات وسجل إني فاكره
+  expected:
+  - retrieval is attempted before restudy
+  - a fresh item rather than an identical repeated question is used
+  - retained is recorded only from successful delayed evidence
+  locale: ar-MSA
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: brief
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+  fixture_refs:
+    context: context.retention-accessibility.delayed-retention-review.v1
+- id: failed-retrieval-adaptation
+  prompt: كنت فاهمه لكن نسيته في المراجعة
+  expected:
+  - the specific gap is repaired and the next interval is shortened
+  - prior independent evidence is preserved while retention evidence is updated
+  locale: ar-MSA
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: brief
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+  fixture_refs:
+    context: context.retention-accessibility.failed-retrieval-adaptation.v1
+- id: disengagement-ambiguous
+  prompt: مش عاوز أعمل التمرين، اديني الحل وخلاص
+  expected:
+  - disengagement is not diagnosed from one signal
+  - one smaller purposeful action is offered without guilt or pressure
+  locale: ar-MSA
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: brief
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+- id: screen-reader-access
+  prompt: أنا بستخدم screen reader والدرس فيه diagram
+  expected:
+  - the diagram receives a structured textual equivalent
+  - the same learning objective and assessment standard are preserved
+  locale: ar-MSA
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: screen-reader
+    safety_level: standard
+    instructional_scope: brief
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+  fixture_refs:
+    context: context.retention-accessibility.screen-reader-access.v1
+- id: simple-pack-surface
+  prompt: فتحت الملفات ومش عارف أبدأ منين
+  expected:
+  - START-HERE is the only entry point and names one current action
+  - internal ledgers are not presented as learner tasks
+  - no link points to an uncreated future lesson
+  locale: ar-MSA
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: brief
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+- id: stale-learner-observation
+  prompt: الطريقة دي كانت مناسبة زمان بس دلوقتي مش نافعة
+  expected:
+  - the contextual strategy observation is corrected rather than treated as a fixed learning style
+  - one material dimension changes and its outcome is observed
+  locale: ar-MSA
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: brief
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+  fixture_refs:
+    context: context.retention-accessibility.stale-learner-observation.v1

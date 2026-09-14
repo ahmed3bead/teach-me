@@ -7,18 +7,17 @@ import sys
 
 payload = json.load(sys.stdin)
 prompt = payload["prompt"]
+if "MALFORMED_PROTOCOL_THEN_OK" in prompt and not payload.get("protocol_retry"):
+    sys.stdout.write("not-json")
+    raise SystemExit(0)
+if "TRANSPORT_THEN_OK" in prompt and not payload.get("protocol_retry"):
+    raise SystemExit(3)
 if "FORCE_FAIL" in prompt:
     response = "fixture-fail"
 elif "ALWAYS_ENGLISH" in prompt:
     response = "This is a complete English explanation that the permissive fixture grader will incorrectly approve."
-elif "ENGLISH_THEN_ARABIC" in prompt and payload.get("attempt_index") == 1:
-    response = "This first response is entirely in English and must trigger exactly one automatic retry."
-elif "INCOMPLETE_THEN_COMPLETE" in prompt and payload.get("attempt_index") == 1:
-    response = "هذا شرح عربي مبسط لكنه ينتهي في منتصف"
 elif "ALWAYS_INCOMPLETE" in prompt:
     response = "هذا شرح عربي مبسط لكنه ينتهي في منتصف"
-elif "MALFORMED_THEN_CLEAN" in prompt and payload.get("attempt_index") == 1:
-    response = "هذا شرح عربي مكتمل ومبسّط، لكنه يقول إذا قسّّيت الشريط إلى جزأين متساويين، فتظهر فيه كلمة مشوشة يجب رفضها."
 elif "ALWAYS_MALFORMED" in prompt:
     response = "هذا شرح عربي مكتمل ومبسّط، لكنه يقول إذا قسّّيت الشريط إلى جزأين متساويين، فتظهر فيه كلمة مشوشة يجب رفضها."
 elif "PREMATURE_ASSESSMENT" in prompt:
@@ -49,4 +48,10 @@ elif str(payload.get("locale", "")).lower().replace("_", "-").startswith("ar"):
     response = "هذا شرح عربي مبسط وواضح للكسور حتى يفهم الطفل الفكرة. سنكمل خطوة خطوة من دون ضغط."
 else:
     response = "fixture-pass"
-json.dump({"response": response, "model": "fixture-response"}, sys.stdout)
+json.dump({
+    "response": response, "artifacts": [], "model": "fixture/response-v2",
+    "settings": {"deterministic": True, "agent_sandbox": "fixture"},
+    "adapter_version": "fixture-2.0.0", "invocation_id": "fixture-response-invocation",
+    "timing": {"started_at": "2026-09-14T00:00:00Z", "completed_at": "2026-09-14T00:00:00Z", "duration_seconds": 0.0},
+    "raw_result": {"response": response, "artifacts": []}, "artifact_evidence": []
+}, sys.stdout)

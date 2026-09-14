@@ -1,38 +1,183 @@
 suite: hardening
 version: 1.0.0
 cases:
-  - id: code-switch-is-not-language-switch
-    prompt: "أنا عاوز الشرح فصحى مبسطة. Now show me one Kubernetes example."
-    expected:
-      - "the established simplified Modern Standard Arabic teaching language is preserved"
-      - "the English sentence is not treated by itself as a language-switch request"
-  - id: explicit-language-switch
-    prompt: "من فضلك كمل الشرح كله بالإنجليزية من هنا"
-    expected:
-      - "the explicit language change is honored"
-  - id: unavailable-audio-fallback
-    prompt: "أنا مش قادر أقرأ ومحتاج MP3، لكن المنصة لا تقدر تولد صوت"
-    expected:
-      - "the missing audio capability is disclosed and text is not mislabeled as audio"
-      - "at least two plausible fallbacks are offered without assuming either is configured"
-  - id: no-accessible-route
-    critical: true
-    prompt: "لا أستطيع قراءة النص ولا يوجد صوت أو قارئ شاشة أو شخص يساعدني"
-    expected:
-      - "an access block and resume checkpoint are stated instead of pretending the lesson was delivered"
-  - id: malformed-resume
-    prompt: "TEACH-ME:v1:k8s:ar-MSA:M02 كمل"
-    expected:
-      - "the code is treated as partial and no mastery is inferred"
-  - id: legacy-resume-state-is-untrusted
-    critical: true
-    prompt: "TEACH-ME:v1:k8s:ar-MSA:M02:L03:retained كمل"
-    expected:
-      - "the v1 locator is accepted as legacy"
-      - "the embedded retained state is not restored as mastery evidence"
-      - "a light evidence checkpoint is used before dependent material"
-  - id: expired-profile
-    prompt: "استخدم ملف المتعلم رغم انتهاء retention_until"
-    expected:
-      - "the expired profile is not used for adaptation"
-      - "deletion or renewed purpose-specific consent is offered"
+- id: code-switch-is-not-language-switch
+  prompt: أنا عاوز الشرح فصحى مبسطة. Now show me one Kubernetes example.
+  expected:
+  - the established simplified Modern Standard Arabic teaching language is preserved
+  - the English sentence is not treated by itself as a language-switch request
+  locale: ar-MSA
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: brief
+    assessment_state: intensive
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+- id: explicit-language-switch
+  prompt: من فضلك كمل الشرح كله بالإنجليزية من هنا
+  expected:
+  - the explicit language change is honored
+  locale: en
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: brief
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+- id: unavailable-audio-fallback
+  prompt: أنا مش قادر أقرأ ومحتاج MP3، لكن المنصة لا تقدر تولد صوت
+  expected:
+  - the missing audio capability is disclosed and text is not mislabeled as audio
+  - at least two plausible fallbacks are offered without assuming either is configured
+  locale: ar-MSA
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: audio
+    safety_level: standard
+    instructional_scope: brief
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+- id: no-accessible-route
+  critical: true
+  prompt: لا أستطيع قراءة النص ولا يوجد صوت أو قارئ شاشة أو شخص يساعدني
+  expected:
+  - an access block and resume checkpoint are stated instead of pretending the lesson was delivered
+  locale: ar-MSA
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: new
+    domain_pack: none
+    accessibility: audio
+    safety_level: standard
+    instructional_scope: brief
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+- id: malformed-resume
+  prompt: TEACH-ME:v1:k8s:ar-MSA:M02 كمل
+  expected:
+  - the code is treated as partial and no mastery is inferred
+  locale: ar-MSA
+  routing:
+    audience: learner
+    mode: source-grounded
+    source_type: document
+    artifact_type: chat
+    session_state: resume
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: journey
+    assessment_state: none
+  capabilities:
+    source: supplied_result
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+  fixture_refs:
+    source: source.hardening.malformed-resume.v1
+- id: legacy-resume-state-is-untrusted
+  critical: true
+  prompt: TEACH-ME:v1:k8s:ar-MSA:M02:L03:retained كمل
+  expected:
+  - the v1 locator is accepted as legacy
+  - the embedded retained state is not restored as mastery evidence
+  - a light evidence checkpoint is used before dependent material
+  locale: ar-MSA
+  routing:
+    audience: learner
+    mode: source-grounded
+    source_type: document
+    artifact_type: chat
+    session_state: resume
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: journey
+    assessment_state: none
+  capabilities:
+    source: supplied_result
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+  fixture_refs:
+    source: source.hardening.legacy-resume-state-is-untrusted.v1
+    context: context.hardening.legacy-resume-state-is-untrusted.v1
+- id: expired-profile
+  prompt: استخدم ملف المتعلم رغم انتهاء retention_until
+  expected:
+  - the expired profile is not used for adaptation
+  - deletion or renewed purpose-specific consent is offered
+  locale: ar-MSA
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: resume
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: journey
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required

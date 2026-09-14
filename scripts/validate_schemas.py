@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 try:
+    import yaml
     from jsonschema import Draft202012Validator, FormatChecker
     from jsonschema.exceptions import SchemaError, ValidationError
 except ImportError as exc:  # pragma: no cover - exercised by dependency-free CI failure
@@ -32,6 +33,14 @@ def expect_rejected(validator: Draft202012Validator, value: dict[str, Any], labe
 
 
 def validate_pair(schema_path: Path) -> None:
+    if schema_path.name == "eval-fixture-registry.schema.json":
+        schema = load(schema_path); Draft202012Validator.check_schema(schema)
+        validator = Draft202012Validator(schema, format_checker=FormatChecker())
+        fixture = yaml.safe_load((ROOT / "fixtures" / "eval-registry.yaml").read_text(encoding="utf-8"))
+        validator.validate(fixture)
+        bad = copy.deepcopy(fixture); bad["fixtures"][0]["unexpected"] = True
+        expect_rejected(validator, bad, "fixture registry additional-property check")
+        return
     fixture_path = FIXTURES / schema_path.name.replace(".schema", "")
     if not fixture_path.exists():
         raise AssertionError(f"{schema_path.name}: missing fixture {fixture_path.name}")
@@ -68,6 +77,6 @@ def main() -> int:
 if __name__ == "__main__":
     try:
         raise SystemExit(main())
-    except (AssertionError, SchemaError, ValidationError, json.JSONDecodeError) as exc:
+    except (AssertionError, SchemaError, ValidationError, json.JSONDecodeError, yaml.YAMLError) as exc:
         print(f"Schema validation failed: {exc}", file=sys.stderr)
         raise SystemExit(1)

@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ahmed3bead/teach-me/schemas/eval-fixture-registry.schema.json",
+  "type": "object", "required": ["version", "fixtures"],
+  "properties": {
+    "version": {"const": "1.0.0"},
+    "fixtures": {"type": "array", "items": {"$ref": "#/$defs/entry"}}
+  }, "additionalProperties": false,
+  "$defs": {
+    "entry": {
+      "type": "object",
+      "required": ["id", "capability", "state", "authorized", "provenance", "captured_at", "content_sha256", "simulated", "result"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9]+(?:[._-][a-z0-9]+)*$"},
+        "capability": {"enum": ["source", "web", "file", "rendering", "sandbox", "video", "external_catalog", "context"]},
+        "state": {"enum": ["supplied_result", "executable_temp"]},
+        "authorized": {"const": true}, "provenance": {"type": "string", "minLength": 1},
+        "captured_at": {"type": "string", "format": "date-time"},
+        "content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "simulated": {"const": true}, "result": {"type": "object", "minProperties": 1}
+      }, "additionalProperties": false,
+      "allOf": [
+        {"if": {"properties": {"capability": {"enum": ["source", "web", "sandbox", "video", "external_catalog", "context"]}}}, "then": {"properties": {"state": {"const": "supplied_result"}}}},
+        {"if": {"properties": {"capability": {"enum": ["file", "rendering"]}}}, "then": {"properties": {"state": {"const": "executable_temp"}}}},
+        {"if": {"properties": {"capability": {"const": "file"}}}, "then": {"properties": {"result": {"$ref": "#/$defs/fileResult"}}}},
+        {"if": {"properties": {"capability": {"const": "rendering"}}}, "then": {"properties": {"result": {"$ref": "#/$defs/renderResult"}}}},
+        {"if": {"properties": {"capability": {"const": "source"}}}, "then": {"properties": {"result": {"$ref": "#/$defs/sourceResult"}}}},
+        {"if": {"properties": {"capability": {"const": "web"}}}, "then": {"properties": {"result": {"$ref": "#/$defs/webResult"}}}},
+        {"if": {"properties": {"capability": {"const": "sandbox"}}}, "then": {"properties": {"result": {"$ref": "#/$defs/sandboxResult"}}}},
+        {"if": {"properties": {"capability": {"const": "video"}}}, "then": {"properties": {"result": {"$ref": "#/$defs/videoResult"}}}},
+        {"if": {"properties": {"capability": {"const": "external_catalog"}}}, "then": {"properties": {"result": {"$ref": "#/$defs/catalogResult"}}}},
+        {"if": {"properties": {"capability": {"const": "context"}}}, "then": {"properties": {"result": {"$ref": "#/$defs/contextResult"}}}}
+      ]
+    },
+    "capturedResult": {"type": "object", "required": ["tool_result_type", "data"], "properties": {"tool_result_type": {"type": "string"}, "data": {"type": "object", "minProperties": 1}}, "additionalProperties": false},
+    "sourceResult": {"allOf": [{"$ref": "#/$defs/capturedResult"}, {"properties": {"tool_result_type": {"const": "simulated_source"}}}]},
+    "webResult": {"allOf": [{"$ref": "#/$defs/capturedResult"}, {"properties": {"tool_result_type": {"const": "simulated_web"}}}]},
+    "sandboxResult": {"allOf": [{"$ref": "#/$defs/capturedResult"}, {"properties": {"tool_result_type": {"const": "simulated_sandbox"}, "data": {"type": "object", "required": ["tool_network"], "properties": {"tool_network": {"const": "disabled"}}}}}]},
+    "videoResult": {"allOf": [{"$ref": "#/$defs/capturedResult"}, {"properties": {"tool_result_type": {"const": "simulated_video"}}}]},
+    "catalogResult": {"allOf": [{"$ref": "#/$defs/capturedResult"}, {"properties": {"tool_result_type": {"const": "simulated_external_catalog"}}}]},
+    "contextResult": {"allOf": [{"$ref": "#/$defs/capturedResult"}, {"properties": {"tool_result_type": {"const": "simulated_context"}}}]},
+    "fileResult": {
+      "type": "object", "required": ["tool_result_type", "workspace", "artifact_protocol", "overwrite", "symlinks", "tool_network"],
+      "properties": {"tool_result_type": {"const": "artifact_workspace"}, "workspace": {"const": "disposable_temp"}, "artifact_protocol": {"const": "structured_content"}, "overwrite": {"const": false}, "symlinks": {"const": false}, "tool_network": {"const": "disabled"}}, "additionalProperties": false
+    },
+    "renderResult": {
+      "type": "object", "required": ["tool_result_type", "engine", "input_capability", "source_media_type", "output_media_type", "tool_network"],
+      "properties": {"tool_result_type": {"const": "local_renderer"}, "engine": {"type": "string", "minLength": 1}, "input_capability": {"const": "file"}, "source_media_type": {"const": "text/html"}, "output_media_type": {"const": "application/pdf"}, "tool_network": {"const": "disabled"}}, "additionalProperties": false
+    }
+  }
+}

@@ -12,6 +12,13 @@ from locale_policy import unicode_phrase_boundary
 ASSESSMENT_INTENTS = frozenset({"none", "accept", "decline"})
 _ARABIC_MARK = re.compile(r"[\u0610-\u061a\u064b-\u065f\u0670\u06d6-\u06ed\u0640]")
 _ARABIC_SEPARATOR = r"[\s،,؛;:.!?؟\-]*"
+_ASSESSMENT_CONTEXT = re.compile(
+    unicode_phrase_boundary(
+        r"(?:الفحص|فحص|للفحص|الاختبار|اختبار|للاختبار|الأسئلة|أسئلة|للأسئلة|التمارين|تمارين|للتمارين|اختبرني|اسألني|"
+        r"تختبرني|check|quiz|test|questions?|exercises?|test\s+me|quiz\s+me|ask\s+me)"
+    ),
+    flags=re.IGNORECASE,
+)
 
 _DECLINE = re.compile(
     unicode_phrase_boundary(
@@ -36,12 +43,11 @@ _DECLINE = re.compile(
 _ACCEPT = re.compile(
     unicode_phrase_boundary(
         r"(?:"
-        r"نعم\s*[،,]?\s*(?:أوافق|اوافق|أختار|اختار|أريد|اريد)|"
-        r"أجل\s*[،,]?\s*(?:أوافق|اوافق|أختار|اختار|أريد|اريد)|"
-        r"(?:أوافق|اوافق)\s+على\s+(?:الفحص|الاختبار|الأسئلة|التمارين)|"
+        r"(?:نعم|أجل|ايوه|أيوه)\s*[،,]?\s*(?:أوافق|اوافق|أختار|اختار|أريد|اريد)|"
+        r"(?:أوافق|اوافق)\s+على\s+(?:الفحص|الاختبار|اختبار|الأسئلة|أسئلة|التمارين|تمارين)|"
         r"(?:أختار|اختار|أريد|اريد)\s+(?:الفحص|الاختبار|الأسئلة|التمارين)|"
         r"(?:أنا\s+)?(?:جاهز(?:ة|ا)?|مستعد(?:ة|ا)?)\s+(?:للفحص|للاختبار|للأسئلة|للتمارين)|"
-        r"اختبرني|اسألني|"
+        r"اختبرني|تختبرني|اسألني|"
         r"(?:yes|sure|okay|ok)\s*[,.]?\s*i\s+(?:agree|accept|choose)(?:\s+(?:the\s+)?(?:check|quiz|test|questions?|exercises?))?|"
         r"please\s+(?:do|start)\s+(?:the\s+)?(?:check|quiz|test|questions?|exercises?)|"
         r"let['’]s\s+do\s+(?:the\s+)?(?:check|quiz|test|questions?|exercises?)|"
@@ -57,6 +63,12 @@ _ACCEPT = re.compile(
 def legacy_assessment_intent(text: str) -> str:
     """Classify only explicit legacy consent or refusal, with negation winning."""
     normalized = _ARABIC_MARK.sub("", unicodedata.normalize("NFKC", text))
+    if not _ASSESSMENT_CONTEXT.search(normalized):
+        if re.search(r"(?:لا|لن|لم)[\s،,؛;:.!?؟-]*(?:أوافق|اوافق)", normalized):
+            return "decline"
+        if re.search(r"(?:do\s+not|don['’]t|did\s+not|didn['’]t|will\s+not|won['’]t)\s+(?:agree|accept)", normalized, re.IGNORECASE):
+            return "decline"
+        return "none"
     if _DECLINE.search(normalized):
         return "decline"
     if _ACCEPT.search(normalized):

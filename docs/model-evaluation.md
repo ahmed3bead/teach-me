@@ -44,23 +44,29 @@ Only after both smoke commands pass, remove `--case` to run all static suites an
 
 Local results prove behavior only for the recorded local models. Before claiming compatibility with a hosted provider, run a small representative compatibility sample on that provider. Save a full paid run for the release candidate rather than every commit.
 
-Arabic model runs use canonical `ar-MSA`. Inputs written in an Arabic dialect and legacy `ar-EG` payloads are normalized to simplified Modern Standard Arabic. The runner independently checks script dominance, colloquial markers, preserved technical terms, response completeness, and premature assessment; model-grader approval alone is never sufficient.
+Behavioral cases must declare the canonical locale `ar-MSA` or `en`; missing, ambiguous, invalid, and legacy `ar-EG` case locales fail validation before adapter execution. Inputs written in an Arabic dialect still use `ar-MSA`. The runner independently checks script dominance, colloquial markers, preserved technical terms, response completeness, and premature assessment; model-grader approval alone is never sufficient.
 
 ## Static behavioral evaluation
 
-The response adapter receives JSON with `type: generate`, prompt/history, locale, case identifiers, and `skill_root`. It returns:
+The response adapter receives JSON with `type: generate`, chronological history, explicit locale, case identifiers, and an immutable `prompt_packet`. The packet contains the complete content and SHA-256 of `SKILL.md` and every conditionally routed reference, routing axes, an explicit capability-state manifest, and controlled synthetic inputs resolved from stable fixture IDs. It returns complete invocation evidence and a structured artifact array (empty when no file is requested):
 
 ```json
-{"response": "...", "model": "provider/model-version"}
+{"response":"...","artifacts":[],"model":"provider/model-version","settings":{},"adapter_version":"...","raw_result":{},"invocation_id":"...","timing":{"started_at":"...","completed_at":"...","duration_seconds":0.0}}
 ```
 
-The independent grader receives `type: grade`, the transcript, expected observable criteria, and grading rule. It returns one boolean result per criterion:
+The independent grader receives `type: grade`, the ordered numbered transcript, structured assessment events, relevant case context, controlled results, actual artifact validation, raw final response, criteria, and evidence rule. It returns one evidence-bearing verdict per criterion with the same invocation metadata:
 
 ```json
-{"model": "provider/grader-version", "results": [{"passed": true, "reason": "observable evidence"}]}
+{"model":"provider/grader-version","settings":{},"adapter_version":"...","raw_result":{},"invocation_id":"...","timing":{},"results":[{"verdict":"pass","evidence":{"source":"response","turn":2,"quote":"exact excerpt"},"reason":"why the excerpt satisfies the criterion"}]}
 ```
 
-Each case report records `response_attempts`, `selected_attempts` (one per turn), the final-turn `selected_attempt`, `deterministic_preflight_passed`, and an `attempt_log` containing the model, seed, acceptance state, and deterministic rejection reasons for every generation attempt. A later successful turn cannot erase a deterministic rejection in an earlier selected turn.
+Deterministic educational, language, terminology, completeness, text-quality, and consent failures are fail-closed and are never regenerated. A retry is permitted only for a recorded transport or malformed-protocol failure, defaults to one, and is capped at two. The report preserves every protocol attempt and retry cause. A later turn cannot erase an earlier selected-turn rejection.
+
+The report is atomically initialized as `running`, checkpointed through turns, guards, and grading, and finalized as `complete` or `failed`. Resume accepts only a matching Git and run-configuration fingerprint and does not rerun completed educational responses. It preserves immutable prompt packets, raw responses, invocation evidence, artifact hashes and validation, deterministic guards, grader evidence, timestamps, and duration. Instruction bodies are stored once by content hash; prompt packets and journal entries use lossless hash references instead of repeating those bodies.
+
+Reference routing uses independent metadata for audience, mode, source type, locale, artifact type, capability state, session state, accessibility, instructional scope, assessment state, safety level, and domain pack. `supplied_result` requires an authorized, simulated, provenance-bearing registry record with a verified content hash. `unavailable` is graded on the safe fallback. The Codex adapter permits subscription model transport but gives the response agent a read-only sandbox and only controlled external-source observations; it does not claim a generic network switch it cannot prove.
+
+Release evidence additionally requires `--release-evidence --candidate-commit FULL_SHA`. Before either adapter runs, the runner proves that the full SHA equals `HEAD`, `origin/main`, and their merge base and that the tracked worktree is clean. Non-release fixture runs cannot provide a candidate SHA.
 
 Run:
 
