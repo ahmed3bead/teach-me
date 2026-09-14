@@ -53,8 +53,8 @@ DIRECT_ASSESSMENT = re.compile(
 )
 ASSESSMENT_QUESTION = re.compile(
     unicode_phrase_boundary(
-        r"(?:إيه|ايه|كام|ليه|ما\s+(?:هو|هي)|تفتكر|قول(?:ي|ّي)|احسب|اختار|"
-        r"هل\s+(?:فهمت|فهمتي)|فاهم(?:ة)?|what|which|how\s+many|why|can\s+you\s+explain|"
+        r"(?:إيه|ايه|أي|أين|كام|ليه|ما\s+(?:هو|هي)|تفتكر|قول(?:ي|ّي)|احسب|اختار|"
+        r"هل\s+(?:فهمت|فهمتي)|فاهم(?:ة)?|what|which|where|how\s+many|why|can\s+you\s+explain|"
         r"did\s+you\s+understand|do\s+you\s+understand|got\s+it)"
     )
     + r"[^؟?]*[؟?]",
@@ -253,16 +253,26 @@ def learner_opted_into_assessment(turns: list[dict[str, Any]]) -> bool:
     return state == "accept"
 
 
+def assessment_prompt_match(text: str) -> re.Match[str] | None:
+    """Return the shared deterministic marker for an assessment question or task."""
+    return DIRECT_ASSESSMENT.search(text) or ASSESSMENT_QUESTION.search(text)
+
+
 def deterministic_assessment_check(
     text: str,
-    turns: list[dict[str, Any]],
+    turns: list[dict[str, Any]] | None = None,
+    learner_event: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Prevent the first test item or task from being bundled with its invitation."""
-    current = next(
-        (turn for turn in reversed(turns) if turn.get("role") in {"user", "learner"}),
-        None,
-    )
-    if current is not None and "assessment_intent" in current:
+    current = learner_event
+    structured = current is not None
+    if current is None:
+        current = next(
+            (turn for turn in reversed(turns or []) if turn.get("role") in {"user", "learner"}),
+            None,
+        )
+        structured = current is not None and "assessment_intent" in current
+    if structured:
         try:
             opted_in = intent_from_turn(current, allow_legacy=False) == "accept"
         except ValueError:
@@ -272,11 +282,11 @@ def deterministic_assessment_check(
             }
         source = "structured learner assessment_intent"
     else:
-        opted_in = learner_opted_into_assessment(turns)
+        opted_in = learner_opted_into_assessment(turns or [])
         source = "legacy learner text"
     if opted_in:
         return {"passed": True, "reason": f"learner explicitly opted into assessment via {source}"}
-    match = DIRECT_ASSESSMENT.search(text) or ASSESSMENT_QUESTION.search(text)
+    match = assessment_prompt_match(text)
     if match:
         excerpt = " ".join(match.group(0).split())[:120]
         return {
@@ -289,21 +299,37 @@ def deterministic_assessment_check(
     }
 
 
-def deterministic_completeness_check(text: str, prompt: str = "") -> dict[str, Any]:
-    """Reject visibly truncated or too-short model output even if the AI grader approves it."""
+def deterministic_completeness_check(
+    text: str,
+    prompt: str = "",
+    learner_event: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Apply strict teaching length, with a bounded exception for accepted assessment tasks."""
     stripped = text.strip()
     word_count = len(stripped.split())
     child_lesson = any(
         marker in prompt.casefold() for marker in ("طفل", "ابتدائي", "primary school", "child")
     )
-    minimum_words = 40 if child_lesson else 12
+    substantive_minimum = 40 if child_lesson else 12
+    intent = "missing"
+    if learner_event is not None:
+        try:
+            intent = intent_from_turn(learner_event, allow_legacy=False)
+        except ValueError:
+            intent = "invalid"
+    assessment_task = assessment_prompt_match(stripped) is not None
+    short_assessment = intent == "accept" and assessment_task
+    minimum_words = 8 if short_assessment else substantive_minimum
+    minimum_characters = 30 if short_assessment else 1
     terminal = stripped.endswith((".", "!", "?", "؟", "…"))
-    passed = word_count >= minimum_words and terminal
+    passed = word_count >= minimum_words and len(stripped) >= minimum_characters and terminal
     return {
         "passed": passed,
         "reason": (
-            f"deterministic completeness check: {word_count} words, minimum {minimum_words}, "
-            f"terminal punctuation {'present' if terminal else 'missing'}"
+            f"deterministic completeness check ({'accepted assessment task' if short_assessment else 'substantive response'}): "
+            f"{word_count} words, minimum {minimum_words}; {len(stripped)} characters, "
+            f"minimum {minimum_characters}; terminal punctuation {'present' if terminal else 'missing'}; "
+            f"structured assessment intent {intent}"
         ),
     }
 

@@ -456,6 +456,67 @@ def main() -> int:
         )["passed"]:
             raise AssertionError("contradictory structured intent did not fail closed")
 
+        accepted_event = {
+            "role": "learner",
+            "content": "I accept the short check.",
+            "assessment_intent": "accept",
+        }
+        ten_word_question = "Which sorting method should this dataset use, and why exactly?"
+        if len(ten_word_question.split()) != 10:
+            raise AssertionError("the short-assessment regression fixture must contain exactly ten words")
+        if not runner.deterministic_completeness_check(
+            ten_word_question, learner_event=accepted_event
+        )["passed"]:
+            raise AssertionError("a complete ten-word post-consent assessment question was rejected")
+        if not runner.deterministic_completeness_check(
+            "أي طريقة تناسب هذه المسألة الجديدة، وما سبب اختيارك لها؟",
+            learner_event={
+                "role": "learner",
+                "content": "أختار الفحص القصير.",
+                "assessment_intent": "accept",
+            },
+        )["passed"]:
+            raise AssertionError("a complete Arabic post-consent assessment question was rejected")
+        if runner.deterministic_assessment_check(
+            ten_word_question,
+            learner_event={
+                "role": "learner", "content": "I need more explanation.", "assessment_intent": "none"
+            },
+        )["passed"]:
+            raise AssertionError("the same question was allowed before structured acceptance")
+        if runner.deterministic_completeness_check(
+            "This short explanation states a rule but omits useful supporting detail.",
+            learner_event=accepted_event,
+        )["passed"]:
+            raise AssertionError("acceptance weakened completeness for a substantive explanation")
+        for minimal in ("Ready?", "Answer?", "جاهز؟", "أجب."):
+            if runner.deterministic_completeness_check(
+                minimal, learner_event=accepted_event
+            )["passed"]:
+                raise AssertionError(f"a minimal post-consent response passed completeness: {minimal}")
+        if runner.deterministic_completeness_check(
+            ten_word_question.removesuffix("?"), learner_event=accepted_event
+        )["passed"]:
+            raise AssertionError("truncated post-consent assessment text passed completeness")
+        normal_teaching = (
+            "This complete explanation introduces the rule, demonstrates its use, and ends with a clear example."
+        )
+        if not runner.deterministic_completeness_check(normal_teaching)["passed"]:
+            raise AssertionError("an existing normal-length teaching response failed completeness")
+        for blocked_event in (
+            {"role": "learner", "content": "I decline the check.", "assessment_intent": "decline"},
+            {"role": "learner", "content": "I need more explanation."},
+            {"role": "learner", "content": "I accept the check.", "assessment_intent": "unknown"},
+        ):
+            if runner.deterministic_completeness_check(
+                ten_word_question, learner_event=blocked_event
+            )["passed"]:
+                raise AssertionError(f"invalid assessment authority enabled the short threshold: {blocked_event}")
+            if runner.deterministic_assessment_check(
+                ten_word_question, learner_event=blocked_event
+            )["passed"]:
+                raise AssertionError(f"invalid assessment authority permitted a question: {blocked_event}")
+
         dialect = runner.deterministic_language_check(
             "هذا شرح عام، لكن النتيجة مش واضحة حتى الآن ونحتاج إلى مثال آخر.", "ar-MSA"
         )

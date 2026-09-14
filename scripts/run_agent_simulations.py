@@ -368,30 +368,19 @@ def main() -> int:
                 teacher_response = required_text(teaching, "response", key)
                 teacher_models.append(teaching.get("model"))
                 teacher_adapter_calls.append(adapter_attempt_record(teaching, "teach", turn_index))
-                learner_turns = [
-                    {
-                        "role": "user",
-                        "content": item["content"],
-                        "assessment_intent": item["assessment_intent"],
-                    }
-                    for item in history
-                    if item["role"] == "learner"
-                ] + [{
-                    "role": "user",
-                    "content": learner_event["utterance"],
-                    "assessment_intent": learner_event["assessment_intent"],
-                }]
                 teacher_turn_checks.append(
                     {
                         "turn_index": turn_index,
                         "language": deterministic_language_check(teacher_response, simulation["locale"]),
                         "text_quality": deterministic_text_quality_check(teacher_response),
                         "completeness": deterministic_completeness_check(
-                            teacher_response, simulation["initial_request"]
+                            teacher_response,
+                            simulation["initial_request"],
+                            learner_event=learner_event,
                         ),
                         "assessment": deterministic_assessment_check(
                             teacher_response,
-                            learner_turns,
+                            learner_event=learner_event,
                         ),
                     }
                 )
