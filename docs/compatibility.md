@@ -1,6 +1,8 @@
 # Compatibility and capability matrix
 
-Teach Me follows the Agent Skills layout and keeps core conversational teaching usable without optional tools. A host must expose a capability before the skill may claim to have used it.
+Teach Me has two editions. **Teach Me for ChatGPT** provides the shared core teaching method in ordinary ChatGPT conversations and depends only on capabilities actually exposed by that ChatGPT surface. **Teach Me for Codex** follows the Agent Skills layout and adds the repository's local tooling, controlled artifacts, and validation workflows. The editions are not technically identical, and output can differ with model, tool, context, and execution environment.
+
+The ChatGPT Edition package is a private beta configuration and is not a publicly published GPT. Current GPT creation is web-only and requires an eligible managed workspace and owner permission; supported mobile apps can use an existing GPT but cannot create it. Its owner-facing compatibility and settings are documented in [`../chatgpt-edition/README.md`](../chatgpt-edition/README.md). The matrix below describes Codex and other Agent Skills-compatible hosts. A host must expose a capability before the skill may claim to have used it.
 
 | Capability | Without it | With it |
 |---|---|---|

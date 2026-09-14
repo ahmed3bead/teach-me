@@ -21,6 +21,11 @@ jobs:
       - run: python3 -m pip check
       - run: python3 scripts/check_dependency_pins.py
       - run: python3 scripts/check_context_budget.py
+      - run: python3 scripts/build_chatgpt_edition.py --check
+      - run: python3 scripts/check_product_docs.py
+      - run: python3 scripts/check_markdown_links.py
+      - run: python3 scripts/test_installers.py
+      - run: bash -n installers/install.sh
       - run: python3 scripts/validate.py
       - run: python3 scripts/validate_schemas.py
       - run: python3 scripts/validate_evals.py
@@ -71,6 +76,10 @@ jobs:
       - run: python scripts/validate_schemas.py
       - run: python scripts/validate_evals.py
       - run: python scripts/validate_simulations.py
+      - run: python scripts/build_chatgpt_edition.py --check
+      - run: python scripts/check_product_docs.py
+      - run: python scripts/check_markdown_links.py
+      - run: python scripts/test_installers.py
       - run: python scripts/test_openai_api_eval_adapter.py
       - run: python scripts/test_validate_session.py
       - run: python scripts/test_validate_resume.py

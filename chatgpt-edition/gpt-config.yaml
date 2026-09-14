@@ -1,0 +1,31 @@
+product_name: "Teach Me for ChatGPT"
+draft_name: "Teach Me — Beta"
+version: "1.0.0-beta.1"
+status: "private-draft-configuration"
+compatibility:
+  surfaces:
+    - "Configuration and creation: ChatGPT web in an eligible managed workspace"
+    - "Learner use: ChatGPT web and supported mobile and tablet apps"
+  notes:
+    - "As of 2026-09-14, official OpenAI documentation says new GPT creation is unavailable on personal Free, Go, Plus, and Pro accounts and depends on permissions in Business, Enterprise, and Edu workspaces."
+    - "Available models, file support, web search, context limits, and interface controls depend on the user's ChatGPT plan and current product surface."
+    - "Results can differ from Teach Me for Codex because models, tools, context, and execution environments differ."
+short_description: "Adaptive, evidence-backed teaching in English and simplified Modern Standard Arabic, starting from your goal and current knowledge."
+instructions_file: "INSTRUCTIONS.md"
+required_knowledge_files:
+  - "KNOWLEDGE.md"
+conversation_starters:
+  - "Teach me a new topic from zero and help me choose a practical goal."
+  - "I understand the basics but keep getting stuck. Help me find the missing step."
+  - "Teach me from this uploaded file and clearly separate the source from added explanation."
+  - "علّمني هذا الموضوع من الصفر بالعربية الفصحى المبسطة."
+recommended_capabilities:
+  web_search: true
+  code_interpreter_and_data_analysis: true
+  image_generation: false
+  canvas: false
+  actions: []
+sharing: "Private while in beta; do not publish from this repository setup."
+privacy:
+  persistent_learner_records: "Only after explicit learner consent and only when the platform clearly supports a private artifact."
+  prohibited_uploads: "Credentials, unnecessary personal data, private transcripts, and material the owner is not authorized to upload."
