@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.0-rc.1 - Unreleased
+## 1.0.0 - 2026-09-14
 
 - Derive progress from evidence type, support level, outcome, task identity, and time instead of accepting caller-selected mastery states.
 - Require a fresh unsupported retrieval at least 24 hours after distinct independent evidence before recording retention, and downgrade retained state after later failure.
