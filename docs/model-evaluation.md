@@ -76,7 +76,7 @@ python3 scripts/run_behavioral_evals.py \
 The learner adapter never receives hidden fictional teaching material. This makes leakage visible and lets the runner measure baseline-to-transfer gain. The saved transcript includes the learner's closing message even when it ends the dialogue.
 
 - `type: baseline`: return `{"answer":"...","model":"..."}` from persona and baseline task only.
-- `type: dialogue`: return `{"message":"...","done":false,"model":"..."}`. Set `done` true only after the scripted learner behavior has reached a natural endpoint.
+- `type: dialogue`: return `{"utterance":"...","assessment_intent":"none|accept|decline","done":false,"model":"..."}`. All three protocol fields are required. `done` must be a JSON Boolean and may become true only after every required learner behavior has been exercised.
 - `type: transfer`: return `{"answer":"...","model":"..."}` from the transcript and fresh task.
 - The teacher adapter receives `type: teach`, the governing material, transcript, current learner message, and `skill_root`; return `{"response":"...","model":"..."}`.
 - The grader receives `type: simulation-grade`; return `baseline_score` and `transfer_score` from 0 to 1 plus one criterion result per expected item.
@@ -92,6 +92,8 @@ python3 scripts/run_agent_simulations.py \
 ```
 
 The run fails when pass rate is below 90%, any critical simulation fails, transfer is below its scenario threshold, learning gain is below its threshold, or an authoritative deterministic guard fails. Dynamic reports record hard checks for the closed-book learner payload boundary, Arabic/English output language, Unicode text quality, assessment opt-in, teacher-response completeness, and unsupported mastery claims. The model grader cannot override them. Fixture adapters only test plumbing and must never be reported as model-quality evidence.
+
+The structured dialogue contract is the only supported live-adapter protocol before v1; live adapters that return the old `message` field or omit `assessment_intent` are rejected. Stored transcripts and reports that predate the structured event remain readable through conservative text classification, but that compatibility does not relax validation for a new live run.
 
 ## Release evidence
 

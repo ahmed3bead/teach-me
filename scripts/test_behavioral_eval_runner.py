@@ -419,6 +419,42 @@ def main() -> int:
             raise AssertionError("existing English assessment phrase was missed")
         if not runner.learner_opted_into_assessment([{"role": "user", "content": "Please test me."}]):
             raise AssertionError("existing English assessment opt-in phrase was missed")
+        legacy_lifecycle = [
+            {"role": "user", "content": "Please test me."},
+            {"role": "user", "content": "Here is my first answer."},
+        ]
+        if not runner.learner_opted_into_assessment(legacy_lifecycle):
+            raise AssertionError("legacy assessment acceptance was not retained across a neutral answer")
+        legacy_lifecycle.append({"role": "user", "content": "Do not test me now."})
+        if runner.learner_opted_into_assessment(legacy_lifecycle):
+            raise AssertionError("a later legacy refusal did not revoke assessment acceptance")
+        structured_accept = [{
+            "role": "learner",
+            "content": "نعم، أوافق على الفحص.",
+            "assessment_intent": "accept",
+        }]
+        if not runner.deterministic_assessment_check(
+            "اكتب إجابتك الآن.", structured_accept
+        )["passed"]:
+            raise AssertionError("structured Arabic assessment acceptance was ignored")
+        structured_decline = [{
+            "role": "learner",
+            "content": "لا أريد الأسئلة الآن.",
+            "assessment_intent": "decline",
+        }]
+        if runner.deterministic_assessment_check(
+            "اكتب إجابتك الآن.", structured_decline
+        )["passed"]:
+            raise AssertionError("structured Arabic assessment refusal permitted a question")
+        contradictory = [{
+            "role": "learner",
+            "content": "I do not agree to the quiz.",
+            "assessment_intent": "accept",
+        }]
+        if runner.deterministic_assessment_check(
+            "Answer this question.", contradictory
+        )["passed"]:
+            raise AssertionError("contradictory structured intent did not fail closed")
 
         dialect = runner.deterministic_language_check(
             "هذا شرح عام، لكن النتيجة مش واضحة حتى الآن ونحتاج إلى مثال آخر.", "ar-MSA"

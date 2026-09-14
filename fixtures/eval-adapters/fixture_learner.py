@@ -12,8 +12,26 @@ elif payload["type"] == "transfer":
     result = {"answer": "fixture-fail" if "FORCE_FAIL" in payload["task"] else "fixture-learned", "model": "fixture-learner"}
 else:
     done = not str(payload.get("simulation_id", "")).endswith("max-turn")
-    message = "I understand the complete unit."
+    utterance = "I understand the complete unit."
+    assessment_intent = "none"
     if str(payload.get("simulation_id", "")).endswith("artifact-blocking"):
-        message = "Draft: I understand.\n{"
-    result = {"message": message, "done": done, "model": "fixture-learner"}
+        utterance = "Draft: I understand.\n{"
+    if str(payload.get("simulation_id", "")).endswith("missing-intent"):
+        result = {"utterance": utterance, "done": done, "model": "fixture-learner"}
+    elif str(payload.get("simulation_id", "")).endswith("missing-done"):
+        result = {
+            "utterance": utterance,
+            "assessment_intent": assessment_intent,
+            "model": "fixture-learner",
+        }
+    else:
+        if str(payload.get("simulation_id", "")).endswith("contradictory-intent"):
+            utterance = "I do not agree to the quiz."
+            assessment_intent = "accept"
+        result = {
+            "utterance": utterance,
+            "assessment_intent": assessment_intent,
+            "done": done,
+            "model": "fixture-learner",
+        }
 json.dump(result, sys.stdout)
