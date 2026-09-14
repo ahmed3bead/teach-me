@@ -83,12 +83,21 @@ REPEATED_ARABIC_DIACRITIC = re.compile(r"([\u064b-\u065f])\1+")
 ARABIC_TOKEN = re.compile(r"[\u0600-\u06ff]+")
 SENSITIVE_ARGUMENT = re.compile(r"(?:api[-_]?key|access[-_]?token|password|passwd|private[-_]?key|client[-_]?secret|authorization)", re.I)
 ADAPTER_ENV_ALLOWLIST = frozenset({"PATH", "HOME", "CODEX_HOME", "LANG", "LC_ALL", "LC_CTYPE", "TMPDIR", "TEMP", "TMP"})
+OPENAI_API_KEY_ENV = "OPENAI_API_KEY"
 
 
 def safe_adapter_command(command: str) -> list[str]:
     parts = shlex.split(command)
-    if not parts or any(SENSITIVE_ARGUMENT.search(part) for part in parts):
-        raise RuntimeError("adapter command is empty or contains credential-bearing arguments")
+    if not parts: raise RuntimeError("adapter command is empty")
+    index = 0
+    while index < len(parts):
+        if parts[index] == "--api-key-env":
+            if index + 1 >= len(parts) or parts[index + 1] != OPENAI_API_KEY_ENV:
+                raise RuntimeError("adapter API key option must name OPENAI_API_KEY")
+            index += 2
+            continue
+        if SENSITIVE_ARGUMENT.search(parts[index]): raise RuntimeError("adapter command contains credential-bearing arguments")
+        index += 1
     return parts
 
 
@@ -99,8 +108,13 @@ def stream_metadata(value: str | bytes | None) -> dict[str, Any]:
     return {"bytes": len(raw), "sha256": hashlib.sha256(raw).hexdigest()}
 
 
-def adapter_environment(source: dict[str, str]) -> dict[str, str]:
-    return {name: source[name] for name in ADAPTER_ENV_ALLOWLIST if source.get(name)}
+def adapter_environment(source: dict[str, str], api_key_env: str | None = None) -> dict[str, str]:
+    environment = {name: source[name] for name in ADAPTER_ENV_ALLOWLIST if source.get(name)}
+    if api_key_env is not None:
+        if api_key_env != OPENAI_API_KEY_ENV: raise RuntimeError("only OPENAI_API_KEY may be passed to an adapter")
+        if not source.get(api_key_env): raise RuntimeError("requested adapter API key environment variable is missing")
+        environment[api_key_env] = source[api_key_env]
+    return environment
 
 
 class AdapterInvocationError(RuntimeError):
@@ -123,7 +137,7 @@ def payload_journal_fields(payload: dict[str, Any]) -> dict[str, Any]:
             "turn_index": payload.get("turn_index")}
 
 
-def invoke_once(command: str, payload: dict[str, Any], timeout: int, role: str) -> tuple[dict[str, Any], dict[str, Any]]:
+def invoke_once(command: str, payload: dict[str, Any], timeout: int, role: str, api_key_env: str | None = None) -> tuple[dict[str, Any], dict[str, Any]]:
     """Invoke once and preserve an independently auditable command journal entry."""
     started_at = datetime.now(timezone.utc)
     started = time.monotonic()
@@ -135,7 +149,7 @@ def invoke_once(command: str, payload: dict[str, Any], timeout: int, role: str) 
             capture_output=True,
             timeout=timeout,
             check=False,
-            env=adapter_environment(dict(os.environ)),
+            env=adapter_environment(dict(os.environ), api_key_env),
         )
     except subprocess.TimeoutExpired as exc:
         record = {
@@ -143,6 +157,7 @@ def invoke_once(command: str, payload: dict[str, Any], timeout: int, role: str) 
             "started_at": started_at.isoformat(),
             "duration_seconds": time.monotonic() - started,
             "command": safe_adapter_command(command),
+            "credential_env": api_key_env,
             **payload_journal_fields(payload),
             "stdout": stream_metadata(exc.stdout),
             "stderr": stream_metadata(exc.stderr),
@@ -156,6 +171,7 @@ def invoke_once(command: str, payload: dict[str, Any], timeout: int, role: str) 
         "completed_at": datetime.now(timezone.utc).isoformat(),
         "duration_seconds": time.monotonic() - started,
         "command": safe_adapter_command(command),
+        "credential_env": api_key_env,
         **payload_journal_fields(payload),
         "stdout": stream_metadata(completed.stdout),
         "stderr": stream_metadata(completed.stderr),
@@ -189,6 +205,7 @@ def invoke_protocol(
     protocol_retries: int,
     validator: Any | None = None,
     on_record: Any | None = None,
+    api_key_env: str | None = None,
 ) -> tuple[dict[str, Any], list[dict[str, Any]], Any]:
     """Retry only transport/malformed protocol failures, never content or guard failures."""
     records: list[dict[str, Any]] = []
@@ -202,7 +219,7 @@ def invoke_protocol(
                 "feedback": "Return one well-formed object matching the documented adapter protocol.",
             }
         try:
-            output, record = invoke_once(command, attempt_payload, timeout, role)
+            output, record = invoke_once(command, attempt_payload, timeout, role, api_key_env)
             records.append(record)
             if on_record: on_record(record)
             try: validated = validator(output) if validator else None
@@ -770,10 +787,13 @@ def validate_model_evidence(output: dict[str, Any], role: str) -> None:
     if not all(isinstance(timing[key], str) and timing[key] for key in ("started_at", "completed_at")) or not isinstance(timing["duration_seconds"], (int, float)) or timing["duration_seconds"] < 0: raise RuntimeError(f"{role} timing malformed")
 
 
-def validate_release_model(output: dict[str, Any], role: str, release_evidence: bool) -> None:
+def validate_release_model(output: dict[str, Any], role: str, release_evidence: bool, expected_model: str) -> None:
     if not release_evidence: return
-    if output.get("model") != "codex/gpt-5.6-sol" or output.get("settings", {}).get("model") != "gpt-5.6-sol":
-        raise RuntimeError(f"{role} release evidence must use codex/gpt-5.6-sol with recorded settings")
+    if not re.fullmatch(r"[^/\s]+/[^/\s]+", expected_model):
+        raise RuntimeError(f"{role} expected model must be an exact provider/model identifier")
+    requested_model = expected_model.split("/", 1)[1]
+    if output.get("model") != expected_model or output.get("settings", {}).get("model") != requested_model:
+        raise RuntimeError(f"{role} release evidence does not match expected model {expected_model}")
 
 
 def validate_response_output(output: dict[str, Any]) -> str:
@@ -817,12 +837,20 @@ def main() -> int:
     parser.add_argument("--candidate-commit", default=None)
     parser.add_argument("--release-evidence", action="store_true")
     parser.add_argument("--resume", action="store_true")
+    parser.add_argument("--expected-response-model", default="codex/gpt-5.6-sol")
+    parser.add_argument("--expected-grader-model", default="codex/gpt-5.6-sol")
+    parser.add_argument("--response-api-key-env", default=None)
+    parser.add_argument("--grader-api-key-env", default=None)
     args = parser.parse_args()
 
     if not 0 <= args.pass_threshold <= 1:
         parser.error("--pass-threshold must be between 0 and 1")
     if not 0 <= args.protocol_retries <= 2:
         parser.error("--protocol-retries must be between 0 and 2")
+    if args.response_api_key_env not in {None, OPENAI_API_KEY_ENV} or args.grader_api_key_env not in {None, OPENAI_API_KEY_ENV}:
+        parser.error("adapter API key environment options accept only OPENAI_API_KEY")
+    if any(value and not os.environ.get(value) for value in (args.response_api_key_env, args.grader_api_key_env)):
+        parser.error("requested adapter API key environment variable is missing")
     paths = args.suites or (
         sorted((ROOT / "evals").glob("*.yaml"))
         + sorted((ROOT / "domain-packs").glob("*/evals.yaml"))
@@ -861,6 +889,8 @@ def main() -> int:
         "selected_case": args.case, "response_command": safe_adapter_command(args.response_command),
         "grader_command": safe_adapter_command(args.grader_command), "protocol_retries": args.protocol_retries,
         "timeout_seconds": args.timeout, "pass_threshold": args.pass_threshold,
+        "expected_response_model": args.expected_response_model, "expected_grader_model": args.expected_grader_model,
+        "response_credential_env": args.response_api_key_env, "grader_credential_env": args.grader_api_key_env,
     }
     configuration_sha256 = hashlib.sha256(json.dumps(run_configuration, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
     report: dict[str, Any] = {
@@ -869,7 +899,9 @@ def main() -> int:
         "verified_commit": git_verification, "run_id": f"behavioral-{generated_at.strftime('%Y%m%dT%H%M%S.%fZ')}",
         "generated_at": generated_at.isoformat(), "resume": {"requested": args.resume, "completed_case_keys": []},
         "run_configuration": run_configuration, "run_configuration_sha256": configuration_sha256,
-        "commands": {"response": safe_adapter_command(args.response_command), "grader": safe_adapter_command(args.grader_command), "protocol_retries": args.protocol_retries, "timeout_seconds": args.timeout},
+        "commands": {"response": safe_adapter_command(args.response_command), "grader": safe_adapter_command(args.grader_command),
+                     "response_credential_env": args.response_api_key_env, "grader_credential_env": args.grader_api_key_env,
+                     "protocol_retries": args.protocol_retries, "timeout_seconds": args.timeout},
         "instruction_sources": {}, "prompt_packets": {}, "invocations": invocation_journal, "results": results,
     }
     completed_keys: set[str] = set()
@@ -926,7 +958,7 @@ def main() -> int:
                 }
                 if pending_generation is not None and turn_index == active.get("turn"):
                     generated, records, response = pending_generation, pending_records, validate_response_output(pending_generation)
-                    validate_release_model(pending_generation, "response", args.release_evidence)
+                    validate_release_model(pending_generation, "response", args.release_evidence, args.expected_response_model)
                     pending_generation = None
                 else:
                     report["active_case"] = {"case_key": case_key, "stage": "response-invoking", "turn": turn_index, "attempts": [],
@@ -940,7 +972,8 @@ def main() -> int:
                         write_report(args.output, report)
                     generated, records, response = invoke_protocol(
                         args.response_command, generation_payload, args.timeout, "response", args.protocol_retries,
-                        lambda output: (validate_response_output(output), validate_release_model(output, "response", args.release_evidence))[0], checkpoint_response,
+                        lambda output: (validate_response_output(output), validate_release_model(output, "response", args.release_evidence, args.expected_response_model))[0],
+                        checkpoint_response, args.response_api_key_env,
                     )
                 report["active_case"].update({"stage": "response", "attempts": records})
                 write_report(args.output, report)
@@ -1023,8 +1056,9 @@ def main() -> int:
                 args.timeout,
                 "grader",
                 args.protocol_retries,
-                lambda output: (validate_model_evidence(output, "grader"), validate_release_model(output, "grader", args.release_evidence), validate_grade(output, case_expected, history, artifacts, checkpoint_criterion))[2],
+                lambda output: (validate_model_evidence(output, "grader"), validate_release_model(output, "grader", args.release_evidence, args.expected_grader_model), validate_grade(output, case_expected, history, artifacts, checkpoint_criterion))[2],
                 checkpoint_grader,
+                args.grader_api_key_env,
             )
             report["active_case"].update({"stage": "grader", "grader_attempts": grader_records})
             write_report(args.output, report)
@@ -1056,8 +1090,15 @@ def main() -> int:
                     "selected_attempts": selected_attempts,
                     "selected_attempt": selected_attempts[-1],
                     "deterministic_preflight_passed": deterministic_preflight_passed,
-                    "response_evidence": {**{key: generated.get(key) for key in ("model", "settings", "adapter_version", "invocation_id", "timing")}, "raw_result_ref": f"attempt_log:{selected_attempts[-1]}"},
-                    "grader_evidence": {key: graded.get(key) for key in ("model", "settings", "adapter_version", "raw_result", "invocation_id", "timing")},
+                    "response_evidence": {
+                        **{key: generated.get(key) for key in ("model", "settings", "adapter_version", "invocation_id", "timing")},
+                        **{key: generated[key] for key in ("usage", "api", "effective_prompt_sha256") if key in generated},
+                        "raw_result_ref": f"attempt_log:{selected_attempts[-1]}",
+                    },
+                    "grader_evidence": {
+                        **{key: graded.get(key) for key in ("model", "settings", "adapter_version", "raw_result", "invocation_id", "timing")},
+                        **{key: graded[key] for key in ("usage", "api", "effective_prompt_sha256") if key in graded},
+                    },
                     "artifacts": artifacts,
                 }
             )
