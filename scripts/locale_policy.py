@@ -9,9 +9,18 @@ import re
 CANONICAL_LOCALES = {"ar-MSA", "en"}
 LEGACY_LOCALE_ALIASES = {"ar-EG": "ar-MSA"}
 ARABIC_TEXT = re.compile(r"[\u0600-\u06ff]")
+
+
+def unicode_phrase_boundary(pattern: str) -> str:
+    """Wrap a phrase pattern so it cannot match inside a Unicode word."""
+    return rf"(?<!\w)(?:{pattern})(?!\w)"
+
+
 ENGLISH_REQUEST = re.compile(
-    r"(?:بال(?:لغة\s+)?(?:إنجليزي|الإنجليزي|انجليزي|الانجليزي|إنجليزية|الإنجليزية|انجليزية|الانجليزية)|"
-    r"(?:answer|respond|continue|teach|explain)\s+(?:me\s+)?in\s+english)",
+    unicode_phrase_boundary(
+        r"(?:بال(?:لغة\s+)?(?:إنجليزي|الإنجليزي|انجليزي|الانجليزي|إنجليزية|الإنجليزية|انجليزية|الانجليزية)|"
+        r"(?:answer|respond|continue|teach|explain)\s+(?:me\s+)?in\s+english)"
+    ),
     flags=re.IGNORECASE,
 )
 

@@ -6,4 +6,13 @@ import sys
 
 
 payload = json.load(sys.stdin)
-json.dump({"response": "fixture complete lesson", "model": "fixture-teacher"}, sys.stdout)
+response = "This complete fixture lesson explains the fictional rule clearly before offering any optional check."
+if str(payload.get("simulation_id", "")).endswith("guard-blocking"):
+    response = "Answer this question now: what does the fictional rule map to after this brief explanation?"
+json.dump(
+    {
+        "response": response,
+        "model": "fixture-teacher",
+    },
+    sys.stdout,
+)
