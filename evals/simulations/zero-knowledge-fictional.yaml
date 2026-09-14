@@ -7,10 +7,10 @@ simulations:
     max_turns: 7
     learner_persona: "متعلم بالغ يبدأ بصفر معرفة عن نظام Luma الخيالي. لا تستخدم أي معرفة غير موجودة في كلام المدرس. تحدث بالفصحى المبسطة."
     learner_behaviors:
-      - "بعد أول شرح حقيقي، عبّر مرة واحدة إن الفرق بين القاعدة والاستثناء مش واضح."
-      - "لو المدرس سألك أسئلة قبل ما يشرح وحدة كاملة، ارفض بلطف واطلب استكمال الشرح."
+      - "بعد أول شرح حقيقي، عبّر مرة واحدة عن أن الفرق بين القاعدة والاستثناء غير واضح."
+      - "إذا سألك المدرس أسئلة قبل أن يشرح وحدة كاملة، ارفض بلطف واطلب استكمال الشرح."
       - "بعد شرح القواعد والأمثلة كوحدة كاملة، وافق على فحص فهم قصير."
-      - "جاوب من المعلومات التي شرحها المدرس فقط، واظهر أي نقطة ما زالت غير واضحة."
+      - "أجب من المعلومات التي شرحها المدرس فقط، وأظهر أي نقطة ما زالت غير واضحة."
     initial_request: "أنا معرفش أي حاجة عن نظام Luma. علّمني من الصفر بالفصحى المبسطة عشان أعرف أوجّه الصناديق صح."
     teaching_material: |
       نظام Luma خيالي ولا توجد عنه معرفة خارج هذا السيناريو.
@@ -22,12 +22,20 @@ simulations:
     baseline_task: "قبل أي شرح: أين يذهب صندوق أزرق وزنه 6 كجم، وصندوق أصفر عليه مثلث؟ اشرح السبب."
     transfer_task: "حالة جديدة: صندوق أزرق 3 كجم، صندوق أزرق 8 كجم، صندوق أصفر 9 كجم، وصندوق أصفر عليه مثلث. وجّه الأربعة واشرح ترتيب قرارك."
     expected:
-      - "the baseline shows no invented Luma knowledge"
-      - "the teacher explains purpose, rules, exceptions, and a worked example before routine assessment"
-      - "the teacher changes representation when the learner reports confusion"
-      - "the learner is not pressured when declining an early check"
-      - "the transfer answer correctly routes all four unseen cases and explains exception priority"
-      - "the interaction remains clear simplified Modern Standard Arabic without fabricated mastery"
+      - evidence_scope: baseline
+        criterion: "the baseline shows no invented Luma knowledge"
+      - evidence_scope: transcript
+        criterion: "the teacher explains purpose, rules, exceptions, and a worked example before routine assessment"
+      - evidence_scope: transcript
+        criterion: "the teacher changes representation when the learner reports confusion"
+      - evidence_scope: transcript
+        criterion: "the learner is not pressured when declining an early check"
+      - evidence_scope: transfer
+        criterion: "the transfer answer correctly routes all four unseen cases and explains exception priority"
+      - evidence_scope: transcript
+        criterion: "the interaction remains clear simplified Modern Standard Arabic without fabricated mastery"
+      - evidence_scope: transcript
+        criterion: "the teacher stays within the authorized fictional material and adds no invented rule, exception, or meaning"
     minimum_gain: 0.6
     minimum_transfer: 0.8
   - id: vela-constraints-en
@@ -48,9 +56,15 @@ simulations:
     baseline_task: "Before teaching, validate `cache | local | 6` and explain how it competes with a global priority-5 rule."
     transfer_task: "Validate and order these fresh rules: `audit | global | 3`, `cache | local | 2`, `sync | local | 5`, and `backup | | 4`. Explain validity and execution order."
     expected:
-      - "the learner does not use fictional rules before they are taught"
-      - "the teacher provides a causal model and worked example rather than a definition dump"
-      - "scope versus priority confusion is diagnosed and repaired with a different representation"
-      - "the transfer answer rejects the missing scope and orders valid rules by scope then priority"
+      - evidence_scope: baseline
+        criterion: "the learner does not use fictional rules before they are taught"
+      - evidence_scope: transcript
+        criterion: "the teacher provides a causal model and worked example rather than a definition dump"
+      - evidence_scope: transcript
+        criterion: "scope versus priority confusion is diagnosed and repaired with a different representation"
+      - evidence_scope: transfer
+        criterion: "the transfer answer rejects the missing scope and orders valid rules by scope then priority"
+      - evidence_scope: transcript
+        criterion: "the teacher stays within the authorized fictional material and adds no invented rule, exception, or meaning"
     minimum_gain: 0.6
     minimum_transfer: 0.8

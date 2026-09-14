@@ -4,12 +4,14 @@
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
 
 import run_behavioral_evals as runner
+from locale_policy import unicode_phrase_boundary
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -398,6 +400,36 @@ def main() -> int:
             raise AssertionError("text-quality check was not general across unseen Arabic tokens")
         if not runner.deterministic_text_quality_check("هذا مثال يعلّم الفكرة بعلامات سليمة.")["passed"]:
             raise AssertionError("text-quality check rejected well-formed Arabic")
+
+        arabic_phrase = re.compile(unicode_phrase_boundary("ليه"))
+        for standalone in ("ليه", "ليه؟"):
+            if not arabic_phrase.search(standalone):
+                raise AssertionError(f"standalone Arabic token was missed: {standalone}")
+        for embedded in ("إليه", "عليه", "إليهم"):
+            if arabic_phrase.search(embedded):
+                raise AssertionError(f"internal Arabic characters caused a phrase match: {embedded}")
+
+        for standalone in ("ليه؟", "ليه تغيرت النتيجة؟"):
+            if runner.deterministic_assessment_check(standalone, [])["passed"]:
+                raise AssertionError(f"standalone Arabic assessment phrase was missed: {standalone}")
+        for embedded in ("اتجه إليه؟", "هل الطريق عليه آمن؟", "وصلت إليهم؟"):
+            if not runner.deterministic_assessment_check(embedded, [])["passed"]:
+                raise AssertionError(f"internal Arabic characters caused a phrase false positive: {embedded}")
+        if runner.deterministic_assessment_check("Why did the value change?", [])["passed"]:
+            raise AssertionError("existing English assessment phrase was missed")
+        if not runner.learner_opted_into_assessment([{"role": "user", "content": "Please test me."}]):
+            raise AssertionError("existing English assessment opt-in phrase was missed")
+
+        dialect = runner.deterministic_language_check(
+            "هذا شرح عام، لكن النتيجة مش واضحة حتى الآن ونحتاج إلى مثال آخر.", "ar-MSA"
+        )
+        if dialect["passed"] or "مش" not in dialect["reason"]:
+            raise AssertionError("standalone dialect token was not rejected")
+        standard = runner.deterministic_language_check(
+            "هذا المشروع يشرح الفكرة بطريقة واضحة، ويعرض نتيجة صحيحة ومثالا مفيدا للمتعلم.", "ar-MSA"
+        )
+        if not standard["passed"] or "مش" in standard["reason"]:
+            raise AssertionError("dialect characters embedded in a standard Arabic word were falsely rejected")
 
     print("Teach Me behavioral eval runner tests passed (pass and critical-fail paths)")
     return 0

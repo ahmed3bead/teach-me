@@ -73,7 +73,7 @@ python3 scripts/run_behavioral_evals.py \
 
 ## Dynamic zero-knowledge simulation
 
-The learner adapter never receives hidden fictional teaching material. This makes leakage visible and lets the runner measure baseline-to-transfer gain.
+The learner adapter never receives hidden fictional teaching material. This makes leakage visible and lets the runner measure baseline-to-transfer gain. The saved transcript includes the learner's closing message even when it ends the dialogue.
 
 - `type: baseline`: return `{"answer":"...","model":"..."}` from persona and baseline task only.
 - `type: dialogue`: return `{"message":"...","done":false,"model":"..."}`. Set `done` true only after the scripted learner behavior has reached a natural endpoint.
@@ -91,7 +91,7 @@ python3 scripts/run_agent_simulations.py \
   --output reports/agent-simulations.json
 ```
 
-The run fails when pass rate is below 90%, any critical simulation fails, transfer is below its scenario threshold, or learning gain is below its threshold. Fixture adapters only test plumbing and must never be reported as model-quality evidence.
+The run fails when pass rate is below 90%, any critical simulation fails, transfer is below its scenario threshold, learning gain is below its threshold, or an authoritative deterministic guard fails. Dynamic reports record hard checks for the closed-book learner payload boundary, Arabic/English output language, Unicode text quality, assessment opt-in, teacher-response completeness, and unsupported mastery claims. The model grader cannot override them. Fixture adapters only test plumbing and must never be reported as model-quality evidence.
 
 ## Release evidence
 

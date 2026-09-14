@@ -6,6 +6,9 @@ import sys
 
 
 payload = json.load(sys.stdin)
+if str(payload.get("simulation_id", "")).endswith("grader-failure"):
+    print("synthetic grader protocol failure", file=sys.stderr)
+    raise SystemExit(2)
 passed = payload["transfer_answer"] == "fixture-learned"
 json.dump({
     "baseline_score": 0.0,

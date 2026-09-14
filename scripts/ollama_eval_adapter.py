@@ -11,12 +11,13 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 from pathlib import Path
 from typing import Any
 from urllib import error, parse, request
 
-from locale_policy import canonical_locale, infer_locale
+from locale_policy import canonical_locale, infer_locale, unicode_phrase_boundary
 
 
 LOCAL_HOSTS = {"localhost", "127.0.0.1", "::1"}
@@ -39,6 +40,19 @@ ARABIC_TEACHER_CONTEXT = """
 - عند شرح الكسور لطفل، ابدأ بمعنى «أجزاء متساوية» مستخدمًا شريطًا من الورق له جزآن متساويان، ثم سمِّ النصف أو الربع. لا تستخدم الأكل أو شيئًا غير مألوف.
 
 للطفل: استخدم جملًا قصيرة، وأمثلة محسوسة، ومفهومًا واحدًا قبل الرموز والاستثناءات، ومن دون أسئلة تشعره بأنه في امتحان.
+""".strip()
+
+SIMULATION_TEACHER_CONTEXT = """
+Teach one compact, useful unit before assessment. Start from the learner's stated knowledge level. Use a simple causal
+model and one worked scenario. Treat fictional labels as opaque unless the authorized material defines them. When the
+learner reports confusion, diagnose the exact confusion and use a materially different representation. Do not repeat
+or lightly paraphrase the previous explanation. Choose a concrete example, spatial description, step-by-step worked
+example, comparison, or decision table that the dialogue has not already used. Apply explicit exceptions and
+higher-priority constraints before general rules.
+Offer a short check only after the explanation, and do not include its first question until the learner explicitly opts
+in. Never claim mastery without demonstrated evidence. Keep foreign and technical terms in their original language.
+For ar-MSA, all learner-facing prose must be natural simplified Modern Standard Arabic with no local dialect. Do not
+mirror dialect from learner messages, and never transliterate foreign or technical terms into Arabic script.
 """.strip()
 
 
@@ -73,9 +87,11 @@ def load_skill_context(skill_root: Path) -> str:
 
 
 def teacher_skill_context(skill_root: Path, payload: dict[str, Any]) -> str:
-    """Use a compact Arabic rendering so small local models do not mirror an English-heavy context."""
+    """Use a compact simulation contract or the normal locale-appropriate skill context."""
     if not (skill_root / "SKILL.md").is_file():
         raise ValueError(f"SKILL.md not found under {skill_root}")
+    if payload.get("type") == "teach":
+        return SIMULATION_TEACHER_CONTEXT
     if requested_locale(payload).lower().replace("_", "-").startswith("ar"):
         return ARABIC_TEACHER_CONTEXT
     return load_skill_context(skill_root)
@@ -100,10 +116,115 @@ def child_lesson_requested(payload: dict[str, Any]) -> bool:
     return any(marker in combined for marker in ("طفل", "ابتدائي", "primary school", "child"))
 
 
+def learner_opted_in(payload: dict[str, Any]) -> bool:
+    message = str(payload.get("learner_message", "")).casefold()
+    if requested_locale(payload) == "ar-MSA":
+        return bool(re.search(unicode_phrase_boundary(r"(?:نعم|أجل|موافق|مستعد|حسنا)"), message))
+    return bool(re.search(unicode_phrase_boundary(r"(?:yes|sure|ready|okay|ok|please do|let's do it)"), message))
+
+
 def seed_for_payload(base_seed: int, payload: dict[str, Any]) -> int:
     """Use a reproducible but distinct seed for the single corrective retry."""
     attempt = payload.get("attempt_index", 1)
     return base_seed + (max(int(attempt) - 1, 0) * 1009) if isinstance(attempt, int) else base_seed
+
+
+def simulation_score_error(result: dict[str, Any]) -> str | None:
+    """Explain an invalid single-phase score without coercing it into a possible false pass."""
+    value = result.get("score")
+    if isinstance(value, bool) or not isinstance(value, (int, float)) or not 0 <= value <= 1:
+        return f"score must be a JSON number from 0 to 1, not {type(value).__name__}"
+    reason = result.get("reason")
+    if not isinstance(reason, str) or not reason.strip():
+        return "score reason must be a non-empty string"
+    return None
+
+
+def simulation_score_payload(payload: dict[str, Any], phase: str) -> dict[str, Any]:
+    """Build an isolated scoring packet so baseline evidence cannot affect transfer or vice versa."""
+    if phase == "baseline":
+        return {
+            "type": "grade",
+            "evaluation_mode": "simulation-score",
+            "score_phase": phase,
+            "locale": payload.get("locale"),
+            "task": payload.get("baseline_task"),
+            "answer": payload.get("baseline_answer"),
+            "teaching_material": payload.get("teaching_material"),
+        }
+    if phase == "transfer":
+        return {
+            "type": "grade",
+            "evaluation_mode": "simulation-score",
+            "score_phase": phase,
+            "locale": payload.get("locale"),
+            "task": payload.get("transfer_task"),
+            "answer": payload.get("transfer_answer"),
+            "teaching_material": payload.get("teaching_material"),
+        }
+    raise ValueError(f"unsupported simulation score phase: {phase}")
+
+
+def simulation_criterion_payload(payload: dict[str, Any], specification: dict[str, Any]) -> dict[str, Any]:
+    """Build the smallest evidence packet authorized for one structured criterion."""
+    if not isinstance(specification, dict):
+        raise ValueError("simulation criteria must declare evidence_scope and criterion")
+    scope = specification.get("evidence_scope")
+    criterion = specification.get("criterion")
+    if scope not in {"baseline", "transcript", "transfer"} or not isinstance(criterion, str):
+        raise ValueError("invalid simulation criterion specification")
+    result: dict[str, Any] = {
+        "type": "grade",
+        "evaluation_mode": "simulation-criterion",
+        "locale": payload.get("locale"),
+        "simulation_id": payload.get("simulation_id"),
+        "evidence_scope": scope,
+        "expected": [criterion],
+    }
+    if scope == "baseline":
+        result.update({"baseline_task": payload.get("baseline_task"), "baseline_answer": payload.get("baseline_answer")})
+    elif scope == "transcript":
+        result.update({"teaching_material": payload.get("teaching_material"), "transcript": payload.get("transcript")})
+    else:
+        result.update(
+            {
+                "teaching_material": payload.get("teaching_material"),
+                "transfer_task": payload.get("transfer_task"),
+                "transfer_answer": payload.get("transfer_answer"),
+            }
+        )
+    return result
+
+
+def grader_decision_error(result: dict[str, Any], criterion: str) -> str | None:
+    """Reject structurally plausible decisions whose reason supplies no evidence."""
+    items = result.get("results")
+    if not isinstance(items, list) or len(items) != 1 or not isinstance(items[0], dict):
+        return "grader must return exactly one criterion result"
+    verdict = items[0].get("verdict")
+    if not isinstance(verdict, str) or verdict not in {"pass", "fail"}:
+        return "criterion verdict must be the string 'pass' or 'fail'"
+    reason = items[0].get("reason")
+    if not isinstance(reason, str) or not reason.strip():
+        return "criterion reason must be non-empty"
+    normalized_reason = " ".join(reason.casefold().strip(" .:;\"'").split())
+    normalized_criterion = " ".join(criterion.casefold().strip(" .:;\"'").split())
+    if normalized_reason == normalized_criterion:
+        return "criterion reason merely repeats the criterion without evidence"
+    return None
+
+
+def derive_simulation_criterion(result: dict[str, Any], criterion: str) -> dict[str, Any]:
+    """Validate one model verdict and derive the runner's internal Boolean."""
+    error = grader_decision_error(result, criterion)
+    if error:
+        raise ValueError(error)
+    item = result["results"][0]
+    return {"passed": item["verdict"] == "pass", "reason": item["reason"]}
+
+
+def retryable_structured_output_error(exc: RuntimeError) -> bool:
+    return "valid structured JSON" in str(exc) or "structured output must be an object" in str(exc)
 
 
 def locale_instruction(locale: str) -> str:
@@ -179,6 +300,46 @@ def teacher_output_contract(payload: dict[str, Any]) -> str:
     return "\n".join(parts)
 
 
+def simulation_teacher_contract(payload: dict[str, Any]) -> str:
+    """Repeat the closed-book boundary after broad skill context so it remains authoritative."""
+    first_turn = payload.get("turn_index") == 1
+    opted_in = learner_opted_in(payload)
+    locale_rule = (
+        "- Write learner-facing output only in natural simplified Modern Standard Arabic. Do not mirror dialectal "
+        "function words, negation, or verb forms from learner messages. Keep foreign and technical terms in their "
+        "original language and never transliterate them into Arabic script."
+        if requested_locale(payload) == "ar-MSA"
+        else "- Write learner-facing output only in English."
+    )
+    structure = (
+        "- On turn one: state the system's purpose, list the decision steps in order, apply every step to one complete example, then offer an optional short check without including its first question."
+        if first_turn
+        else (
+            "- The learner explicitly opted in; ask exactly one short application question grounded in the material, and do not declare mastery from the answer alone."
+            if opted_in
+            else "- Address the learner's current confusion with a materially different representation that has not already appeared in the dialogue. A repeated or lightly paraphrased explanation is not a repair. Reconnect the new representation to the decision steps, then offer an optional short check without including its first question."
+        )
+    )
+    return "\n".join(
+        [
+            "CLOSED-BOOK SIMULATION BOUNDARY:",
+            "- authorized_teaching_material is the only factual source for the fictional system.",
+            "- Fictional names and labels have no implied real-world meaning; never say where they operate or what they represent unless the material says so.",
+            "- Do not appeal to conventions, definitions, or examples from another real or fictional system.",
+            "- Add no rule, exception, or override, and distinguish each precedence step from the next one.",
+            "- Apply every explicit exception or higher-priority constraint before the general rule it overrides.",
+            locale_rule,
+            "- Keep the response between 100 and 180 words. Use one worked scenario containing enough items to demonstrate every decision and precedence dimension.",
+            (
+                "- After the short question, wait for the learner's answer."
+                if opted_in
+                else "- End with a brief optional-check invitation in the output language; include no question or task."
+            ),
+            structure,
+        ]
+    )
+
+
 def text_schema(field: str) -> dict[str, Any]:
     return {
         "type": "object",
@@ -188,36 +349,62 @@ def text_schema(field: str) -> dict[str, Any]:
     }
 
 
-def grade_schema(count: int, simulation: bool = False) -> dict[str, Any]:
-    properties: dict[str, Any] = {
-        "results": {
-            "type": "array",
-            "minItems": count,
-            "maxItems": count,
-            "items": {
-                "type": "object",
-                "properties": {
-                    "passed": {"type": "boolean"},
-                    "reason": {"type": "string", "minLength": 1, "maxLength": 300},
-                },
-                "required": ["passed", "reason"],
-                "additionalProperties": False,
-            },
-        }
-    }
-    required = ["results"]
-    if simulation:
-        properties.update(
-            {
-                "baseline_score": {"type": "number", "minimum": 0, "maximum": 1},
-                "transfer_score": {"type": "number", "minimum": 0, "maximum": 1},
-            }
-        )
-        required = ["baseline_score", "transfer_score", "results"]
+def grade_schema(count: int) -> dict[str, Any]:
     return {
         "type": "object",
-        "properties": properties,
-        "required": required,
+        "properties": {
+            "results": {
+                "type": "array",
+                "minItems": count,
+                "maxItems": count,
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "passed": {"type": "boolean"},
+                        "reason": {"type": "string", "minLength": 1, "maxLength": 300},
+                    },
+                    "required": ["passed", "reason"],
+                    "additionalProperties": False,
+                },
+            }
+        },
+        "required": ["results"],
+        "additionalProperties": False,
+    }
+
+
+def simulation_score_schema() -> dict[str, Any]:
+    return {
+        "type": "object",
+        "properties": {
+            "score": {"type": "number", "minimum": 0, "maximum": 1},
+            "reason": {"type": "string", "minLength": 1, "maxLength": 300},
+        },
+        "required": ["score", "reason"],
+        "additionalProperties": False,
+    }
+
+
+def simulation_criterion_schema() -> dict[str, Any]:
+    return {
+        "type": "object",
+        "properties": {
+            "results": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 1,
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "verdict": {"type": "string", "enum": ["pass", "fail"]},
+                        "reason": {"type": "string", "minLength": 1, "maxLength": 300},
+                    },
+                    "required": ["verdict", "reason"],
+                    "additionalProperties": False,
+                },
+            }
+        },
+        "required": ["results"],
         "additionalProperties": False,
     }
 
@@ -253,16 +440,18 @@ def messages_and_schema(payload: dict[str, Any], skill_context: str | None) -> t
         return messages, text_schema("response"), 0.2
 
     if kind == "teach":
-        output_contract = teacher_output_contract(payload)
         normalized = requested_locale(payload)
-        if normalized == "ar-MSA":
-            intro = "أنت معلّم Teach Me في محاكاة مغلقة المصادر. التزم بالعقد، وعلّم بلغة طبيعية، ولا تذكر نظام الاختبار."
-        else:
-            intro = (
-                "You are the Teach Me teaching agent in a closed-book simulation. Follow the skill, "
-                "teach naturally in the requested locale, and never discuss the test harness."
-            )
-        system = intro + "\n\n" + (skill_context or "") + f"\n\n{output_contract}"
+        intro = (
+            "You are the Teach Me teaching agent in a closed-book simulation. Use only facts explicitly stated in "
+            "authorized_teaching_material. Never invent real-world meanings, rules, exceptions, or overrides. Teach "
+            "naturally in the required learner-facing language and never discuss the test harness."
+        )
+        system = (
+            intro
+            + "\n\n"
+            + (skill_context or "")
+            + f"\n\n{simulation_teacher_contract(payload)}"
+        )
         history = payload.get("history", [])
         content = {
             "locale": normalized,
@@ -271,32 +460,69 @@ def messages_and_schema(payload: dict[str, Any], skill_context: str | None) -> t
             "current_learner_message": payload.get("learner_message"),
             "turn": payload.get("turn_index"),
             "maximum_turns": payload.get("max_turns"),
+            "response_requirements": [
+                "Use only authorized_teaching_material and deductions directly demonstrated from it.",
+                "Explain the operational decision path, then demonstrate every step on one complete example.",
+                "If dialogue_so_far shows confusion, name the mistaken comparison and repair it with a different representation.",
+            ],
         }
         return [
             {"role": "system", "content": system},
             {"role": "user", "content": json.dumps(content, ensure_ascii=False)},
-        ], text_schema("response"), 0.4
+        ], text_schema("response"), 0.0
 
     if kind in {"baseline", "dialogue", "transfer"}:
-        system = (
-            "Act only as the described learner. Never use hidden or outside knowledge. "
-            "Admit uncertainty naturally and follow the learner behaviors without quoting them.\n"
-            f"Persona: {payload.get('learner_persona', '')}\n"
-            f"Behaviors: {json.dumps(payload.get('learner_behaviors', []), ensure_ascii=False)}"
+        normalized = requested_locale(payload)
+        persona = payload.get("learner_persona", "")
+        behaviors = json.dumps(payload.get("learner_behaviors", []), ensure_ascii=False)
+        language_rule = (
+            "Write every learner utterance in natural simplified Modern Standard Arabic, even if the initial request, "
+            "persona, or dialogue uses dialect. Do not mirror dialectal function words, negation, or verb forms. Keep "
+            "foreign and technical terms in their original language and never transliterate them into Arabic script."
+            if normalized == "ar-MSA"
+            else "Write every learner utterance in English. Keep foreign and technical terms in their original language."
         )
-        if kind == "baseline":
-            user = f"Instruction: {payload.get('instruction', '')}\nTask: {payload.get('task', '')}"
-            return [{"role": "system", "content": system}, {"role": "user", "content": user}], text_schema("answer"), 0.2
+        system = (
+            "Act only as the described learner. " + language_rule + " Never use hidden or outside knowledge and never "
+            "guess a fictional rule. Perform each scripted confusion or clarification request at most once, acknowledge "
+            "when a new explanation resolves it, and advance. Do not quote instructions or emit HTML, template markers, "
+            "evaluator commentary, drafts, corrections, role labels, or JSON syntax inside the answer/message string. "
+            "The string must contain exactly one natural learner utterance.\n"
+            f"Persona: {persona}\nBehaviors: {behaviors}"
+        )
+        if payload.get("adapter_retry_feedback"):
+            retry_rule = "\nOUTPUT-SHAPE CORRECTION: The previous output was not valid JSON. Put one learner utterance in the required fields only, with no HINT, draft, or text after the JSON object."
+            system += retry_rule
         if kind == "transfer":
+            system = (
+                "You are the same learner after the lesson. " + language_rule + " Solve the fresh task using only the "
+                "teaching transcript, with no outside or hidden material. Apply every validation and precedence rule "
+                "stated in the transcript before writing the result."
+            )
+            if payload.get("adapter_retry_feedback"):
+                system += retry_rule
+        elif kind == "dialogue":
+            current_behavior = payload.get("current_behavior")
+            system += (
+                "\nONLY CURRENT BEHAVIOR: " + (str(current_behavior) if current_behavior else "No scripted behavior remains.")
+                + " Perform it at most once. If its condition did not occur, briefly acknowledge what is clear and move on. "
+                "When none remains and the teacher asks a check after your opt-in, answer from the transcript and set done=true."
+            )
+        if kind == "baseline":
+            boundary = "The fictional material has not been taught. Do not solve or guess; clearly state in the required learner-facing language that you do not know its rules yet."
+            user = f"{boundary}\nInstruction: {payload.get('instruction', '')}\nTask: {payload.get('task', '')}"
+            return [{"role": "system", "content": system}, {"role": "user", "content": user}], text_schema("answer"), 0.0
+        if kind == "transfer":
+            transfer_instruction = "Answer the fresh task directly and independently using only the teaching transcript and the required learner-facing language. First validate every item and remove invalid items. Then identify each precedence dimension exactly as taught and apply those dimensions in their stated order; compare a later dimension only when the earlier one ties. State validity, final order, and reasons. Return one final answer with no draft or correction. Do not ask for clarification or continue the dialogue."
             user = json.dumps(
                 {
-                    "instruction": payload.get("instruction"),
+                    "instruction": transfer_instruction,
                     "teaching_transcript": payload.get("history", []),
                     "fresh_task": payload.get("task"),
                 },
                 ensure_ascii=False,
             )
-            return [{"role": "system", "content": system}, {"role": "user", "content": user}], text_schema("answer"), 0.2
+            return [{"role": "system", "content": system}, {"role": "user", "content": user}], text_schema("answer"), 0.0
         schema = text_schema("message")
         schema["properties"]["done"] = {"type": "boolean"}
         schema["required"].append("done")
@@ -307,33 +533,88 @@ def messages_and_schema(payload: dict[str, Any], skill_context: str | None) -> t
                 "turn": payload.get("turn_index"),
                 "maximum_turns": payload.get("max_turns"),
                 "task": "Write the learner's next natural message. Set done=true only at a natural endpoint.",
+                "current_behavior": payload.get("current_behavior"),
+                "completed_behaviors": payload.get("completed_behaviors", []),
             },
             ensure_ascii=False,
         )
-        return [{"role": "system", "content": system}, {"role": "user", "content": user}], schema, 0.2
+        return [{"role": "system", "content": system}, {"role": "user", "content": user}], schema, 0.0
+
+    if kind == "grade" and payload.get("evaluation_mode") == "simulation-score":
+        phase = payload.get("score_phase")
+        phase_rule = (
+            "This is pre-teaching task performance. An answer that admits missing knowledge instead of resolving the task scores 0, even when that restraint is appropriate."
+            if phase == "baseline"
+            else "This is post-teaching transfer performance. Score only correctness and completeness on the fresh task against the authorized material."
+        )
+        correction = (
+            f" Previous output was invalid: {payload['score_format_correction']}. Return a numeric score, never a Boolean."
+            if payload.get("score_format_correction")
+            else ""
+        )
+        system = (
+            "You are a strict task-performance scorer. Use only the supplied task, answer, and authorized material. "
+            + phase_rule
+            + " Score 0 for no correct task resolution and 1 only for a fully correct resolution; use a proportional number for partial correctness. Cite concrete evidence in one concise reason."
+            + correction
+        )
+        return [
+            {"role": "system", "content": system},
+            {"role": "user", "content": json.dumps(payload, ensure_ascii=False)},
+        ], simulation_score_schema(), 0.0
+
+    if kind == "simulation-grade":
+        raise ValueError("simulation-grade must be decomposed into isolated score and criterion requests")
 
     expected = payload.get("expected", [])
-    simulation = kind == "simulation-grade"
-    if requested_locale(payload) == "ar-MSA":
+    simulation_criterion = payload.get("evaluation_mode") == "simulation-criterion"
+    criterion_evidence_rule_en = (
+        "This call judges one simulation criterion only. The payload contains only the evidence authorized by "
+        "evidence_scope. Judge the displayed criterion solely from that packet, and do not demand evidence from a "
+        "different phase. "
+        if simulation_criterion
+        else ""
+    )
+    score_correction_en = (
+        f" The previous scoring output was invalid: {payload['score_format_correction']}. Correct only the output shape now."
+        if payload.get("score_format_correction")
+        else ""
+    )
+    criterion_correction_en = (
+        f" The previous criterion decision was invalid: {payload['criterion_retry_feedback']}. Re-evaluate and cite exact observable evidence."
+        if payload.get("criterion_retry_feedback")
+        else ""
+    )
+    if requested_locale(payload) == "ar-MSA" and not simulation_criterion:
         single_criterion = "يوجد معيار واحد فقط؛ أعد حكمًا واحدًا عليه ولا تقسّمه إلى معايير فرعية. " if len(expected) == 1 else ""
         system = (
             "أنت مصحح مستقل وصارم. قيّم الدليل الظاهر فقط في الرد أو الحوار، ولا تفترض سلوكًا غير مكتوب. "
             + single_criterion
-            + "أعد نتيجة لكل معيار بالترتيب نفسه. اجعل كل سبب جملة واحدة موجزة، واذكر فيها دليلًا محددًا من الرد أو ما ينقصه. "
+            + "passed=true يعني أن عبارة المعيار صحيحة وفق الدليل، وpassed=false يعني أنها غير متحققة. "
+            "أعد نتيجة لكل معيار بالترتيب نفسه. اجعل كل سبب جملة واحدة موجزة، واذكر فيها دليلًا محددًا من الرد أو ما ينقصه. "
             "قيّم كل معيار منفصلًا، ولا تنقل حكم معيار إلى سبب معيار آخر. ممنوع نسخ نص المعيار نفسه على أنه السبب. "
             "الدعوة الاختيارية لاختبار لاحق صحيحة عندما تنتظر الموافقة ولا تتضمن سؤال الاختبار. لا تطلب وجود سؤال قبل الموافقة. "
             "لا تصف مثالًا عاديًا بأنه محرج أو ضار ما لم يحتوِ الرد نفسه على لوم أو سخرية أو ضغط."
         )
     else:
+        decision_rule = (
+            "Set verdict to 'pass' exactly when the criterion statement is supported by the supplied evidence; otherwise set it to 'fail'. "
+            if simulation_criterion
+            else "Set passed=true exactly when the criterion statement is supported by the supplied evidence; otherwise set false. "
+        )
         system = (
             "You are an independent strict evaluator. Judge only observable evidence in the supplied response or transcript. "
-            "Do not infer missing behavior. Return results in exactly the same order as the criteria. "
+            + criterion_evidence_rule_en
+            + score_correction_en
+            + criterion_correction_en
+            + decision_rule
+            + "Do not infer missing behavior. Return results in exactly the same order as the criteria. "
             "For every result, name concrete evidence from the response or name what is missing. Never copy the criterion as the reason."
         )
     return [
         {"role": "system", "content": system},
         {"role": "user", "content": json.dumps(payload, ensure_ascii=False)},
-    ], grade_schema(len(expected), simulation=simulation), 0.0
+    ], (simulation_criterion_schema() if simulation_criterion else grade_schema(len(expected))), 0.0
 
 
 def ollama_chat(
@@ -354,7 +635,6 @@ def ollama_chat(
             "stream": False,
             "think": False,
             "format": schema,
-            "keep_alive": "10m",
             "options": {
                 "temperature": temperature,
                 "num_ctx": num_ctx,
@@ -382,8 +662,12 @@ def ollama_chat(
     try:
         parsed = json.loads(content)
     except json.JSONDecodeError as exc:
-        excerpt = " ".join(content.split())[:240]
-        raise RuntimeError(f"Ollama did not return valid structured JSON: {excerpt!r}") from exc
+        excerpt = " ".join(content.split())[:160]
+        tail = " ".join(content.split())[-160:]
+        raise RuntimeError(
+            "Ollama did not return valid structured JSON "
+            f"(characters={len(content)}, done_reason={result.get('done_reason')!r}, start={excerpt!r}, tail={tail!r})"
+        ) from exc
     if not isinstance(parsed, dict):
         raise RuntimeError("Ollama structured output must be an object")
     parsed["model"] = "ollama/" + str(result.get("model") or model)
@@ -415,7 +699,99 @@ def main() -> int:
         skill_context = None
         if args.role in {"response", "teacher"}:
             skill_context = teacher_skill_context(Path(payload["skill_root"]), payload)
-        if payload["type"] == "grade" and len(payload.get("expected", [])) > 1:
+        if payload["type"] == "simulation-grade":
+            scoring_results: dict[str, dict[str, Any]] = {}
+            for score_index, phase in enumerate(("baseline", "transfer")):
+                scoring_payload = simulation_score_payload(payload, phase)
+                messages, schema, temperature = messages_and_schema(scoring_payload, skill_context)
+                scoring_result = ollama_chat(
+                    host, args.model, messages, schema, temperature, args.timeout,
+                    args.num_ctx, args.num_predict, args.seed + score_index,
+                )
+                retry_reason = simulation_score_error(scoring_result)
+                attempts = 1
+                if retry_reason:
+                    corrected_payload = {**scoring_payload, "score_format_correction": retry_reason}
+                    messages, schema, temperature = messages_and_schema(corrected_payload, skill_context)
+                    scoring_result = ollama_chat(
+                        host, args.model, messages, schema, temperature, args.timeout,
+                        args.num_ctx, args.num_predict, args.seed + score_index + 1009,
+                    )
+                    attempts = 2
+                    remaining_error = simulation_score_error(scoring_result)
+                    if remaining_error:
+                        raise RuntimeError(
+                            f"simulation grader returned an invalid {phase} score after one corrective retry: "
+                            f"{remaining_error} (attempts=2)"
+                        )
+                scoring_result["attempts"] = attempts
+                scoring_result["retry_reason"] = retry_reason
+                scoring_results[phase] = scoring_result
+            combined_results = []
+            result_model = str(scoring_results["transfer"].get("model", "ollama/" + args.model))
+            for criterion_index, criterion in enumerate(payload.get("expected", []), 1):
+                criterion_payload = simulation_criterion_payload(payload, criterion)
+                messages, schema, temperature = messages_and_schema(criterion_payload, skill_context)
+                criterion_result = ollama_chat(
+                    host,
+                    args.model,
+                    messages,
+                    schema,
+                    temperature,
+                    args.timeout,
+                    args.num_ctx,
+                    args.num_predict,
+                    args.seed + criterion_index,
+                )
+                criterion_text = criterion["criterion"]
+                criterion_retry_reason = grader_decision_error(criterion_result, criterion_text)
+                criterion_attempts = 1
+                if criterion_retry_reason:
+                    corrected_criterion_payload = {
+                        **criterion_payload,
+                        "criterion_retry_feedback": criterion_retry_reason,
+                    }
+                    messages, schema, temperature = messages_and_schema(corrected_criterion_payload, skill_context)
+                    criterion_result = ollama_chat(
+                        host,
+                        args.model,
+                        messages,
+                        schema,
+                        temperature,
+                        args.timeout,
+                        args.num_ctx,
+                        args.num_predict,
+                        args.seed + criterion_index + 1009,
+                    )
+                    criterion_attempts = 2
+                    remaining_error = grader_decision_error(criterion_result, criterion_text)
+                    if remaining_error:
+                        raise RuntimeError(
+                            "simulation grader returned an invalid criterion decision after one corrective retry: "
+                            + remaining_error
+                            + " (attempts=2)"
+                        )
+                derived = derive_simulation_criterion(criterion_result, criterion_text)
+                derived["attempts"] = criterion_attempts
+                derived["retry_reason"] = criterion_retry_reason
+                combined_results.append(derived)
+                result_model = str(criterion_result.get("model", result_model))
+            result = {
+                "baseline_score": scoring_results["baseline"]["score"],
+                "transfer_score": scoring_results["transfer"]["score"],
+                "baseline_score_reason": scoring_results["baseline"]["reason"],
+                "transfer_score_reason": scoring_results["transfer"]["reason"],
+                "results": combined_results,
+                "model": result_model,
+                "seed": args.seed,
+                "score_attempts": {
+                    phase: scoring_results[phase]["attempts"] for phase in ("baseline", "transfer")
+                },
+                "score_retry_reason": {
+                    phase: scoring_results[phase]["retry_reason"] for phase in ("baseline", "transfer")
+                },
+            }
+        elif payload["type"] == "grade" and len(payload.get("expected", [])) > 1:
             combined_results: list[dict[str, Any]] = []
             result_model = "ollama/" + args.model
             for criterion in payload["expected"]:
@@ -437,17 +813,40 @@ def main() -> int:
             result = {"results": combined_results, "model": result_model}
         else:
             messages, schema, temperature = messages_and_schema(payload, skill_context)
-            result = ollama_chat(
-                host,
-                args.model,
-                messages,
-                schema,
-                temperature,
-                args.timeout,
-                args.num_ctx,
-                args.num_predict,
-                seed_for_payload(args.seed, payload),
-            )
+            adapter_attempts = 1
+            adapter_retry_reason = None
+            try:
+                result = ollama_chat(
+                    host,
+                    args.model,
+                    messages,
+                    schema,
+                    temperature,
+                    args.timeout,
+                    args.num_ctx,
+                    args.num_predict,
+                    seed_for_payload(args.seed, payload),
+                )
+            except RuntimeError as exc:
+                if not retryable_structured_output_error(exc):
+                    raise
+                adapter_retry_reason = str(exc)
+                corrected_payload = {**payload, "adapter_retry_feedback": adapter_retry_reason}
+                messages, schema, temperature = messages_and_schema(corrected_payload, skill_context)
+                result = ollama_chat(
+                    host,
+                    args.model,
+                    messages,
+                    schema,
+                    temperature,
+                    args.timeout,
+                    args.num_ctx,
+                    args.num_predict,
+                    seed_for_payload(args.seed, payload) + 1009,
+                )
+                adapter_attempts = 2
+            result["adapter_attempts"] = adapter_attempts
+            result["adapter_retry_reason"] = adapter_retry_reason
         print(json.dumps(result, ensure_ascii=False))
         return 0
     except (KeyError, OSError, ValueError, RuntimeError, json.JSONDecodeError) as exc:

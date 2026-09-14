@@ -18,7 +18,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from locale_policy import canonical_locale
+from locale_policy import canonical_locale, unicode_phrase_boundary
 
 try:
     import yaml
@@ -31,7 +31,7 @@ ROOT = Path(__file__).resolve().parents[1]
 ARABIC_LETTER = re.compile(r"[\u0621-\u063a\u0641-\u064a\u066e\u066f\u0671-\u06d3\u06fa-\u06fc]")
 LATIN_LETTER = re.compile(r"[A-Za-z]")
 COLLOQUIAL_ARABIC_MARKER = re.compile(
-    r"\b(?:ده|دي|دول|كده|إحنا|احنا|عشان|عايز|عاوز|إزاي|ازاي|دلوقتي|مش|لسه)\b"
+    unicode_phrase_boundary(r"(?:ده|دي|دول|كده|إحنا|احنا|عشان|عايز|عاوز|إزاي|ازاي|دلوقتي|مش|لسه)")
 )
 TECHNICAL_TERMS = {
     "Database Replication": ("داتابيز ريبليكيشن", "داتا بيز ريبليكيشن"),
@@ -42,23 +42,30 @@ TECHNICAL_TERMS = {
     "Database": ("داتابيز", "داتا بيز"),
 }
 ASSESSMENT_OPT_IN = re.compile(
-    r"(?:اختبرني|اسألني|اديني\s+(?:سؤال|أسئلة|تمرين|تمارين)|"
-    r"(?:عايز|عاوز|جاهز|موافق)\s+(?:لل)?(?:أسئلة|تمارين|اختبار)|"
-    r"test\s+me|quiz\s+me|ask\s+me|give\s+me\s+(?:a\s+)?(?:question|exercise)|"
-    r"ready\s+for\s+(?:the\s+)?(?:questions|quiz|test))",
+    unicode_phrase_boundary(
+        r"(?:اختبرني|اسألني|اديني\s+(?:سؤال|أسئلة|تمرين|تمارين)|"
+        r"(?:عايز|عاوز|جاهز|موافق)\s+(?:لل)?(?:أسئلة|تمارين|اختبار)|"
+        r"test\s+me|quiz\s+me|ask\s+me|give\s+me\s+(?:a\s+)?(?:question|exercise)|"
+        r"ready\s+for\s+(?:the\s+)?(?:questions|quiz|test))"
+    ),
     flags=re.IGNORECASE,
 )
 DIRECT_ASSESSMENT = re.compile(
     r"(?:^|[.!؟?\n:]\s*|,\s*)"
     r"(?:لو\s+(?:حابب|عايز|عاوز)[،,]?\s*|if\s+you\s+want\s+to\s+practice[،,]?\s*)?"
-    r"(?:جاوب(?:ني)?|جاوبي|حل|احسب|اختار|حد[دّ]|قول(?:ي|ّي)|اكتب|ارسم|لو[نّ]|جر[بّ]|"
-    r"answer|calculate|choose|identify|tell\s+me|write|draw|colou?r|solve|try)\b",
+    + unicode_phrase_boundary(
+        r"(?:جاوب(?:ني)?|جاوبي|حل|احسب|اختار|حد[دّ]|قول(?:ي|ّي)|اكتب|ارسم|لو[نّ]|جر[بّ]|"
+        r"answer|calculate|choose|identify|tell\s+me|write|draw|colou?r|solve|try)"
+    ),
     flags=re.IGNORECASE,
 )
 ASSESSMENT_QUESTION = re.compile(
-    r"(?:إيه|ايه|كام|ليه|ما\s+(?:هو|هي)|تفتكر|قول(?:ي|ّي)|احسب|اختار|"
-    r"هل\s+(?:فهمت|فهمتي)|فاهم(?:ة)?|what|which|how\s+many|why|can\s+you\s+explain|"
-    r"did\s+you\s+understand|do\s+you\s+understand|got\s+it)[^؟?]*[؟?]",
+    unicode_phrase_boundary(
+        r"(?:إيه|ايه|كام|ليه|ما\s+(?:هو|هي)|تفتكر|قول(?:ي|ّي)|احسب|اختار|"
+        r"هل\s+(?:فهمت|فهمتي)|فاهم(?:ة)?|what|which|how\s+many|why|can\s+you\s+explain|"
+        r"did\s+you\s+understand|do\s+you\s+understand|got\s+it)"
+    )
+    + r"[^؟?]*[؟?]",
     flags=re.IGNORECASE,
 )
 FRACTION_NOTATION = re.compile(r"\b\d+\s*/\s*\d+\b")
