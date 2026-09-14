@@ -1,0 +1,10 @@
+# One repository-relative Markdown path per line. Order is preserved.
+references/core-teaching-policy.md
+references/teaching-contract.md
+references/conversational-teaching.md
+references/source-grounded-mode.md
+references/evidence-policy.md
+references/safety-privacy.md
+references/arabic-teaching-style.md
+references/accessibility-engagement.md
+docs/pedagogy-basis.md

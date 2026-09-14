@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Add a maintainable private-beta ChatGPT Edition configuration generated from a shared cross-edition teaching policy, with owner, mobile/tablet, compatibility, and manual acceptance guidance.
+- Add checksum-pinned Linux, macOS, and Windows PowerShell installers with safe backup, disable, restore, version verification, and failure-recovery lifecycles tested only in isolated temporary directories.
+- Reframe the README around the ChatGPT and Codex editions without changing the published `v1.0.0-beta.1` release or advertising a public GPT.
+
 ## 1.0.0-beta.1 - 2026-09-14
 
 - Publish a public beta, not the stable `v1.0.0` release.
