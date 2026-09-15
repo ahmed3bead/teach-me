@@ -99,6 +99,8 @@ def main() -> int:
         skill_name = skill_frontmatter.get("name")
         if plugin_manifest.get("name") != skill_name:
             failures.append("Claude Code plugin name does not match SKILL.md")
+        if "displayName" in plugin_manifest:
+            failures.append("Claude Code plugin manifest must avoid displayName for legacy client compatibility")
         if "version" in plugin_manifest:
             failures.append("Claude Code plugin manifest must use commit-based version fallback")
         if marketplace.get("name") != "teach-me":
@@ -110,6 +112,8 @@ def main() -> int:
             entry = plugins[0]
             if entry.get("name") != skill_name or entry.get("source") != "./":
                 failures.append("Claude Code marketplace does not expose the root Teach Me plugin")
+            if "displayName" in entry:
+                failures.append("Claude Code marketplace entry must avoid displayName for legacy client compatibility")
             if "version" in entry:
                 failures.append("Claude Code marketplace entry must use commit-based version fallback")
         expected_repository = "https://github.com/ahmed3bead/teach-me"
