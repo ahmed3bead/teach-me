@@ -128,7 +128,8 @@ def render_prompt(payload: dict[str, Any], role: str, model: str = DEFAULT_MODEL
         }
         rules = (
             "Act as an independent strict grader. Return one verdict per criterion in order. PASS requires an exact quote and the correct response turn or artifact path. "
-            "FAIL may use source absent with an ABSENT: explanation. Never pass absent, implicit, deferred, or unperformed behavior."
+            "FAIL may use source absent with an ABSENT: explanation. Never pass absent, implicit, deferred, or unperformed behavior. "
+            "Before returning PASS, verify that the reason positively explains how the quoted evidence satisfies the criterion; if the reason says the behavior is absent, missing, implicit, deferred, or unperformed, return FAIL with absent evidence instead."
         )
         return common + rules + "\n\nGRADING PACKET:\n" + json.dumps(packet, ensure_ascii=False)
     raise ValueError("role must be response or grader")
