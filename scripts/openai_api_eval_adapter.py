@@ -19,14 +19,19 @@ from typing import Any
 import openai
 from openai import OpenAI
 
-from codex_subscription_eval_adapter import materialize_artifacts, output_schema, render_prompt
+from codex_subscription_eval_adapter import (
+    invalid_artifact_evidence,
+    materialize_artifacts,
+    output_schema,
+    render_prompt,
+)
 
 DEFAULT_MODEL = "gpt-5.6-sol"
 DEFAULT_MAX_OUTPUT_TOKENS = 2048
 DEFAULT_LONG_ARTIFACT_MAX_OUTPUT_TOKENS = 4096
 LONG_ARTIFACT_TYPES = frozenset({"markdown", "html", "pdf", "curriculum", "learning-pack"})
 LONG_ARTIFACT_SCOPES = frozenset({"substantial", "journey"})
-ADAPTER_VERSION = "1.2.0"
+ADAPTER_VERSION = "1.3.0"
 API_KEY_ENV = "OPENAI_API_KEY"
 
 
@@ -170,9 +175,7 @@ def execute(
         },
     )
     completed_at = datetime.now(timezone.utc)
-    returned_model = str(getattr(response, "model", ""))
-    if not returned_model:
-        raise RuntimeError("OpenAI response did not include a model identifier")
+    returned_model = str(getattr(response, "model", "") or "<missing>")
     status = str(getattr(response, "status", "missing"))
     common_evidence = {
         "model": f"openai/{returned_model}",
@@ -227,10 +230,30 @@ def execute(
                 "reason": reason,
             },
         }
-    raw = json.loads(response.output_text)
-    normalized = normalize_protocol_result(raw, role)
+    try:
+        raw = json.loads(response.output_text)
+        normalized = normalize_protocol_result(raw, role)
+    except (AttributeError, json.JSONDecodeError, TypeError, ValueError) as exc:
+        raw_output = getattr(response, "output_text", None)
+        raw_result = (
+            {"status": status, "unparsed_output": raw_output}
+            if isinstance(raw_output, str)
+            else {"status": status, "unparsed_output_type": type(raw_output).__name__}
+        )
+        invalid_kind = "response-schema" if role == "response" else "grader-schema"
+        result = {
+            **common_evidence,
+            "raw_result": raw_result,
+            "evaluation_error": {"kind": invalid_kind, "message": str(exc)},
+        }
+        if role == "response":
+            result.update(
+                response="", artifacts=[], artifact_evidence=[], invalid_artifact_evidence=[]
+            )
+        return result
     evaluation_error = None
     artifact_records: list[dict[str, Any]] = []
+    invalid_artifact_records: list[dict[str, Any]] = []
     if role == "response":
         with tempfile.TemporaryDirectory(prefix="teach-me-openai-eval-") as directory:
             try:
@@ -239,8 +262,9 @@ def execute(
                     Path(directory),
                     payload.get("prompt_packet", {}).get("capabilities", {}),
                 )
-            except (OSError, ValueError) as exc:
+            except Exception as exc:
                 evaluation_error = {"kind": "artifact-validation", "message": str(exc)}
+                invalid_artifact_records = invalid_artifact_evidence(normalized)
 
     result = dict(normalized)
     result.update(
@@ -251,6 +275,7 @@ def execute(
     )
     if role == "response":
         result["artifact_evidence"] = artifact_records
+        result["invalid_artifact_evidence"] = invalid_artifact_records
     if evaluation_error is not None:
         result["evaluation_error"] = evaluation_error
     return result

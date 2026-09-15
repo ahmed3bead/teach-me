@@ -73,7 +73,7 @@ class BidiParser(HTMLParser):
             self.errors.append(f"unisolated left-to-right text: {sample!r}")
 
 
-def validate(path: Path, check_links: bool = True) -> list[str]:
+def validate(path: Path, check_links: bool = True, require_print: bool = False) -> list[str]:
     parser = BidiParser(path)
     parser.feed(path.read_text(encoding="utf-8"))
     errors = parser.errors
@@ -84,9 +84,22 @@ def validate(path: Path, check_links: bool = True) -> list[str]:
     if not parser.has_main:
         errors.append("missing main landmark")
     css = "\n".join(parser.styles)
-    for rule in ("unicode-bidi", "isolate", "direction: ltr", "direction: rtl", "white-space: nowrap"):
-        if rule not in css:
-            errors.append(f"missing direction CSS rule containing {rule!r}")
+    required_declarations = {
+        "unicode-bidi: isolate": r"\bunicode-bidi\s*:\s*isolate\b",
+        "direction: ltr": r"\bdirection\s*:\s*ltr\b",
+        "direction: rtl": r"\bdirection\s*:\s*rtl\b",
+        "white-space: nowrap": r"\bwhite-space\s*:\s*nowrap\b",
+    }
+    for rule, pattern in required_declarations.items():
+        if not re.search(pattern, css, flags=re.IGNORECASE):
+            errors.append(f"missing direction CSS declaration {rule!r}")
+    if require_print:
+        for rule, pattern in {
+            "@page": r"@page\b",
+            "break-inside": r"\b(?:break-inside|page-break-inside)\s*:",
+        }.items():
+            if not re.search(pattern, css, flags=re.IGNORECASE):
+                errors.append(f"missing print CSS declaration {rule!r}")
     if check_links:
         for href in parser.links:
             parsed = urlparse(href)
@@ -102,10 +115,11 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("html", nargs="+", type=Path)
     parser.add_argument("--skip-links", action="store_true", help="for validating a standalone template")
+    parser.add_argument("--require-print", action="store_true", help="require PDF-ready page and fragmentation CSS")
     args = parser.parse_args()
     failed = False
     for path in args.html:
-        errors = validate(path, check_links=not args.skip_links)
+        errors = validate(path, check_links=not args.skip_links, require_print=args.require_print)
         if errors:
             failed = True
             for error in errors:
