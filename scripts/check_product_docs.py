@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import re
 import sys
 from pathlib import Path
@@ -25,6 +26,9 @@ def main() -> int:
     failures: list[str] = []
     config = yaml.safe_load((ROOT / "chatgpt-edition" / "gpt-config.yaml").read_text(encoding="utf-8"))
     version = skill_version()
+    skill_frontmatter = yaml.safe_load((ROOT / "SKILL.md").read_text(encoding="utf-8").split("---", 2)[1])
+    if len(skill_frontmatter.get("description", "")) > 200:
+        failures.append("SKILL.md description exceeds Claude's 200-character limit")
     if config.get("version") != version:
         failures.append("ChatGPT configuration version does not match SKILL.md")
     if config.get("status") != "private-draft-configuration":
@@ -65,6 +69,60 @@ def main() -> int:
         failures.append("advanced validation appears before edition choice")
     if "publicly available ChatGPT Edition" in readme:
         failures.append("README advertises an unpublished public ChatGPT Edition")
+    for stale_claim in ("eligible managed workspace", "eligible managed-workspace"):
+        if stale_claim in readme or stale_claim in (ROOT / "chatgpt-edition" / "README.md").read_text(encoding="utf-8"):
+            failures.append(f"ChatGPT documentation retains a stale account restriction: {stale_claim}")
+
+    claude_readme = (ROOT / "claude-edition" / "README.md").read_text(encoding="utf-8")
+    for required in (
+        "Customize → Skills",
+        "Code execution and file creation",
+        "--target-host claude-code",
+        "-TargetHost claude-code",
+        "~/.claude/skills/teach-me",
+        "python3 scripts/package_claude_skill.py",
+        "teach-me-claude-1.0.0-beta.1-development.zip",
+    ):
+        if required not in claude_readme:
+            failures.append(f"Claude setup guide is missing {required!r}")
+    if not (ROOT / "claude-edition" / "ACCEPTANCE_TESTS.md").is_file():
+        failures.append("Claude acceptance tests are missing")
+
+    plugin_manifest_path = ROOT / ".claude-plugin" / "plugin.json"
+    marketplace_path = ROOT / ".claude-plugin" / "marketplace.json"
+    try:
+        plugin_manifest = json.loads(plugin_manifest_path.read_text(encoding="utf-8"))
+        marketplace = json.loads(marketplace_path.read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError) as exc:
+        failures.append(f"Claude Code plugin metadata is missing or invalid JSON: {exc}")
+    else:
+        skill_name = skill_frontmatter.get("name")
+        if plugin_manifest.get("name") != skill_name:
+            failures.append("Claude Code plugin name does not match SKILL.md")
+        if "version" in plugin_manifest:
+            failures.append("Claude Code plugin manifest must use commit-based version fallback")
+        if marketplace.get("name") != "teach-me":
+            failures.append("Claude Code marketplace name must remain teach-me")
+        plugins = marketplace.get("plugins")
+        if not isinstance(plugins, list) or len(plugins) != 1:
+            failures.append("Claude Code marketplace must list exactly one plugin")
+        else:
+            entry = plugins[0]
+            if entry.get("name") != skill_name or entry.get("source") != "./":
+                failures.append("Claude Code marketplace does not expose the root Teach Me plugin")
+            if "version" in entry:
+                failures.append("Claude Code marketplace entry must use commit-based version fallback")
+        expected_repository = "https://github.com/ahmed3bead/teach-me"
+        if plugin_manifest.get("repository") != expected_repository:
+            failures.append("Claude Code plugin repository metadata is incorrect")
+
+    for required in (
+        "/plugin marketplace add ahmed3bead/teach-me",
+        "/plugin install teach-me@teach-me",
+        "/teach-me:teach-me",
+    ):
+        if required not in claude_readme or required not in readme:
+            failures.append(f"Claude Code marketplace setup is missing {required!r}")
 
     for relative in ("installers/install.sh", "installers/install.ps1"):
         text = (ROOT / relative).read_text(encoding="utf-8")
@@ -72,6 +130,10 @@ def main() -> int:
             failures.append(f"{relative} does not pin the repository version")
         if "e924647f3bcd11c8e090fe51a12ef4d2fbbfcd30001be76c9631e1733abde728" not in text:
             failures.append(f"{relative} does not pin the published archive checksum")
+        if "claude-code" not in text:
+            failures.append(f"{relative} does not expose the Claude Code target")
+        if ".claude" not in text or "skills" not in text:
+            failures.append(f"{relative} does not select Claude Code's personal skills directory")
 
     install_doc = (ROOT / "docs" / "codex-installation.md").read_text(encoding="utf-8")
     for relative in ("installers/install.sh", "installers/install.ps1"):

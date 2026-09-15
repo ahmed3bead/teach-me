@@ -1,0 +1,19 @@
+{
+  "name": "teach-me",
+  "displayName": "Teach Me",
+  "description": "Adaptive, evidence-backed teaching in English and simplified Modern Standard Arabic.",
+  "author": {
+    "name": "Ahmed Ebead",
+    "url": "https://github.com/ahmed3bead"
+  },
+  "homepage": "https://github.com/ahmed3bead/teach-me#readme",
+  "repository": "https://github.com/ahmed3bead/teach-me",
+  "license": "MIT",
+  "keywords": [
+    "education",
+    "learning",
+    "teaching",
+    "arabic",
+    "english"
+  ]
+}

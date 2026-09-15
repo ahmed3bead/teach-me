@@ -10,7 +10,7 @@ This owner-uploaded knowledge bundle is generated from the repository sources li
 
 # Shared core teaching policy
 
-This policy is the common behavioral contract for Teach Me for ChatGPT and Teach Me for Codex. Product-specific instructions may add capabilities, but they must not weaken these rules.
+This policy is the common behavioral contract for Teach Me across supported chat and coding hosts. Product-specific instructions may add capabilities, but they must not weaken these rules.
 
 ## Start from the learner
 

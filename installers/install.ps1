@@ -1,9 +1,11 @@
-# Install the pinned Teach Me beta safely on Windows PowerShell.
+# Install the pinned Teach Me beta safely for Codex or Claude Code on Windows PowerShell.
 
 [CmdletBinding()]
 param(
     [ValidateSet("install", "update", "version", "disable", "restore", "recover")]
     [string]$Action = "install",
+    [ValidateSet("codex", "claude-code")]
+    [string]$TargetHost = "codex",
     [string]$Version = "1.0.0-beta.1",
     [string]$InstallRoot,
     [string]$Archive,
@@ -48,12 +50,16 @@ if ($Checksum -notmatch '^[0-9a-f]{64}$') {
     Stop-Setup "checksum must be 64 lowercase hexadecimal characters"
 }
 if ([string]::IsNullOrWhiteSpace($InstallRoot)) {
-    if (-not [string]::IsNullOrWhiteSpace($env:CODEX_HOME)) {
+    if ($TargetHost -eq "claude-code") {
+        $InstallRoot = Join-Path $HOME ".claude\skills"
+    } elseif (-not [string]::IsNullOrWhiteSpace($env:CODEX_HOME)) {
         $InstallRoot = Join-Path $env:CODEX_HOME "skills"
     } else {
         $InstallRoot = Join-Path $HOME ".codex\skills"
     }
 }
+$HostLabel = if ($TargetHost -eq "claude-code") { "Claude Code" } else { "Codex" }
+$ReloadMessage = if ($TargetHost -eq "claude-code") { "Restart Claude Code." } else { "Reload Codex." }
 $FullRoot = [System.IO.Path]::GetFullPath($InstallRoot)
 $VolumeRoot = [System.IO.Path]::GetPathRoot($FullRoot)
 if ($FullRoot -eq $VolumeRoot) {
@@ -76,14 +82,14 @@ switch ($Action) {
         if (-not (Test-Path -LiteralPath $Target -PathType Container)) { Stop-Setup "Teach Me is not installed at $Target" }
         if (Test-Path -LiteralPath $Disabled) { Stop-Setup "disabled installation already exists at $Disabled" }
         Move-Item -LiteralPath $Target -Destination $Disabled
-        Write-Output "Teach Me disabled safely at $Disabled. Reload Codex."
+        Write-Output "Teach Me disabled safely for $HostLabel at $Disabled. $ReloadMessage"
         return
     }
     "restore" {
         if (-not (Test-Path -LiteralPath $Disabled -PathType Container)) { Stop-Setup "no disabled installation exists at $Disabled" }
         if (Test-Path -LiteralPath $Target) { Stop-Setup "active installation already exists at $Target" }
         Move-Item -LiteralPath $Disabled -Destination $Target
-        Write-Output "Teach Me restored at $Target. Reload Codex."
+        Write-Output "Teach Me restored for $HostLabel at $Target. $ReloadMessage"
         return
     }
     "recover" {
@@ -95,7 +101,7 @@ switch ($Action) {
         }
         if (-not (Test-Path -LiteralPath $Backup -PathType Container)) { Stop-Setup "no recoverable backup exists at $Backup" }
         Move-Item -LiteralPath $Backup -Destination $Target
-        Write-Output "Teach Me recovered from $Backup to $Target. Reload Codex."
+        Write-Output "Teach Me recovered for $HostLabel from $Backup to $Target. $ReloadMessage"
         return
     }
 }
@@ -108,6 +114,9 @@ if (Test-Path -LiteralPath $Backup) {
 }
 if (Test-Path -LiteralPath $Failed) {
     Stop-Setup "failed-install quarantine already exists at $Failed; preserve or move it before replacing the installation"
+}
+if ([string]::IsNullOrWhiteSpace($Archive) -and $TargetHost -eq "claude-code") {
+    Stop-Setup "the published $PinnedVersion archive predates verified Claude support; pass a compatible -Archive and -Checksum or wait for the next prerelease"
 }
 
 New-Item -ItemType Directory -Force -Path $FullRoot | Out-Null
@@ -188,7 +197,7 @@ Remove-Item -LiteralPath $ExtractRoot -Force
 Remove-Item -LiteralPath $WorkDirectory -Force
 
 if ($DidBackup) {
-    Write-Output "Teach Me $Installed installed at $Target. Previous installation preserved at $Backup. Reload Codex."
+    Write-Output "Teach Me $Installed installed for $HostLabel at $Target. Previous installation preserved at $Backup. $ReloadMessage"
 } else {
-    Write-Output "Teach Me $Installed installed at $Target. Reload Codex."
+    Write-Output "Teach Me $Installed installed for $HostLabel at $Target. $ReloadMessage"
 }

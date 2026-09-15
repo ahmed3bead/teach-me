@@ -1,0 +1,31 @@
+{
+  "name": "teach-me",
+  "owner": {
+    "name": "Ahmed Ebead",
+    "url": "https://github.com/ahmed3bead"
+  },
+  "description": "The official Teach Me plugin catalog for Claude Code.",
+  "plugins": [
+    {
+      "name": "teach-me",
+      "displayName": "Teach Me",
+      "source": "./",
+      "description": "Adaptive, evidence-backed teaching in English and simplified Modern Standard Arabic.",
+      "author": {
+        "name": "Ahmed Ebead",
+        "url": "https://github.com/ahmed3bead"
+      },
+      "homepage": "https://github.com/ahmed3bead/teach-me#readme",
+      "repository": "https://github.com/ahmed3bead/teach-me",
+      "license": "MIT",
+      "keywords": [
+        "education",
+        "learning",
+        "teaching",
+        "arabic",
+        "english"
+      ],
+      "category": "education"
+    }
+  ]
+}

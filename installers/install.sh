@@ -1,5 +1,5 @@
 #!/bin/sh
-# Install the pinned Teach Me beta safely on Linux or macOS.
+# Install the pinned Teach Me beta safely for Codex or Claude Code on Linux or macOS.
 
 set -eu
 
@@ -17,7 +17,8 @@ usage() {
         "Usage: sh installers/install.sh [install|update|version|disable|restore|recover] [options]" \
         "Options:" \
         "  --version VERSION       Must match the version pinned by this installer." \
-        "  --install-root PATH     Skills directory (default: CODEX_HOME/skills or ~/.codex/skills)." \
+        "  --target-host HOST      codex (default) or claude-code." \
+        "  --install-root PATH     Override the selected host's skills directory." \
         "  --archive URL_OR_PATH   Release archive override; HTTPS, file://, or local path." \
         "  --checksum SHA256       Expected archive checksum (64 lowercase hexadecimal characters)."
 }
@@ -31,19 +32,21 @@ if [ "$#" -gt 0 ]; then
 fi
 
 requested_version="$PINNED_VERSION"
+target_host="codex"
 install_root=""
 archive_source=""
 expected_checksum="$PINNED_SHA256"
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
-        --version|--install-root|--archive|--checksum)
+        --version|--target-host|--install-root|--archive|--checksum)
             [ "$#" -ge 2 ] || fail "$1 requires a value"
             option="$1"
             value="$2"
             shift 2
             case "$option" in
                 --version) requested_version="$value" ;;
+                --target-host) target_host="$value" ;;
                 --install-root) install_root="$value" ;;
                 --archive) archive_source="$value" ;;
                 --checksum) expected_checksum="$value" ;;
@@ -55,18 +58,34 @@ while [ "$#" -gt 0 ]; do
 done
 
 [ "$requested_version" = "$PINNED_VERSION" ] || fail "this installer supports only version $PINNED_VERSION"
+case "$target_host" in
+    codex)
+        host_label="Codex"
+        reload_message="Reload Codex."
+        ;;
+    claude-code)
+        host_label="Claude Code"
+        reload_message="Restart Claude Code."
+        ;;
+    *) fail "target host must be codex or claude-code" ;;
+esac
 case "$expected_checksum" in
     *[!0-9a-f]*|'') fail "checksum must be 64 lowercase hexadecimal characters" ;;
 esac
 [ "${#expected_checksum}" -eq 64 ] || fail "checksum must be 64 lowercase hexadecimal characters"
 
 if [ -z "$install_root" ]; then
-    if [ -n "${CODEX_HOME:-}" ]; then
-        install_root="$CODEX_HOME/skills"
-    else
-        [ -n "${HOME:-}" ] || fail "HOME is unavailable; pass --install-root"
-        install_root="$HOME/.codex/skills"
-    fi
+    [ -n "${HOME:-}" ] || fail "HOME is unavailable; pass --install-root"
+    case "$target_host" in
+        codex)
+            if [ -n "${CODEX_HOME:-}" ]; then
+                install_root="$CODEX_HOME/skills"
+            else
+                install_root="$HOME/.codex/skills"
+            fi
+            ;;
+        claude-code) install_root="$HOME/.claude/skills" ;;
+    esac
 fi
 
 case "$install_root" in
@@ -105,14 +124,14 @@ case "$action" in
         [ -d "$target" ] || fail "Teach Me is not installed at $target"
         [ ! -e "$disabled" ] || fail "disabled installation already exists at $disabled"
         mv "$target" "$disabled"
-        printf '%s\n' "Teach Me disabled safely at $disabled. Reload Codex."
+        printf '%s\n' "Teach Me disabled safely for $host_label at $disabled. $reload_message"
         exit 0
         ;;
     restore)
         [ -d "$disabled" ] || fail "no disabled installation exists at $disabled"
         [ ! -e "$target" ] || fail "active installation already exists at $target"
         mv "$disabled" "$target"
-        printf '%s\n' "Teach Me restored at $target. Reload Codex."
+        printf '%s\n' "Teach Me restored for $host_label at $target. $reload_message"
         exit 0
         ;;
     recover)
@@ -123,7 +142,7 @@ case "$action" in
         fi
         [ -d "$backup" ] || fail "no recoverable backup exists at $backup"
         mv "$backup" "$target"
-        printf '%s\n' "Teach Me recovered from $backup to $target. Reload Codex."
+        printf '%s\n' "Teach Me recovered for $host_label from $backup to $target. $reload_message"
         exit 0
         ;;
 esac
@@ -133,6 +152,9 @@ if [ "$action" = "update" ]; then
 fi
 [ ! -e "$backup" ] || fail "backup already exists at $backup; preserve or move it before replacing the installation"
 [ ! -e "$failed" ] || fail "failed-install quarantine already exists at $failed; preserve or move it before replacing the installation"
+if [ -z "$archive_source" ] && [ "$target_host" = "claude-code" ]; then
+    fail "the published $PINNED_VERSION archive predates verified Claude support; pass a compatible --archive and --checksum or wait for the next prerelease"
+fi
 
 mkdir -p "$install_root"
 work_dir=$(mktemp -d "${TMPDIR:-/tmp}/teach-me-install.XXXXXX") || fail "could not create a temporary directory"
@@ -219,7 +241,7 @@ rmdir "$extract_root" 2>/dev/null || true
 rmdir "$work_dir" 2>/dev/null || true
 
 if [ "$did_backup" -eq 1 ]; then
-    printf '%s\n' "Teach Me $value installed at $target. Previous installation preserved at $backup. Reload Codex."
+    printf '%s\n' "Teach Me $value installed for $host_label at $target. Previous installation preserved at $backup. $reload_message"
 else
-    printf '%s\n' "Teach Me $value installed at $target. Reload Codex."
+    printf '%s\n' "Teach Me $value installed for $host_label at $target. $reload_message"
 fi
