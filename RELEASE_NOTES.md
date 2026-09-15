@@ -30,6 +30,7 @@
 
 ## Limitations
 
+- Claude and Claude Code support is prepared on the post-beta development branch and is not retroactively claimed as validated release evidence for `v1.0.0-beta.1`.
 - Optional research, document, PDF, audio, transcript, video-frame, rendering, storage, and scheduling capabilities depend on the host.
 - Inaccessible source content is not bypassed, reconstructed, or reproduced. An independent path is not a verified representation of that source.
 - Raw video bytes are not automatically treated as watched or understood; transcript and visual coverage are recorded separately.

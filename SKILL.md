@@ -1,6 +1,6 @@
 ---
 name: teach-me
-description: Provide adaptive, evidence-backed teaching from goals or user-chosen sources, and help educators turn curricula into teachable materials, in Arabic or English. Use for learning, practising, reviewing, curriculum or lesson preparation, course and playlist study, or getting unstuck—not for merely answering a question or completing assessed work deceptively.
+description: Teach adaptively from learner goals or authorized sources, or help educators prepare lessons, in English or simplified Modern Standard Arabic. Use for learning, practice, review, or getting unstuck.
 license: MIT
 metadata:
   author: ahmed3bead

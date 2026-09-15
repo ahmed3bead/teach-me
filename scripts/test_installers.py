@@ -33,7 +33,13 @@ def bundle(directory: Path, marker: str) -> tuple[Path, str]:
     return archive, hashlib.sha256(archive.read_bytes()).hexdigest()
 
 
-def command(action: str, install_root: Path, archive: Path | None = None, checksum: str | None = None) -> list[str]:
+def command(
+    action: str,
+    install_root: Path,
+    archive: Path | None = None,
+    checksum: str | None = None,
+    target_host: str = "codex",
+) -> list[str]:
     if os.name == "nt":
         shell = shutil.which("pwsh") or shutil.which("powershell")
         if not shell:
@@ -48,6 +54,8 @@ def command(action: str, install_root: Path, archive: Path | None = None, checks
             str(ROOT / "installers" / "install.ps1"),
             "-Action",
             action,
+            "-TargetHost",
+            target_host,
             "-Version",
             VERSION,
             "-InstallRoot",
@@ -62,6 +70,8 @@ def command(action: str, install_root: Path, archive: Path | None = None, checks
         "sh",
         str(ROOT / "installers" / "install.sh"),
         action,
+        "--target-host",
+        target_host,
         "--version",
         VERSION,
         "--install-root",
@@ -83,6 +93,7 @@ def run(
     succeeds: bool = True,
     injected_failure: bool = False,
     injected_post_install_failure: bool = False,
+    target_host: str = "codex",
 ) -> subprocess.CompletedProcess[str]:
     environment = os.environ.copy()
     environment["TEACH_ME_TESTING"] = "1"
@@ -91,7 +102,7 @@ def run(
     if injected_post_install_failure:
         environment["TEACH_ME_TEST_FAIL_AFTER_INSTALL"] = "1"
     completed = subprocess.run(
-        command(action, install_root, archive, checksum),
+        command(action, install_root, archive, checksum, target_host),
         cwd=ROOT,
         env=environment,
         text=True,
@@ -157,8 +168,26 @@ def main() -> int:
         assert "not installed" in (error.stdout + error.stderr)
         assert not (missing / "teach-me").exists()
 
+        claude = temp / "claude" / "skills"
+        claude_target = claude / "teach-me"
+        claude_disabled = claude / "teach-me.disabled"
+        blocked = run("install", claude, target_host="claude-code", succeeds=False)
+        assert "predates verified Claude support" in (blocked.stdout + blocked.stderr)
+        assert not claude_target.exists()
+        installed = run("install", claude, first, first_checksum, target_host="claude-code")
+        assert marker(claude_target) == "first"
+        assert "Claude Code" in installed.stdout
+        run("disable", claude, target_host="claude-code")
+        assert not claude_target.exists() and marker(claude_disabled) == "first"
+        restored = run("restore", claude, target_host="claude-code")
+        assert marker(claude_target) == "first" and not claude_disabled.exists()
+        assert "Restart Claude Code" in restored.stdout
+
     platform = "Windows PowerShell" if os.name == "nt" else "POSIX shell"
-    print(f"Teach Me installer tests passed ({platform}: install, verify, update, disable, restore, recover, failures)")
+    print(
+        f"Teach Me installer tests passed ({platform}: Codex and Claude Code install, verify, "
+        "update, disable, restore, recover, failures)"
+    )
     return 0
 
 

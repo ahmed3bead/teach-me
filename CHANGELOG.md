@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add a self-hosted Claude Code plugin marketplace and plugin manifest, with commit-based update detection and documented installation commands. Community-marketplace availability remains subject to Anthropic review.
+- Add Claude chat and Claude Code support through the existing Agent Skills release archive, with a Claude upload guide, acceptance checks, and host-aware cross-platform installer defaults.
+- Replace the stale managed-workspace-only ChatGPT Builder claim with capability-based guidance: owners who can access the web editor and **Create** control can use the setup checklist.
 - Add a maintainable private-beta ChatGPT Edition configuration generated from a shared cross-edition teaching policy, with owner, mobile/tablet, compatibility, and manual acceptance guidance.
 - Add checksum-pinned Linux, macOS, and Windows PowerShell installers with safe backup, disable, restore, version verification, and failure-recovery lifecycles tested only in isolated temporary directories.
 - Reframe the README around the ChatGPT and Codex editions without changing the published `v1.0.0-beta.1` release or advertising a public GPT.

@@ -2,6 +2,8 @@
 
 Teach Me for Codex provides the full repository tooling: adaptive teaching plus controlled local files, source workflows, sessions, reports, deterministic validation, and independent evaluation infrastructure. The current public version is the beta `1.0.0-beta.1`.
 
+This page documents the installer's default `codex` target. For Claude chat and the `--target-host claude-code` option, see the [`Claude setup guide`](../claude-edition/README.md).
+
 The installers in this repository pin that exact release and its published SHA-256 checksum. They download before changing the installation, verify before extracting, preserve an existing installation as a versioned backup, reject unsafe archive paths, and restore the previous installation if replacement fails. They never require credentials, run model evaluations, start Ollama, or recursively delete an installation.
 
 ## Fastest safe installation
@@ -33,7 +35,7 @@ installer=$(mktemp /tmp/teach-me-installer.XXXXXX)
 curl --fail --location --silent --show-error --proto '=https' --tlsv1.2 \
   https://raw.githubusercontent.com/ahmed3bead/teach-me/main/installers/install.sh \
   --output "$installer"
-printf '%s  %s\n' 'e47d4edd6415e888e1cfddcb637ce96b8489d2e7be41978d59761d96076a0329' "$installer" | sha256sum --check -
+printf '%s  %s\n' '5195bfae7f7f920b1da46d97fa4209450f4c4f8b4ee56b8d704fd9795c1ecdc1' "$installer" | sha256sum --check -
 sh "$installer" install --version 1.0.0-beta.1
 rm -f "$installer"
 ```
@@ -45,7 +47,7 @@ installer=$(mktemp /tmp/teach-me-installer.XXXXXX)
 curl --fail --location --silent --show-error --proto '=https' --tlsv1.2 \
   https://raw.githubusercontent.com/ahmed3bead/teach-me/main/installers/install.sh \
   --output "$installer"
-printf '%s  %s\n' 'e47d4edd6415e888e1cfddcb637ce96b8489d2e7be41978d59761d96076a0329' "$installer" | shasum -a 256 --check
+printf '%s  %s\n' '5195bfae7f7f920b1da46d97fa4209450f4c4f8b4ee56b8d704fd9795c1ecdc1' "$installer" | shasum -a 256 --check
 sh "$installer" install --version 1.0.0-beta.1
 rm -f "$installer"
 ```
@@ -57,7 +59,7 @@ $installer = Join-Path ([System.IO.Path]::GetTempPath()) "teach-me-install.ps1"
 Invoke-WebRequest -UseBasicParsing `
   -Uri "https://raw.githubusercontent.com/ahmed3bead/teach-me/main/installers/install.ps1" `
   -OutFile $installer
-$expected = "bde98acd511e56a994ccb9f03a04a1a13a255c188eca3025f310cd796af4f117"
+$expected = "a14624bda518142d8caf654a580824691ba17f9a0bd4313948dd04ab0aa04e66"
 if ((Get-FileHash -LiteralPath $installer -Algorithm SHA256).Hash.ToLowerInvariant() -ne $expected) {
     throw "Teach Me installer checksum mismatch; nothing was executed."
 }

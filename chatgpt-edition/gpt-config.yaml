@@ -4,10 +4,10 @@ version: "1.0.0-beta.1"
 status: "private-draft-configuration"
 compatibility:
   surfaces:
-    - "Configuration and creation: ChatGPT web in an eligible managed workspace"
+    - "Configuration and creation: ChatGPT web when the signed-in account exposes the GPT Builder and Create control"
     - "Learner use: ChatGPT web and supported mobile and tablet apps"
   notes:
-    - "As of 2026-09-14, official OpenAI documentation says new GPT creation is unavailable on personal Free, Go, Plus, and Pro accounts and depends on permissions in Business, Enterprise, and Edu workspaces."
+    - "Builder availability varies by account and current product controls; use the controls shown on the signed-in account instead of assuming eligibility from the plan name alone."
     - "Available models, file support, web search, context limits, and interface controls depend on the user's ChatGPT plan and current product surface."
     - "Results can differ from Teach Me for Codex because models, tools, context, and execution environments differ."
 short_description: "Adaptive, evidence-backed teaching in English and simplified Modern Standard Arabic, starting from your goal and current knowledge."

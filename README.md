@@ -7,43 +7,39 @@ Teach Me is an open-source adaptive teaching system for English and simplified M
 [![License: MIT](https://img.shields.io/github/license/ahmed3bead/teach-me)](LICENSE)
 [![Languages: ar-MSA | en](https://img.shields.io/badge/languages-ar--MSA%20%7C%20en-0f766e)](#supported-languages)
 
-The current public repository release is **`v1.0.0-beta.1`**, a public beta rather than stable `v1.0.0`. The ChatGPT Edition configuration is also beta and is **not a publicly published GPT**.
+The current public repository release is **`v1.0.0-beta.1`**, a public beta rather than stable `v1.0.0`. The ChatGPT configuration and Claude support are also beta; no public Teach Me GPT is currently advertised.
 
 ## Choose how you want to use Teach Me
 
-### Teach Me for ChatGPT — easiest
+### Teach Me for ChatGPT — easiest when the Builder is available
 
 Use normal ChatGPT conversations on supported phones, tablets, or the web. There is no terminal, GitHub knowledge, Ollama, programming knowledge, or local installation for learners. It is best for ordinary learning conversations and learning from files the current ChatGPT surface can inspect.
 
-The ready-to-configure private beta package is in [`chatgpt-edition/`](chatgpt-edition/README.md). Creating it currently requires the ChatGPT web builder in an eligible managed workspace; learners can use the resulting private GPT on supported mobile, tablet, and web surfaces. Until an owner publishes a reviewed GPT separately, there is no public Teach Me GPT listing or public share link in this repository.
+The ready-to-configure private beta package is in [`chatgpt-edition/`](chatgpt-edition/README.md). Builder access varies by account and current product controls. If the GPT editor opens and the **Create** button is available, the owner can proceed with the checklist. Learners can use the resulting private GPT on supported mobile, tablet, and web surfaces.
 
-### Teach Me for Codex — full tooling
+### Teach Me for Claude — easiest Claude setup
 
-Use the complete Agent Skill when you need structured learning workflows, educator materials, source processing, validation, resumable sessions, controlled local files, reports, artifacts, independent evaluation infrastructure, or HTML/PDF generation. Installation is required; the safest pinned workflow is in [`docs/codex-installation.md`](docs/codex-installation.md).
+Upload a verified Teach Me Skill ZIP, enable it, and start a normal conversation. Claude currently supports personal custom skills on Free, Pro, Max, Team, and Enterprise plans when Code execution and file creation is enabled. The public `v1.0.0-beta.1` archive predates the Claude compatibility work, so private testing currently uses a development ZIP built from the updated checkout. Follow the [`Claude setup guide`](claude-edition/README.md).
 
-| Capability | Teach Me for ChatGPT | Teach Me for Codex |
-|---|---|---|
-| Teaching and explanation quality | Full core teaching method for ordinary conversation | Full core teaching method plus workflow controls |
-| Adaptive teaching | Goal- and level-aware; changes representation after confusion | Same core behavior with persistent workflow support when authorized |
-| Arabic and English support | Simplified Modern Standard Arabic and English | Simplified Modern Standard Arabic and English, including bidi artifact rules |
-| Mobile and tablet availability | Yes, on supported ChatGPT apps and web surfaces | Not the primary mobile/tablet path |
-| Installation | None for a learner using a configured GPT | Required |
-| File and source handling | Files and sources exposed by the current ChatGPT conversation | Controlled local inspection, coverage ledgers, and source workflows |
-| Session persistence | Visible chat and actual ChatGPT features only; no assumed memory | Consent-gated local session and profile artifacts |
-| Reports and artifacts | Conversational output and supported ChatGPT downloads | Structured reports, curricula, sessions, and linked artifacts |
-| Deterministic guards | Not exposed as a local runtime facility | Repository validators and fail-closed deterministic guards |
-| Independent evaluation | Not part of the learner experience | Provider-neutral evaluation and simulation tooling |
-| HTML/PDF generation | Only when the current ChatGPT surface supports it | Controlled bidi HTML plus validated optional PDF workflow |
-| Local tooling | None | Python scripts, schemas, templates, fixtures, and release tooling |
-| Intended users | Ordinary learners | Advanced learners, educators, developers, and structured workflow owners |
+### Teach Me for Codex or Claude Code — full tooling
 
-The ChatGPT Edition is not weaker for ordinary teaching conversations: it preserves the same essential method—goal discovery, progressive explanation, confusion recovery, assessment consent, evidence-bounded progress, bilingual teaching, source honesty, privacy, and age-appropriate delivery. The Codex Edition is more powerful for automation, validation, reporting, reproducibility, local file workflows, and technical control. They are not technically identical, and results can differ because available models, tools, context, and execution environments differ.
+Use the complete Agent Skill when you need structured learning workflows, educator materials, source processing, validation, resumable sessions, controlled local files, reports, artifacts, independent evaluation infrastructure, or HTML/PDF generation. The same teaching contract follows the open Agent Skills format. Use the pinned installer for [`Codex`](docs/codex-installation.md) or the [`Claude Code marketplace`](claude-edition/README.md#claude-code-marketplace-setup).
+
+| Host | Setup | Best for | Additional capabilities |
+|---|---|---|---|
+| ChatGPT | Configure a private GPT | Ordinary learning on web, phone, or tablet | Current ChatGPT chat, files, and enabled tools |
+| Claude | Upload the generated Skill ZIP | Ordinary learning on Claude chat | Current Claude chat, files, and enabled tools |
+| Codex | Install into the Codex skills directory | Structured and technical learning workflows | Local files, scripts, schemas, artifacts, and validators |
+| Claude Code | Install into `~/.claude/skills` | The same full workflow inside Claude Code | Local files, scripts, schemas, artifacts, and validators |
+
+Every edition preserves the same essential method—goal discovery, progressive explanation, confusion recovery, assessment consent, evidence-bounded progress, bilingual teaching, source honesty, privacy, and age-appropriate delivery. Codex and Claude Code are more powerful for automation, validation, reporting, reproducibility, local file workflows, and technical control. The hosts are not technically identical, and results can differ because available models, tools, context, and execution environments differ.
 
 ## Which edition should I choose?
 
 - Choose **ChatGPT** when you want to open a conversation on a phone, tablet, or browser and learn without setup.
-- Choose **Codex** when the learning project needs files, repeatable validation, source ledgers, educator deliverables, reports, local sessions, or technical inspection.
-- Start with ChatGPT when uncertain. Move to Codex only when the extra workflow control is useful.
+- Choose **Claude** for the same simple chat experience when Claude is your preferred product.
+- Choose **Codex** or **Claude Code** when the learning project needs files, repeatable validation, source ledgers, educator deliverables, reports, local sessions, or technical inspection.
+- Start with a chat edition when uncertain. Move to a coding host only when the extra workflow control is useful.
 
 ## Quick start
 
@@ -56,6 +52,10 @@ Teach me SQL from zero so I can analyze customer-support data. I have 30 minutes
 ```
 
 No public GPT is currently advertised. Owners can create a private draft by following the [`ChatGPT Edition setup checklist`](chatgpt-edition/README.md).
+
+### Claude learner
+
+Build, upload, and enable the private development ZIP using the [`Claude setup guide`](claude-edition/README.md), then send the same practical learning goal in a normal Claude chat.
 
 ### Codex user
 
@@ -73,13 +73,24 @@ sh installers/install.sh version
 
 For a fresh machine, Linux, macOS, update, disable, restore, and recovery commands, see [`docs/codex-installation.md`](docs/codex-installation.md). Reload Codex, then invoke `$teach-me` explicitly or ask naturally.
 
+### Claude Code user
+
+After the marketplace files are merged into the public repository, run these commands inside Claude Code:
+
+```text
+/plugin marketplace add ahmed3bead/teach-me
+/plugin install teach-me@teach-me
+```
+
+If Claude Code requests it, run `/reload-plugins`. Then invoke `/teach-me:teach-me` or ask naturally. For local development before merge, use the verified archive fallback in the [`Claude setup guide`](claude-edition/README.md#claude-code-private-development-fallback).
+
 ## First-session walkthrough
 
 1. Tell Teach Me what you want to be able to do, what you already know, and any time or accessibility constraints that matter.
 2. Correct its stated assumptions if needed. Teach Me begins with the smallest useful objective rather than an unstructured full course.
 3. Read the explanation and example. If it does not click, say what feels confusing; Teach Me should change representation or revisit a prerequisite.
 4. At a meaningful boundary, Teach Me may offer a short understanding check. It must wait for your consent, and you can decline without pressure.
-5. Continue from what you actually demonstrate. Codex users may authorize local progress artifacts; ChatGPT users rely only on the visible chat and features the platform actually provides.
+5. Continue from what you actually demonstrate. Codex and Claude Code users may authorize local progress artifacts; chat users rely only on the visible conversation and features the platform actually provides.
 
 ## Example prompts
 
@@ -121,7 +132,7 @@ I have attached an onboarding curriculum I am authorized to use. Prepare a 90-mi
 6. **Treat evidence honestly.** Reading or confidence alone does not establish mastery or retention.
 7. **Respect sources and privacy.** It distinguishes inspected content, external verification, inference, and access limits.
 
-The shared cross-edition behavior is maintained in [`references/core-teaching-policy.md`](references/core-teaching-policy.md). ChatGPT instructions and knowledge are generated from shared repository sources to reduce policy drift.
+The shared cross-edition behavior is maintained in [`references/core-teaching-policy.md`](references/core-teaching-policy.md). ChatGPT instructions are generated from shared repository sources, while Claude and Claude Code consume the same Agent Skill release archive.
 
 ## Learner, educator, and source-grounded workflows
 
@@ -147,8 +158,9 @@ The retired `ar-EG` value is accepted only as a compatibility alias and is norma
 - Important current, disputed, consequential, or high-stakes claims require suitable authoritative evidence and may require qualified professional review.
 - Source coverage depends on actual host access. Inaccessible material is not bypassed, reconstructed, or presented as inspected.
 - Raw video bytes do not prove transcript or visual understanding; spoken and on-screen coverage must be established separately.
-- ChatGPT model availability, context, file support, browsing, and builder controls vary by plan and product surface. New GPT creation is currently web-only and limited to eligible managed workspaces, as described in the [official OpenAI documentation](https://help.openai.com/en/articles/8554397-creating-and-editing-gpts-with-actions).
+- ChatGPT model availability, context, file support, browsing, and builder controls vary by plan and product surface. GPT creation and editing use the web Builder; an owner who can open the editor and use **Create** can follow the repository checklist.
 - OpenAI has announced a planned retirement of Custom GPTs and recommends migration to Plugins; this ChatGPT Edition package is a beta bridge whose current migration path must be rechecked before public launch.
+- Claude Skills require Code execution and file creation to be enabled. Available models, tools, context, and sharing controls vary by plan and product surface.
 - Codex PDF rendering depends on the pinned Python packages and required platform libraries; validated HTML remains the accessible source of truth when rendering is unavailable.
 - The programming and photography domain packs remain experimental until qualified review.
 - The corrected full 90-case exact-SHA behavioral run remains a requirement for a stable release. Earlier invalid behavioral results are not release evidence.
@@ -161,6 +173,8 @@ See [`RELEASE_NOTES.md`](RELEASE_NOTES.md) for beta evidence and [`docs/compatib
 |---|---|
 | [`chatgpt-edition/README.md`](chatgpt-edition/README.md) | ChatGPT Edition package, owner checklist, settings, and compatibility |
 | [`chatgpt-edition/ACCEPTANCE_TESTS.md`](chatgpt-edition/ACCEPTANCE_TESTS.md) | Manual core and phone/tablet acceptance suite |
+| [`claude-edition/README.md`](claude-edition/README.md) | Claude upload and Claude Code installation guide |
+| [`claude-edition/ACCEPTANCE_TESTS.md`](claude-edition/ACCEPTANCE_TESTS.md) | Manual Claude and Claude Code acceptance suite |
 | [`docs/codex-installation.md`](docs/codex-installation.md) | Pinned verified install, update, disable, restore, and recovery |
 | [`SKILL.md`](SKILL.md) | Codex teaching, evidence, language, safety, routing, and artifact contract |
 | [`RELEASE_NOTES.md`](RELEASE_NOTES.md) | Current public-beta evidence status and limitations |
@@ -234,6 +248,6 @@ Teach Me is released under the [MIT License](LICENSE).
 
 ## لمحة بالعربية
 
-`Teach Me` نظام مفتوح المصدر للتعليم المتكيف والمدعوم بالأدلة. يبدأ من هدف المتعلم وما يعرفه فعليًا، ثم يقدّم شرحًا تدريجيًا بالعربية الفصحى المبسطة أو الإنجليزية، ويغيّر طريقة الشرح عند استمرار الالتباس. نسخة `ChatGPT` هي الأسهل للمحادثات العادية على الهاتف والجهاز اللوحي والويب، لكنها ليست منشورة حاليًا كـ `GPT` عام. أما نسخة `Codex` فتضيف أدوات الملفات المحلية، والجلسات، والتقارير، والتحقق الحتمي، ومسارات المصادر.
+`Teach Me` نظام مفتوح المصدر للتعليم المتكيف والمدعوم بالأدلة. يبدأ من هدف المتعلم وما يعرفه فعليًا، ثم يقدّم شرحًا تدريجيًا بالعربية الفصحى المبسطة أو الإنجليزية، ويغيّر طريقة الشرح عند استمرار الالتباس. نسختا `ChatGPT` و`Claude` هما الأسهل للمحادثات العادية، بينما يضيف `Codex` و`Claude Code` أدوات الملفات المحلية، والجلسات، والتقارير، والتحقق الحتمي، ومسارات المصادر.
 
 الإصدار الحالي `v1.0.0-beta.1` نسخة تجريبية عامة للمستودع، وليس الإصدار المستقر `v1.0.0`. لا يضمن النظام دقة كاملة أو نتيجة تعليمية محددة، لذلك يتطلب الادعاءات المهمة أدلة مناسبة ويعرض حدود الوصول وعدم اليقين بوضوح.
