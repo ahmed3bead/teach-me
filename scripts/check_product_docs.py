@@ -57,16 +57,33 @@ def main() -> int:
 
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     for heading in (
-        "## Choose how you want to use Teach Me",
-        "## Which edition should I choose?",
-        "## First-session walkthrough",
-        "## Limitations",
-        "## Development and validation",
+        "## Why Teach Me?",
+        "## Choose your edition",
+        "## Quick start",
+        "## Documentation",
+        "## Status and limitations",
     ):
         if heading not in readme:
             failures.append(f"README is missing {heading}")
-    if readme.find("## Development and validation") < readme.find("## Choose how you want to use Teach Me"):
-        failures.append("advanced validation appears before edition choice")
+    if len(readme.splitlines()) > 140:
+        failures.append("README is too long; move detailed guidance into focused documentation")
+    arabic_readme_path = ROOT / "README.ar.md"
+    if not arabic_readme_path.is_file():
+        failures.append("Arabic README is missing")
+    else:
+        arabic_readme = arabic_readme_path.read_text(encoding="utf-8")
+        for heading in ("## لماذا Teach Me؟", "## اختر النسخة المناسبة", "## بداية سريعة", "## الأدلة"):
+            if heading not in arabic_readme:
+                failures.append(f"Arabic README is missing {heading}")
+    for relative in (
+        "docs/getting-started.md",
+        "docs/how-it-works.md",
+        "docs/examples.md",
+        "docs/limitations.md",
+        "docs/development.md",
+    ):
+        if not (ROOT / relative).is_file():
+            failures.append(f"focused documentation is missing: {relative}")
     if "publicly available ChatGPT Edition" in readme:
         failures.append("README advertises an unpublished public ChatGPT Edition")
     for stale_claim in ("eligible managed workspace", "eligible managed-workspace"):
