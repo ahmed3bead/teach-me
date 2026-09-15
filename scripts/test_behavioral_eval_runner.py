@@ -39,6 +39,20 @@ def run_case(directory: Path, item: dict, grader: Path = GRADER, extra: list[str
     return completed, json.loads(report.read_text()) if report.exists() else {}
 
 
+def run_cases(
+    directory: Path,
+    items: list[dict],
+    grader: Path = GRADER,
+    extra: list[str] | None = None,
+    response: Path = RESPONSE,
+):
+    suite = directory / "suite.yaml"; report = directory / "report.json"
+    suite.write_text(yaml.safe_dump({"suite": "test-suite", "version": "1.0.0", "cases": items}, sort_keys=False, allow_unicode=True))
+    command = [sys.executable, str(RUNNER), str(suite), "--response-command", f"{sys.executable} {response}", "--grader-command", f"{sys.executable} {grader}", "--output", str(report), "--pass-threshold", "1", *(extra or [])]
+    completed = subprocess.run(command, text=True, capture_output=True, check=False)
+    return completed, json.loads(report.read_text()) if report.exists() else {}
+
+
 def test_registry_and_cases() -> None:
     assert core_validator.top_level_case_ids("- id: case-one\n  fixture:\n  - id: nested-fixture\n- id: case-two\n") == ["case-one", "case-two"]
     registry = load_fixture_registry(); assert len(registry) == 78
@@ -57,6 +71,15 @@ def test_registry_and_cases() -> None:
         "source-grounded/source-misinformation": {"source", "web", "video", "context"},
     }
     for key, refs in critical.items(): assert cases[key]["critical"] and refs <= set(cases[key]["fixture_refs"])
+    meaningful = cases["conversational-teaching/meaningful-checkpoint"]
+    assert meaningful["routing"]["assessment_state"] == "accepted"
+    assert runner.learner_opted_into_assessment(
+        [{"role": "user", "content": meaningful["prompt"]}]
+    )
+    transfer = cases["core-teaching/en-transfer-not-acknowledgement"]
+    assert "prerequisite dependence" in transfer["expected"][0]
+    completed_source = registry["source.conversational-teaching.completed-unit-offer-before-questions.v1"]
+    assert completed_source["result"]["data"]["title"] == "Writing effective prompts"
     broken = copy.deepcopy(next(iter(registry.values()))); broken["extra"] = True
     for mutation in (
         lambda x: x.update(state="invented"), lambda x: x.update(provenance=""),
@@ -96,6 +119,12 @@ def test_semantic_fixture_leakage() -> None:
 def test_reference_routing_and_prompt_boundaries() -> None:
     simple = case("simple")
     assert {p.name for p in reference_paths(simple)} == {"SKILL.md", "teaching-contract.md", "diagnostic-engine.md", "teaching-engine.md"}
+    skill_policy = (ROOT / "SKILL.md").read_text()
+    conversation_policy = (ROOT / "references" / "conversational-teaching.md").read_text()
+    assert "without previewing or promising a routine check" in skill_policy
+    assert "explicit request to verify or confirm understanding is itself opt-in" in skill_policy
+    assert "without previewing, promising, or offering the routine check" in conversation_policy
+    assert "that request is acceptance: begin one suitable check" in conversation_policy
     rich = case("rich", "Prepare an accessible video curriculum.", "ar-MSA")
     rich["routing"].update(audience="educator", mode="source-grounded", source_type="video", artifact_type="pdf", session_state="multi-turn", accessibility="screen-reader", safety_level="sensitive", instructional_scope="journey", assessment_state="offered")
     rich["capabilities"].update(source="supplied_result", web="supplied_result", file="executable_temp", rendering="executable_temp", video="supplied_result")
@@ -117,7 +146,8 @@ def test_reference_routing_and_prompt_boundaries() -> None:
     case_json = json.loads(prompt.split("CASE DATA:\n", 1)[1])
     assert "expected" not in case_json and "critical" not in case_json
     grader_prompt = render_prompt({"type":"grade", "criteria":["observable behavior"]}, "grader")
-    assert "if the reason says the behavior is absent" in grader_prompt and "return FAIL with absent evidence" in grader_prompt
+    assert "behavior required by the criterion is absent" in grader_prompt
+    assert "criterion that explicitly requires the absence" in grader_prompt
     tampered = copy.deepcopy(packet); tampered["instruction_sources"][0]["content"] += "tamper"
     try: render_prompt({"type":"generate", "locale":"ar-MSA", "prompt":"تعلم", "history":[], "prompt_packet":tampered}, "response")
     except ValueError: pass
@@ -161,7 +191,19 @@ def test_assessment_and_consent() -> None:
     none = [{"role":"user", "content":"Continue.", "assessment_intent":"none"}]
     bad = ("Answer these questions now.", "Read this and answer why it changed.", "If you want, solve 2+2 now.", "Here is the explanation. Why is the sky blue?", "What is 2+2?", "Current action: write your answer now.", "إن أردت، حل 2+2 الآن.", "اقرأ المثال وأجب لماذا تغيرت القيمة؟")
     for text in bad: assert not runner.deterministic_assessment_check(text, none)["passed"], text
-    good = ("Send the book title.", "Which operating system do you use?", "Read the example and notice the difference.", "Example: “Why is the value different?”", "أرسل رابط المصدر.")
+    good = (
+        "Send the book title.",
+        "Which operating system do you use?",
+        "Read the example and notice the difference.",
+        "Example: “Why is the value different?”",
+        "أرسل رابط المصدر.",
+        "ما نوع عملك، وما المهام التي تريد تنفيذها في Excel؟",
+        "ما بلد الدراسة، وما جنسيتك، وهل ستقدّم من بلد إقامتك؟",
+        "يمكننا إجراء تحقق قصير من الفهم. هل تريد أن نبدأ؟",
+        "هل تريد اختبارًا قصيرًا؟ لن أبدأ الأسئلة قبل موافقتك.",
+        "الإجراء الآن: أجب بنعم للاختبار أو لا للمتابعة دون اختبار.",
+        "What would you like to learn next, and what are you hoping to use it for?",
+    )
     for text in good: assert runner.deterministic_assessment_check(text, none)["passed"], text
     accepted = [{"role":"user","content":"Yes, I accept the check.","assessment_intent":"accept"}, {"role":"user","content":"My answer is four.","assessment_intent":"none"}]
     assert runner.deterministic_assessment_check("Explain why your answer is four.", accepted)["passed"]
@@ -170,6 +212,7 @@ def test_assessment_and_consent() -> None:
     contradictory = [{"role":"user","content":"I do not accept the quiz.","assessment_intent":"accept"}]
     assert not runner.deterministic_assessment_check("Solve it.", contradictory)["passed"]
     assert runner.learner_opted_into_assessment([{"role":"user","content":"عندي امتحان غدًا وأريدك أن تختبرني بأسئلة كثيرة"}])
+    assert runner.learner_opted_into_assessment([{"role":"user","content":"أريد أن أتأكد أنني استفدت وفهمت الدرس"}])
 
 
 def test_terminology_structure_and_child_semantics() -> None:
@@ -213,6 +256,23 @@ def test_grader_evidence() -> None:
             "original_verdict":"pass",
             "original_evidence":bad["results"][0]["evidence"],
         }
+    negative_passes = (
+        (
+            "questions, scoring, and visible mastery labels stop immediately",
+            "The response stops questions and does not include scores or visible mastery labels.",
+        ),
+        (
+            "introduced or mastery labels are not announced after every learner message",
+            "The response requests missing context without announcing any introduced or mastery label.",
+        ),
+    )
+    for criterion, reason in negative_passes:
+        correct = copy.deepcopy(valid); correct["results"][0]["reason"] = reason
+        normalized = runner.validate_grade(correct, [criterion], transcript)[0]
+        assert normalized["passed"] and "grader_protocol_adjustment" not in normalized
+        unsupported = copy.deepcopy(valid); unsupported["results"][0]["reason"] = "The required behavior is absent."
+        adjusted = runner.validate_grade(unsupported, [criterion], transcript)[0]
+        assert not adjusted["passed"] and adjusted["grader_protocol_adjustment"]
     absent = {"results":[{"verdict":"fail","evidence":{"source":"absent","quote":"ABSENT: criterion"},"reason":"No evidence."}]}
     assert not runner.validate_grade(absent, ["criterion"], transcript)[0]["passed"]
 
@@ -268,6 +328,9 @@ def test_runner_retry_checkpoint_and_resume() -> None:
         assert corrected_report["summary"]["grader_protocol_adjustments"]==2
         corrected_criterion=corrected_report["results"][0]["criteria"][0]
         assert not corrected_criterion["passed"] and corrected_criterion["grader_protocol_adjustment"]["kind"]=="contradictory-pass-downgraded"
+        adjusted_criteria = [item for item in corrected_report["results"][0]["criteria"] if item.get("grader_protocol_adjustment")]
+        assert len(adjusted_criteria) == 2
+        assert all(not item["passed"] and item["verdict"] == "fail" for item in adjusted_criteria)
         marker=temp/"grader-ready"; bad_grader=temp/"bad_grader.py"
         bad_grader.write_text(f"from pathlib import Path\nimport runpy\np=Path({str(marker)!r})\nif not p.exists(): p.write_text('ready'); print('not-json')\nelse: runpy.run_path({str(GRADER)!r}, run_name='__main__')\n")
         interrupted, failed=run_case(temp, case("resume"), bad_grader, ["--protocol-retries","0"])
@@ -290,10 +353,46 @@ def test_runner_retry_checkpoint_and_resume() -> None:
         else: raise AssertionError("disk-write failure was hidden")
 
 
+def test_incomplete_case_continues_and_report_is_integral() -> None:
+    with tempfile.TemporaryDirectory() as directory:
+        temp = Path(directory)
+        response = temp / "incomplete_response.py"
+        response.write_text(
+            "import json,sys\n"
+            "p=json.load(sys.stdin)\n"
+            "base={'model':'fixture/response-v2','settings':{'deterministic':True},'adapter_version':'fixture-2.0.0','invocation_id':'fixture-response','timing':{'started_at':'x','completed_at':'y','duration_seconds':0},'raw_result':{}}\n"
+            "if p['case_id']=='incomplete': base.update({'response':'','artifacts':[],'artifact_evidence':[],'evaluation_error':{'kind':'model-incomplete','status':'incomplete','reason':'max_output_tokens'}})\n"
+            "else: base.update({'response':'A complete teaching explanation with a clear example and a useful next action.','artifacts':[],'artifact_evidence':[]})\n"
+            "json.dump(base,sys.stdout)\n"
+        )
+        completed, report = run_cases(
+            temp,
+            [case("incomplete"), case("continues")],
+            response=response,
+            extra=["--protocol-retries", "0"],
+        )
+        assert completed.returncode == 1, completed.stderr
+        assert report["status"] == "complete" and len(report["results"]) == 2
+        first, second = report["results"]
+        assert not first["passed"] and first["failure_category"] == "model-protocol"
+        assert first["model_protocol_failure"]["reason"] == "max_output_tokens"
+        assert first["grader_evidence"]["skipped"] is True and second["passed"]
+        assert report["summary"]["model_protocol_failures"] == 1
+        assert report["summary"]["response_invocations"] == 2
+        assert report["summary"]["grader_invocations"] == 1
+        assert report["summary"]["grader_protocol_adjustments"] == 0
+        assert report["summary"]["infrastructure_failures"] == 0
+        assert "active_case" not in report
+        incomplete_invocation = report["invocations"][0]
+        assert incomplete_invocation["status"] == "model-protocol-error"
+        assert len(incomplete_invocation["result_sha256"]) == 64
+
+
 def main() -> int:
     test_registry_and_cases(); test_semantic_fixture_leakage(); test_reference_routing_and_prompt_boundaries()
     test_artifact_and_environment_safety(); test_assessment_and_consent(); test_terminology_structure_and_child_semantics()
     test_grader_evidence(); test_release_git_binding(); test_runner_retry_checkpoint_and_resume()
+    test_incomplete_case_continues_and_report_is_integral()
     print("Teach Me behavioral evaluator adversarial tests passed")
     return 0
 

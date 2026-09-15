@@ -69,6 +69,36 @@ NAVIGATION_CONTEXT = re.compile(
     r"الوقت|وقت|الميزانية|الملف|الفصل|الدرس|المنهج|الكورس|المهارة|اللغة)",
     flags=re.IGNORECASE,
 )
+NAVIGATION_QUESTION = re.compile(
+    r"^(?:"
+    r"what\s+(?:would\s+you\s+like\s+to|are\s+you\s+hoping\s+to)\s+(?:learn|study|use|build|create|do)|"
+    r"(?:what|which)\s+(?:operating system|device|platform|language|book|source|course)\s+do\s+you\s+use|"
+    r"(?:what|which)\s+(?:is|are)\s+your\s+(?:job|work|goal|country|nationality|citizenship|residence|jurisdiction)|"
+    r"how\s+much\s+time\s+can\s+you\s+(?:spend|set aside|study)|"
+    r"(?:ما|أي)\s+(?:نوع\s+)?(?:عملك|وظيفتك|هدفك|المهام(?:\s+التي)?|بلد\s+الدراسة|جنسيتك|محل\s+إقامتك|بلد\s+إقامتك)|"
+    r"كم\s+(?:وقت(?:ًا|ا)?|ساعة|دقيقة).*(?:تستطيع|يمكنك).*(?:التعلم|التعلّم|الدراسة|تخصيص)|"
+    r"هل\s+(?:ستقد[ّ]?م|تستخدم|تستعمل).*(?:بلد\s+إقامتك|جهاز|منصة|نظام)"
+    r")\b.*[؟?]$",
+    flags=re.IGNORECASE,
+)
+ASSESSMENT_OFFER = re.compile(
+    r"(?:اختبار|تحق[ّ]?ق|مراجعة|أسئلة|تمارين|check|quiz|test|questions?|exercises?)",
+    flags=re.IGNORECASE,
+)
+ASSESSMENT_INVITATION = re.compile(
+    r"^(?:هل\s+(?:تريد|ترغب|تحب).*(?:اختبار|تحق[ّ]?ق|مراجعة|أسئلة|تمارين)|"
+    r"(?:do\s+you\s+want|would\s+you\s+like).*(?:check|quiz|test|questions?|exercises?)).*[؟?]$",
+    flags=re.IGNORECASE,
+)
+GENERIC_START_INVITATION = re.compile(
+    r"^(?:هل\s+(?:تريد|ترغب|تحب)\s+أن\s+نبدأ|(?:would\s+you\s+like\s+to|shall\s+we)\s+start)\s*[؟?]$",
+    flags=re.IGNORECASE,
+)
+CONSENT_SELECTION = re.compile(
+    r"(?:أجب|رد|اختر).*(?:نعم|أجل).*(?:لا|كلا).*(?:اختبار|تحق[ّ]?ق|مراجعة|أسئلة)|"
+    r"(?:reply|answer|choose).*(?:yes|no).*(?:check|quiz|test|questions?)",
+    flags=re.IGNORECASE,
+)
 NON_ASSESSMENT_ACTION = re.compile(
     r"^(?:current action|your action|الخطوة الحالية|إجراءك الحالي|الإجراء الآن)?\s*[:：-]?\s*"
     r"(?:send|provide|paste|attach|tell me|reply with|read|observe|notice|continue|open|look at|"
@@ -270,6 +300,26 @@ UNSUPPORTED_PASS_REASON = re.compile(
     flags=re.IGNORECASE,
 )
 
+NEGATIVE_CRITERION = re.compile(
+    r"(?:\b(?:no|not|never|without|stop|stops|remain(?:s)? internal|not announced|does not)\b|"
+    r"لا |دون |من دون|يتوقف|تبقى داخلية|لا تُعلن|لا تعلن)",
+    flags=re.IGNORECASE,
+)
+NEGATIVE_SATISFACTION_REASON = re.compile(
+    r"(?:\b(?:does not|do not|without|no |never |stops?|remains? internal|avoids?)\b|"
+    r"لا يتضمن|لا يحتوي|من دون|دون |يوقف|يتوقف|تبقى داخلية)",
+    flags=re.IGNORECASE,
+)
+
+
+def pass_reason_contradicts(criterion: str, reason: str) -> bool:
+    """Downgrade absent required behavior, not the desired absence of prohibited behavior."""
+    if not UNSUPPORTED_PASS_REASON.search(reason):
+        return False
+    if NEGATIVE_CRITERION.search(criterion) and NEGATIVE_SATISFACTION_REASON.search(reason):
+        return False
+    return True
+
 
 def validate_grade(grade: dict[str, Any], expected: list[str], transcript: list[dict[str, Any]], artifacts: list[dict[str, Any]] | None = None, on_result: Any | None = None) -> list[dict[str, Any]]:
     results = grade.get("results")
@@ -300,7 +350,7 @@ def validate_grade(grade: dict[str, Any], expected: list[str], transcript: list[
         elif passed or not quote.startswith("ABSENT:"):
             raise RuntimeError("only FAIL may use ABSENT: evidence")
         protocol_adjustment = None
-        if passed and UNSUPPORTED_PASS_REASON.search(reason):
+        if passed and pass_reason_contradicts(criterion, reason):
             protocol_adjustment = {
                 "kind": "contradictory-pass-downgraded",
                 "original_verdict": item["verdict"],
@@ -499,6 +549,12 @@ def assessment_prompt_match(text: str) -> AssessmentMatch | None:
             if re.search(r"(?:answer|أجب|جاوب)\s+(?:these|the following|هذه|الآتية)?\s*(?:\w+\s+)?questions|read .*answer|اقرأ .*أجب", candidate, re.I):
                 if navigation_questionnaire: continue
                 return AssessmentMatch(candidate)
+            if ASSESSMENT_INVITATION.search(candidate):
+                continue
+            if GENERIC_START_INVITATION.search(candidate) and ASSESSMENT_OFFER.search(line):
+                continue
+            if NAVIGATION_QUESTION.search(candidate):
+                continue
             if ASSESSMENT_QUESTION.search(candidate):
                 if NAVIGATION_CONTEXT.search(candidate): continue
                 return AssessmentMatch(candidate)
@@ -506,6 +562,7 @@ def assessment_prompt_match(text: str) -> AssessmentMatch | None:
             task_candidate = re.sub(r"^(?:if you want|إذا أردت|إن أردت|إن أحببت)[،,]?\s*", "", task_candidate, flags=re.I)
             imperative = ASSESSMENT_IMPERATIVE.match(task_candidate)
             if imperative:
+                if CONSENT_SELECTION.search(candidate): continue
                 if NON_ASSESSMENT_ACTION.search(candidate) and not re.search(r"(?:answer|solve|explain why|أجب|حل|فسر|لماذا)", candidate, re.I): continue
                 return AssessmentMatch(candidate)
     return None
@@ -692,6 +749,19 @@ def enforce_deterministic_checks(
     terminology = deterministic_terminology_check(response, prompt)
     api_replication_contrast = deterministic_api_replication_contrast_check(response, prompt)
     assessment_criterion_present = False
+
+    def require_deterministic_pass(item: dict[str, Any], check: dict[str, Any]) -> None:
+        """A hard guard may fail closed but must never erase a grader failure or downgrade."""
+        if check["passed"]:
+            return
+        item["passed"] = False
+        item["verdict"] = "fail"
+        item["evidence"] = {
+            "source": "absent",
+            "quote": f"ABSENT: {item['criterion']}"[:800],
+        }
+        item["reason"] = f"{check['reason']} (authoritative)"
+
     for item in criteria:
         criterion = item["criterion"].lower()
         if (
@@ -699,32 +769,26 @@ def enforce_deterministic_checks(
             or "response uses the requested locale" in criterion
             or "response remains in english" in criterion
         ):
-            item["passed"] = bool(language["passed"])
-            item["reason"] = f"{language['reason']} (authoritative)"
+            require_deterministic_pass(item, language)
             continue
         elif "is preserved in its original script and defined in arabic on first use" in criterion:
-            item["passed"] = bool(terminology["passed"])
-            item["reason"] = f"{terminology['reason']} (authoritative)"
+            require_deterministic_pass(item, terminology)
             continue
         elif (
             "communication interface from maintaining synchronized data copies" in criterion
             or "api is distinguished from maintaining synchronized database copies" in criterion
         ):
-            item["passed"] = bool(api_replication_contrast["passed"])
-            item["reason"] = f"{api_replication_contrast['reason']} (authoritative)"
+            require_deterministic_pass(item, api_replication_contrast)
             continue
         elif "no assessment question is asked before learner opt-in" in criterion:
             assessment_criterion_present = True
-            item["passed"] = bool(assessment["passed"])
-            item["reason"] = f"{assessment['reason']} (authoritative)"
+            require_deterministic_pass(item, assessment)
             continue
         elif "one central concept is taught before notation" in criterion:
-            item["passed"] = bool(child_concept_order["passed"])
-            item["reason"] = f"{child_concept_order['reason']} (authoritative)"
+            require_deterministic_pass(item, child_concept_order)
             continue
         elif "acknowledges that the child is starting from zero" in criterion:
-            item["passed"] = bool(child_onboarding["passed"])
-            item["reason"] = f"{child_onboarding['reason']} (authoritative)"
+            require_deterministic_pass(item, child_onboarding)
             continue
     completeness = deterministic_completeness_check(response, prompt)
     text_quality = deterministic_text_quality_check(response)
@@ -805,8 +869,16 @@ def validate_release_model(output: dict[str, Any], role: str, release_evidence: 
 
 
 def validate_response_output(output: dict[str, Any]) -> str:
-    if isinstance(output.get("evaluation_error"), dict):
-        raise NonRetryableEvaluationError(f"adapter completed with {output['evaluation_error'].get('kind', 'evaluation-error')}")
+    evaluation_error = output.get("evaluation_error")
+    if isinstance(evaluation_error, dict):
+        if evaluation_error.get("kind") != "model-incomplete":
+            raise NonRetryableEvaluationError(
+                f"adapter completed with {evaluation_error.get('kind', 'evaluation-error')}"
+            )
+        validate_model_evidence(output, "response")
+        if output.get("response") not in {None, ""} or output.get("artifact_evidence") not in (None, []):
+            raise RuntimeError("incomplete model output must not expose partial response or artifact content")
+        return ""
     response = output.get("response")
     if not isinstance(response, str) or not response.strip():
         raise RuntimeError("response adapter returned no non-empty response")
@@ -945,6 +1017,7 @@ def main() -> int:
             selected_attempts: list[int] = list(active.get("selected_attempts", []))
             turn_guard_results: list[dict[str, Any]] = list(active.get("turn_guard_results", []))
             all_artifacts: list[dict[str, Any]] = list(active.get("artifacts", []))
+            model_protocol_failed = False
             completed_turns = len([item for item in history if item.get("role") == "assistant"])
             pending_records = list(active.get("attempts", []))
             pending_generation = pending_records[-1].get("result") if pending_records and pending_records[-1].get("status") == "completed" and active.get("turn", 0) > completed_turns else None
@@ -986,6 +1059,93 @@ def main() -> int:
                 report["active_case"].update({"stage": "response", "attempts": records})
                 write_report(args.output, report)
                 response_attempts += len(records)
+                evaluation_error = generated.get("evaluation_error")
+                if isinstance(evaluation_error, dict) and evaluation_error.get("kind") == "model-incomplete":
+                    failure_reason = (
+                        "model response was incomplete; "
+                        f"status={evaluation_error.get('status', 'unknown')}, "
+                        f"reason={evaluation_error.get('reason', 'unknown')}"
+                    )
+                    for index, record in enumerate(records, response_attempts - len(records) + 1):
+                        record["status"] = "model-protocol-error"
+                        attempt_log.append(
+                            {
+                                "sequence": index,
+                                "turn_index": turn_index,
+                                "attempt_index": 1,
+                                "protocol_retry_cause": record.get("retry_cause"),
+                                "retry_feedback": record.get("retry_feedback"),
+                                "status": record["status"],
+                                "model": generated.get("model"),
+                                "raw_result": generated,
+                                "accepted": False,
+                                "deterministic_guards": None,
+                                "rejection_reasons": [
+                                    {"check": "model-protocol", "reason": failure_reason}
+                                ],
+                            }
+                        )
+                    selected_attempts.append(response_attempts)
+                    incomplete_history = history + [dict(turn, turn=turn_index)]
+                    criteria = [
+                        {
+                            "criterion": criterion,
+                            "passed": False,
+                            "verdict": "fail",
+                            "evidence": {
+                                "source": "absent",
+                                "quote": f"ABSENT: {failure_reason}"[:800],
+                            },
+                            "reason": failure_reason,
+                        }
+                        for criterion in case_expected
+                    ]
+                    results.append(
+                        {
+                            "suite": suite["suite"],
+                            "case_id": case["id"],
+                            "locale": case["locale"],
+                            "routing": case["routing"],
+                            "capabilities": case["capabilities"],
+                            "fixture_refs": case.get("fixture_refs", {}),
+                            "prompt_packet_ref": packet["sha256"],
+                            "critical": bool(case.get("critical", False)),
+                            "passed": False,
+                            "failure_category": "model-protocol",
+                            "model_protocol_failure": evaluation_error,
+                            "criteria": criteria,
+                            "deterministic_guards": turn_guard_results,
+                            "raw_transcript": incomplete_history,
+                            "response_attempts": response_attempts,
+                            "attempt_log": attempt_log,
+                            "selected_attempts": selected_attempts,
+                            "selected_attempt": selected_attempts[-1],
+                            "deterministic_preflight_passed": False,
+                            "response_evidence": {
+                                **{key: generated.get(key) for key in ("model", "settings", "adapter_version", "invocation_id", "timing")},
+                                **{key: generated[key] for key in ("usage", "api", "effective_prompt_sha256") if key in generated},
+                                "evaluation_error": evaluation_error,
+                                "raw_result_ref": f"attempt_log:{selected_attempts[-1]}",
+                            },
+                            "grader_evidence": {
+                                "skipped": True,
+                                "reason": "model response was incomplete",
+                            },
+                            "artifacts": all_artifacts,
+                        }
+                    )
+                    for record in [item for item in invocation_journal if item.get("case_key") == case_key]:
+                        raw_result = record.pop("result", None)
+                        if raw_result is not None:
+                            record["result_sha256"] = hashlib.sha256(
+                                json.dumps(raw_result, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
+                            ).hexdigest()
+                    completed_keys.add(case_key)
+                    report["resume"]["completed_case_keys"] = sorted(completed_keys)
+                    report.pop("active_case", None)
+                    write_report(args.output, report)
+                    model_protocol_failed = True
+                    break
                 guards: dict[str, Any] = {}
                 for guard_name, guard_function in (
                     ("language", lambda: deterministic_language_check(response, case["locale"])),
@@ -1028,6 +1188,9 @@ def main() -> int:
                     "turn_guard_results": turn_guard_results})
                 report["active_case"]["artifacts"] = all_artifacts
                 write_report(args.output, report)
+
+            if model_protocol_failed:
+                continue
 
             response = history[-1]["content"]
             raw_evidence = response
@@ -1137,6 +1300,16 @@ def main() -> int:
                 bool(criterion.get("grader_protocol_adjustment"))
                 for result in results
                 for criterion in result["criteria"]
+            ),
+            "model_protocol_failures": sum(
+                result.get("failure_category") == "model-protocol" for result in results
+            ),
+            "grader_protocol_failures": sum(
+                item.get("role") == "grader" and item.get("status") == "malformed-protocol"
+                for item in invocation_journal
+            ),
+            "infrastructure_failures": sum(
+                item.get("status") == "transport-error" for item in invocation_journal
             ),
         },
     })

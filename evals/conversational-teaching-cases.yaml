@@ -124,7 +124,7 @@ cases:
     accessibility: standard
     safety_level: standard
     instructional_scope: substantial
-    assessment_state: none
+    assessment_state: accepted
   capabilities:
     source: not_required
     web: not_required
