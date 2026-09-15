@@ -125,13 +125,13 @@ fixtures:
   authorized: true
   provenance: case-specific simulated source capture
   captured_at: '2026-09-14T00:00:00Z'
-  content_sha256: 692201851b29920062d9960493498f440a27f4304d523380046cbff5312269dd
+  content_sha256: dcfedb3074628cc848ec8baec25fc79caad3b64ec6f00d5c41a3b2c10b588093
   simulated: true
   result:
     tool_result_type: simulated_source
     data:
-      title: Water cycle lesson
-      excerpt: Evaporation changes liquid water into vapor; condensation forms droplets as vapor cools.
+      title: Writing effective prompts
+      excerpt: An effective Prompt states the goal, supplies relevant context, defines constraints, and requests a clear output format.
       location: unit 1
 - id: context.conversational-teaching.optional-check-declined.v1
   capability: context

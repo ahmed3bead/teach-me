@@ -31,7 +31,7 @@ cases:
   locale: en
   prompt: I think I understand percentages now. Can we move on?
   expected:
-  - checks understanding with an application or transfer task
+  - asks what comes next so prerequisite dependence can be determined before offering an application or transfer task
   - does not treat acknowledgement as mastery
   routing:
     audience: learner

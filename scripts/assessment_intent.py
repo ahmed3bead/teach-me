@@ -15,7 +15,9 @@ _ARABIC_SEPARATOR = r"[\s،,؛;:.!?؟\-]*"
 _ASSESSMENT_CONTEXT = re.compile(
     unicode_phrase_boundary(
         r"(?:الفحص|فحص|للفحص|الاختبار|اختبار|للاختبار|الأسئلة|أسئلة|للأسئلة|التمارين|تمارين|للتمارين|اختبرني|اسألني|"
-        r"تختبرني|check|quiz|test|questions?|exercises?|test\s+me|quiz\s+me|ask\s+me)"
+        r"تختبرني|أتأكد|اتاكد|التأكد|استفدت|فهمي|check|quiz|test|questions?|exercises?|"
+        r"verify\s+(?:my\s+)?understanding|check\s+(?:my\s+)?understanding|make\s+sure\s+i\s+understand|"
+        r"test\s+me|quiz\s+me|ask\s+me)"
     ),
     flags=re.IGNORECASE,
 )
@@ -48,10 +50,12 @@ _ACCEPT = re.compile(
         r"(?:أختار|اختار|أريد|اريد)\s+(?:الفحص|الاختبار|الأسئلة|التمارين)|"
         r"(?:أنا\s+)?(?:جاهز(?:ة|ا)?|مستعد(?:ة|ا)?)\s+(?:للفحص|للاختبار|للأسئلة|للتمارين)|"
         r"اختبرني|تختبرني|اسألني|"
+        r"و?(?:أريد|اريد|عايز|عاوز)\s+(?:أن\s+)?(?:أتأكد|اتاكد|التحقق).*(?:فهم\w*|استفد\w*)|"
         r"(?:yes|sure|okay|ok)\s*[,.]?\s*i\s+(?:agree|accept|choose)(?:\s+(?:the\s+)?(?:check|quiz|test|questions?|exercises?))?|"
         r"please\s+(?:do|start)\s+(?:the\s+)?(?:check|quiz|test|questions?|exercises?)|"
         r"let['’]s\s+do\s+(?:the\s+)?(?:check|quiz|test|questions?|exercises?)|"
         r"i\s+(?:choose|accept|agree\s+to|want)\s+(?:the\s+)?(?:check|quiz|test|questions?|exercises?)|"
+        r"i\s+(?:want|would\s+like)\s+to\s+(?:check|verify|make\s+sure).*(?:understand|learned)|"
         r"(?:i(?:'m|\s+am)\s+)?ready\s+for\s+(?:the\s+)?(?:check|quiz|test|questions?|exercises?)|"
         r"(?:test|quiz|ask)\s+me"
         r")"

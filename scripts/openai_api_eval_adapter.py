@@ -23,7 +23,9 @@ from codex_subscription_eval_adapter import materialize_artifacts, output_schema
 
 DEFAULT_MODEL = "gpt-5.6-sol"
 DEFAULT_MAX_OUTPUT_TOKENS = 2048
-ADAPTER_VERSION = "1.0.0"
+DEFAULT_LONG_ARTIFACT_MAX_OUTPUT_TOKENS = 4096
+LONG_ARTIFACT_TYPES = frozenset({"curriculum", "learning-pack"})
+ADAPTER_VERSION = "1.1.0"
 API_KEY_ENV = "OPENAI_API_KEY"
 
 
@@ -94,6 +96,38 @@ def usage_record(response: Any) -> dict[str, int]:
     }
 
 
+def uses_long_artifact_budget(payload: dict[str, Any]) -> bool:
+    """Reserve the larger bound only for file-backed curriculum artifacts."""
+    if payload.get("type") != "generate":
+        return False
+    packet = payload.get("prompt_packet", {})
+    routing = packet.get("routing", {}) if isinstance(packet, dict) else {}
+    capabilities = packet.get("capabilities", {}) if isinstance(packet, dict) else {}
+    return (
+        routing.get("artifact_type") in LONG_ARTIFACT_TYPES
+        and capabilities.get("file") == "executable_temp"
+    )
+
+
+def effective_output_token_limit(
+    payload: dict[str, Any],
+    max_output_tokens: int,
+    long_artifact_max_output_tokens: int,
+) -> int:
+    if uses_long_artifact_budget(payload):
+        return max(max_output_tokens, long_artifact_max_output_tokens)
+    return max_output_tokens
+
+
+def incomplete_reason(response: Any) -> str:
+    details = getattr(response, "incomplete_details", None)
+    if isinstance(details, dict):
+        reason = details.get("reason")
+    else:
+        reason = getattr(details, "reason", None)
+    return str(reason or "unknown")
+
+
 def execute(
     payload: dict[str, Any],
     role: str,
@@ -103,9 +137,13 @@ def execute(
     temperature: float,
     api_key_env: str,
     client: Any,
+    long_artifact_max_output_tokens: int = DEFAULT_LONG_ARTIFACT_MAX_OUTPUT_TOKENS,
 ) -> dict[str, Any]:
     prompt = render_prompt(payload, role, model)
     schema = output_schema(payload)
+    effective_max_output_tokens = effective_output_token_limit(
+        payload, max_output_tokens, long_artifact_max_output_tokens
+    )
     started_at = datetime.now(timezone.utc)
     started = time.monotonic()
     response = client.responses.create(
@@ -116,7 +154,7 @@ def execute(
         parallel_tool_calls=False,
         service_tier="default",
         truncation="disabled",
-        max_output_tokens=max_output_tokens,
+        max_output_tokens=effective_max_output_tokens,
         reasoning={"effort": reasoning_effort},
         temperature=temperature,
         text={
@@ -130,8 +168,63 @@ def execute(
         },
     )
     completed_at = datetime.now(timezone.utc)
-    if getattr(response, "status", None) != "completed":
-        raise RuntimeError(f"OpenAI response status was {getattr(response, 'status', 'missing')}")
+    returned_model = str(getattr(response, "model", ""))
+    if not returned_model:
+        raise RuntimeError("OpenAI response did not include a model identifier")
+    status = str(getattr(response, "status", "missing"))
+    common_evidence = {
+        "model": f"openai/{returned_model}",
+        "settings": {
+            "model": model,
+            "requested_model": model,
+            "reasoning": {"effort": reasoning_effort},
+            "temperature": temperature,
+            "max_output_tokens": effective_max_output_tokens,
+            "configured_max_output_tokens": max_output_tokens,
+            "long_artifact_max_output_tokens": long_artifact_max_output_tokens,
+            "long_artifact_budget_applied": uses_long_artifact_budget(payload),
+            "store": False,
+            "tools": [],
+            "parallel_tool_calls": False,
+            "service_tier": "default",
+            "truncation": "disabled",
+            "structured_output": {"type": "json_schema", "strict": True},
+            "model_transport": "openai-responses-api-standard",
+            "external_source_access": "controlled-fixtures-only",
+            "sdk": f"openai/{openai.__version__}",
+            "sdk_max_retries": 0,
+            "api_key_env": api_key_env,
+        },
+        "adapter_version": ADAPTER_VERSION,
+        "invocation_id": str(uuid.uuid4()),
+        "timing": {
+            "started_at": started_at.isoformat(),
+            "completed_at": completed_at.isoformat(),
+            "duration_seconds": time.monotonic() - started,
+        },
+        "usage": usage_record(response),
+        "effective_prompt_sha256": hashlib.sha256(prompt.encode()).hexdigest(),
+        "api": {
+            "response_id": getattr(response, "id", None),
+            "request_id": getattr(response, "_request_id", None),
+            "service_tier_returned": getattr(response, "service_tier", None),
+            "created_at": getattr(response, "created_at", None),
+        },
+    }
+    if status != "completed":
+        reason = incomplete_reason(response)
+        return {
+            **common_evidence,
+            "response": "",
+            "artifacts": [],
+            "artifact_evidence": [],
+            "raw_result": {"status": status, "incomplete_details": {"reason": reason}},
+            "evaluation_error": {
+                "kind": "model-incomplete",
+                "status": status,
+                "reason": reason,
+            },
+        }
     raw = json.loads(response.output_text)
     normalized = normalize_protocol_result(raw, role)
     evaluation_error = None
@@ -147,47 +240,11 @@ def execute(
             except (OSError, ValueError) as exc:
                 evaluation_error = {"kind": "artifact-validation", "message": str(exc)}
 
-    returned_model = str(getattr(response, "model", ""))
-    if not returned_model:
-        raise RuntimeError("OpenAI response did not include a model identifier")
     result = dict(normalized)
     result.update(
         {
-            "model": f"openai/{returned_model}",
-            "settings": {
-                "model": model,
-                "requested_model": model,
-                "reasoning": {"effort": reasoning_effort},
-                "temperature": temperature,
-                "max_output_tokens": max_output_tokens,
-                "store": False,
-                "tools": [],
-                "parallel_tool_calls": False,
-                "service_tier": "default",
-                "truncation": "disabled",
-                "structured_output": {"type": "json_schema", "strict": True},
-                "model_transport": "openai-responses-api-standard",
-                "external_source_access": "controlled-fixtures-only",
-                "sdk": f"openai/{openai.__version__}",
-                "sdk_max_retries": 0,
-                "api_key_env": api_key_env,
-            },
-            "adapter_version": ADAPTER_VERSION,
-            "invocation_id": str(uuid.uuid4()),
-            "timing": {
-                "started_at": started_at.isoformat(),
-                "completed_at": completed_at.isoformat(),
-                "duration_seconds": time.monotonic() - started,
-            },
-            "usage": usage_record(response),
+            **common_evidence,
             "raw_result": raw,
-            "effective_prompt_sha256": hashlib.sha256(prompt.encode()).hexdigest(),
-            "api": {
-                "response_id": getattr(response, "id", None),
-                "request_id": getattr(response, "_request_id", None),
-                "service_tier_returned": getattr(response, "service_tier", None),
-                "created_at": getattr(response, "created_at", None),
-            },
         }
     )
     if role == "response":
@@ -217,6 +274,11 @@ def main() -> int:
     parser.add_argument("--model", default=DEFAULT_MODEL)
     parser.add_argument("--api-key-env", choices=[API_KEY_ENV], required=True)
     parser.add_argument("--max-output-tokens", type=int, default=DEFAULT_MAX_OUTPUT_TOKENS)
+    parser.add_argument(
+        "--long-artifact-max-output-tokens",
+        type=int,
+        default=DEFAULT_LONG_ARTIFACT_MAX_OUTPUT_TOKENS,
+    )
     parser.add_argument("--reasoning-effort", choices=["none"], default="none")
     parser.add_argument("--temperature", type=float, choices=[0.0], default=0.0)
     parser.add_argument("--timeout", type=float, default=600)
@@ -224,6 +286,8 @@ def main() -> int:
     args = parser.parse_args()
     if not 256 <= args.max_output_tokens <= 4096:
         parser.error("--max-output-tokens must be between 256 and 4096")
+    if not args.max_output_tokens <= args.long_artifact_max_output_tokens <= 8192:
+        parser.error("--long-artifact-max-output-tokens must be between --max-output-tokens and 8192")
 
     secret = ""
     try:
@@ -245,6 +309,7 @@ def main() -> int:
                     args.temperature,
                     args.api_key_env,
                     client,
+                    args.long_artifact_max_output_tokens,
                 ),
                 ensure_ascii=False,
             )

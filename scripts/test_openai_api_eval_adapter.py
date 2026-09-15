@@ -41,15 +41,24 @@ ROUTING = {
 
 
 class FakeResponses:
-    def __init__(self, raw: dict[str, object]) -> None:
+    def __init__(
+        self,
+        raw: dict[str, object],
+        *,
+        status: str = "completed",
+        incomplete_reason: str | None = None,
+    ) -> None:
         self.raw = raw
+        self.status = status
+        self.incomplete_reason = incomplete_reason
         self.calls: list[dict[str, object]] = []
 
     def create(self, **kwargs: object) -> SimpleNamespace:
         self.calls.append(kwargs)
         return SimpleNamespace(
-            status="completed",
-            output_text=json.dumps(self.raw),
+            status=self.status,
+            incomplete_details=SimpleNamespace(reason=self.incomplete_reason),
+            output_text=json.dumps(self.raw) if self.status == "completed" else "{truncated",
             model="gpt-5.6-sol",
             id="resp_test",
             _request_id="req_test",
@@ -65,11 +74,18 @@ class FakeResponses:
         )
 
 
-def fake_client(raw: dict[str, object]) -> SimpleNamespace:
-    return SimpleNamespace(responses=FakeResponses(raw))
+def fake_client(
+    raw: dict[str, object],
+    *,
+    status: str = "completed",
+    incomplete_reason: str | None = None,
+) -> SimpleNamespace:
+    return SimpleNamespace(
+        responses=FakeResponses(raw, status=status, incomplete_reason=incomplete_reason)
+    )
 
 
-def generation_payload() -> dict[str, object]:
+def generation_payload(*, long_artifact: bool = False) -> dict[str, object]:
     case = {
         "id": "mock",
         "locale": "en",
@@ -80,6 +96,10 @@ def generation_payload() -> dict[str, object]:
         "capabilities": copy.deepcopy(CAPABILITIES),
         "fixture_refs": {},
     }
+    if long_artifact:
+        case["routing"]["artifact_type"] = "curriculum"
+        case["capabilities"]["file"] = "executable_temp"
+        case["fixture_refs"] = {"file": "file.disposable-workspace.v1"}
     return {
         "type": "generate",
         "suite": "mock-suite",
@@ -115,6 +135,51 @@ def test_generation_request() -> None:
         "total_tokens": 150,
     }
     assert result["api"]["request_id"] == "req_test" and result["raw_result"] == raw
+
+
+def test_long_artifact_budget_and_incomplete_evidence() -> None:
+    raw = {"response": "A complete teaching explanation with one clear example.", "artifacts": []}
+    long_client = fake_client(raw)
+    long_result = adapter.execute(
+        generation_payload(long_artifact=True),
+        "response",
+        "gpt-5.6-sol",
+        2048,
+        "none",
+        0.0,
+        adapter.API_KEY_ENV,
+        long_client,
+        4096,
+    )
+    assert long_client.responses.calls[0]["max_output_tokens"] == 4096
+    assert long_result["settings"]["long_artifact_budget_applied"] is True
+    assert long_result["settings"]["configured_max_output_tokens"] == 2048
+
+    incomplete_client = fake_client(
+        {}, status="incomplete", incomplete_reason="max_output_tokens"
+    )
+    incomplete = adapter.execute(
+        generation_payload(long_artifact=True),
+        "response",
+        "gpt-5.6-sol",
+        2048,
+        "none",
+        0.0,
+        adapter.API_KEY_ENV,
+        incomplete_client,
+        4096,
+    )
+    assert incomplete["evaluation_error"] == {
+        "kind": "model-incomplete",
+        "status": "incomplete",
+        "reason": "max_output_tokens",
+    }
+    assert incomplete["raw_result"] == {
+        "status": "incomplete",
+        "incomplete_details": {"reason": "max_output_tokens"},
+    }
+    assert incomplete["response"] == "" and incomplete["artifact_evidence"] == []
+    assert incomplete["usage"]["output_tokens"] == 30
 
 
 def test_grader_schema_and_normalization() -> None:
@@ -187,6 +252,7 @@ def test_secret_boundaries_and_release_identity() -> None:
 
 def main() -> int:
     test_generation_request()
+    test_long_artifact_budget_and_incomplete_evidence()
     test_grader_schema_and_normalization()
     test_secret_boundaries_and_release_identity()
     print("Teach Me OpenAI API adapter mocked tests passed")
