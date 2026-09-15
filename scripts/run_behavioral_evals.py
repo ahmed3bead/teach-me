@@ -299,17 +299,25 @@ def validate_grade(grade: dict[str, Any], expected: list[str], transcript: list[
                 raise RuntimeError("evidence quote must occur in the identified artifact")
         elif passed or not quote.startswith("ABSENT:"):
             raise RuntimeError("only FAIL may use ABSENT: evidence")
+        protocol_adjustment = None
         if passed and UNSUPPORTED_PASS_REASON.search(reason):
-            raise RuntimeError("PASS reasoning says the required behavior is absent, implicit, promised, or not performed")
-        normalized.append(
-            {
-                "criterion": criterion,
-                "passed": passed,
-                "verdict": item["verdict"],
-                "evidence": evidence,
-                "reason": reason,
+            protocol_adjustment = {
+                "kind": "contradictory-pass-downgraded",
+                "original_verdict": item["verdict"],
+                "original_evidence": evidence,
             }
-        )
+            passed = False
+            evidence = {"source": "absent", "quote": f"ABSENT: {criterion}"[:800]}
+        normalized_item = {
+            "criterion": criterion,
+            "passed": passed,
+            "verdict": "pass" if passed else "fail",
+            "evidence": evidence,
+            "reason": reason,
+        }
+        if protocol_adjustment is not None:
+            normalized_item["grader_protocol_adjustment"] = protocol_adjustment
+        normalized.append(normalized_item)
         if on_result: on_result(normalized[-1], len(normalized))
     return normalized
 
@@ -1125,6 +1133,11 @@ def main() -> int:
             "critical_failures": critical_failures,
             "response_invocations": sum(item.get("role") == "response" for item in invocation_journal),
             "grader_invocations": sum(item.get("role") == "grader" for item in invocation_journal),
+            "grader_protocol_adjustments": sum(
+                bool(criterion.get("grader_protocol_adjustment"))
+                for result in results
+                for criterion in result["criteria"]
+            ),
         },
     })
     write_report(args.output, report)

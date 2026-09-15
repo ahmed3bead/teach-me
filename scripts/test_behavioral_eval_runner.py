@@ -116,6 +116,8 @@ def test_reference_routing_and_prompt_boundaries() -> None:
     assert all(source["content"] in prompt and len(source["sha256"]) == 64 for source in packet["instruction_sources"])
     case_json = json.loads(prompt.split("CASE DATA:\n", 1)[1])
     assert "expected" not in case_json and "critical" not in case_json
+    grader_prompt = render_prompt({"type":"grade", "criteria":["observable behavior"]}, "grader")
+    assert "if the reason says the behavior is absent" in grader_prompt and "return FAIL with absent evidence" in grader_prompt
     tampered = copy.deepcopy(packet); tampered["instruction_sources"][0]["content"] += "tamper"
     try: render_prompt({"type":"generate", "locale":"ar-MSA", "prompt":"تعلم", "history":[], "prompt_packet":tampered}, "response")
     except ValueError: pass
@@ -203,9 +205,14 @@ def test_grader_evidence() -> None:
     reasons = ("never demonstrates it", "fails to show it", "omitted", "lacks detail", "missing", "not performed", "promised later", "implicit only", "لا يتضمن ذلك", "يفتقد الدليل", "غائب", "لم ينفذ", "لم يتم تنفيذ", "سيقوم لاحقًا")
     for reason in reasons:
         bad = copy.deepcopy(valid); bad["results"][0]["reason"] = reason
-        try: runner.validate_grade(bad, ["criterion"], transcript)
-        except RuntimeError: pass
-        else: raise AssertionError(f"unsupported PASS accepted: {reason}")
+        corrected = runner.validate_grade(bad, ["criterion"], transcript)[0]
+        assert not corrected["passed"] and corrected["verdict"] == "fail", reason
+        assert corrected["evidence"] == {"source":"absent","quote":"ABSENT: criterion"}
+        assert corrected["grader_protocol_adjustment"] == {
+            "kind":"contradictory-pass-downgraded",
+            "original_verdict":"pass",
+            "original_evidence":bad["results"][0]["evidence"],
+        }
     absent = {"results":[{"verdict":"fail","evidence":{"source":"absent","quote":"ABSENT: criterion"},"reason":"No evidence."}]}
     assert not runner.validate_grade(absent, ["criterion"], transcript)[0]["passed"]
 
@@ -248,6 +255,19 @@ def test_runner_retry_checkpoint_and_resume() -> None:
         stopped_error,error_report=run_case(temp,case("content-error"),extra=["--protocol-retries","2"],response=content_error)
         assert stopped_error.returncode==2 and len([x for x in error_report["invocations"] if x["role"]=="response"])==1
         assert error_report["invocations"][-1]["status"]=="content-error"
+        contradictory_grader=temp/"contradictory_grader.py"
+        contradictory_grader.write_text(
+            "import json,sys\n"
+            "p=json.load(sys.stdin); r=p['raw_final_response']; t=[x for x in p['ordered_transcript'] if x['role']=='assistant'][-1]['turn']\n"
+            "items=[{'verdict':'pass','evidence':{'source':'response','turn':t,'quote':r[:120]},'reason':'The required behavior is absent from the response.'} for _ in p['criteria']]\n"
+            "json.dump({'model':'fixture/grader-v2','settings':{'deterministic':True},'adapter_version':'fixture-2.0.0','invocation_id':'contradictory-grader','timing':{'started_at':'x','completed_at':'y','duration_seconds':0},'raw_result':{'results':items},'results':items},sys.stdout)\n"
+        )
+        corrected, corrected_report=run_case(temp,case("contradictory-pass"),contradictory_grader,["--protocol-retries","0"])
+        assert corrected.returncode==1 and corrected_report["status"]=="complete", corrected.stderr
+        assert corrected_report["summary"]["grader_invocations"]==1
+        assert corrected_report["summary"]["grader_protocol_adjustments"]==2
+        corrected_criterion=corrected_report["results"][0]["criteria"][0]
+        assert not corrected_criterion["passed"] and corrected_criterion["grader_protocol_adjustment"]["kind"]=="contradictory-pass-downgraded"
         marker=temp/"grader-ready"; bad_grader=temp/"bad_grader.py"
         bad_grader.write_text(f"from pathlib import Path\nimport runpy\np=Path({str(marker)!r})\nif not p.exists(): p.write_text('ready'); print('not-json')\nelse: runpy.run_path({str(GRADER)!r}, run_name='__main__')\n")
         interrupted, failed=run_case(temp, case("resume"), bad_grader, ["--protocol-retries","0"])
