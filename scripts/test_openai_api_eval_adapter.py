@@ -275,22 +275,31 @@ def test_invalid_artifact_evidence() -> None:
         "artifacts": [{"path": "pack.html", "media_type": "text/html", "content": html}],
     }
     client = fake_client(raw)
-    result = adapter.execute(
-        generation_payload(
-            artifact_type="pdf",
-            instructional_scope="substantial",
-            file_capability="executable_temp",
-            rendering_capability="executable_temp",
-        ),
-        "response",
-        "gpt-5.6-sol",
-        2048,
-        "none",
-        0.0,
-        adapter.API_KEY_ENV,
-        client,
-        4096,
-    )
+    original_materialize = adapter.materialize_artifacts
+
+    def reject_invalid_artifact(*_args: object, **_kwargs: object) -> list[dict[str, object]]:
+        raise ValueError("invalid bilingual HTML: missing main landmark")
+
+    adapter.materialize_artifacts = reject_invalid_artifact
+    try:
+        result = adapter.execute(
+            generation_payload(
+                artifact_type="pdf",
+                instructional_scope="substantial",
+                file_capability="executable_temp",
+                rendering_capability="executable_temp",
+            ),
+            "response",
+            "gpt-5.6-sol",
+            2048,
+            "none",
+            0.0,
+            adapter.API_KEY_ENV,
+            client,
+            4096,
+        )
+    finally:
+        adapter.materialize_artifacts = original_materialize
     assert result["evaluation_error"]["kind"] == "artifact-validation"
     assert "missing main landmark" in result["evaluation_error"]["message"]
     assert "direction CSS" not in result["evaluation_error"]["message"]
