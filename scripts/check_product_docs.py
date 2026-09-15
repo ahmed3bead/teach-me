@@ -99,8 +99,8 @@ def main() -> int:
         skill_name = skill_frontmatter.get("name")
         if plugin_manifest.get("name") != skill_name:
             failures.append("Claude Code plugin name does not match SKILL.md")
-        if plugin_manifest.get("skills") != "./":
-            failures.append("Claude Code plugin must explicitly expose its root skill for legacy clients")
+        if plugin_manifest.get("skills") != "./skills/":
+            failures.append("Claude Code plugin must expose its conventional skills directory")
         if "displayName" in plugin_manifest:
             failures.append("Claude Code plugin manifest must avoid displayName for legacy client compatibility")
         if "version" in plugin_manifest:
@@ -121,6 +121,15 @@ def main() -> int:
         expected_repository = "https://github.com/ahmed3bead/teach-me"
         if plugin_manifest.get("repository") != expected_repository:
             failures.append("Claude Code plugin repository metadata is incorrect")
+
+        claude_skill = ROOT / "skills" / "teach-me" / "SKILL.md"
+        if not claude_skill.is_file():
+            failures.append("Claude Code compatibility skill adapter is missing")
+        else:
+            adapter = claude_skill.read_text(encoding="utf-8")
+            for required in ("name: teach-me", "${CLAUDE_PLUGIN_ROOT}/SKILL.md"):
+                if required not in adapter:
+                    failures.append(f"Claude Code compatibility skill adapter is missing {required!r}")
 
     for required in (
         "/plugin marketplace add ahmed3bead/teach-me",
