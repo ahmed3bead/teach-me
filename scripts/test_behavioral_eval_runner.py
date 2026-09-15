@@ -76,6 +76,13 @@ def test_registry_and_cases() -> None:
     assert runner.learner_opted_into_assessment(
         [{"role": "user", "content": meaningful["prompt"]}]
     )
+    assert "without another confirmation" in meaningful["expected"][1]
+    unfinished = cases["conversational-teaching/unfinished-slice-is-not-boundary"]
+    assert "previewing, promising" in unfinished["expected"][1]
+    whole_book = cases["curriculum-delivery/whole-book-artifact-first"]
+    assert "requested locale and available capabilities" in whole_book["expected"][0]
+    markdown = cases["curriculum-delivery/markdown-default-ltr"]
+    assert "data analysis for operational reporting" in markdown["prompt"]
     transfer = cases["core-teaching/en-transfer-not-acknowledgement"]
     assert "prerequisite dependence" in transfer["expected"][0]
     completed_source = registry["source.conversational-teaching.completed-unit-offer-before-questions.v1"]
@@ -191,6 +198,12 @@ def test_assessment_and_consent() -> None:
     none = [{"role":"user", "content":"Continue.", "assessment_intent":"none"}]
     bad = ("Answer these questions now.", "Read this and answer why it changed.", "If you want, solve 2+2 now.", "Here is the explanation. Why is the sky blue?", "What is 2+2?", "Current action: write your answer now.", "إن أردت، حل 2+2 الآن.", "اقرأ المثال وأجب لماذا تغيرت القيمة؟")
     for text in bad: assert not runner.deterministic_assessment_check(text, none)["passed"], text
+    assert not runner.deterministic_assessment_check(
+        "What topic do you want, and what is 2+2?", none
+    )["passed"]
+    assert not runner.deterministic_assessment_check(
+        "What concept are you trying to understand, and what is 2+2?", none
+    )["passed"]
     good = (
         "Send the book title.",
         "Which operating system do you use?",
@@ -203,6 +216,8 @@ def test_assessment_and_consent() -> None:
         "هل تريد اختبارًا قصيرًا؟ لن أبدأ الأسئلة قبل موافقتك.",
         "الإجراء الآن: أجب بنعم للاختبار أو لا للمتابعة دون اختبار.",
         "What would you like to learn next, and what are you hoping to use it for?",
+        "What concept are you trying to understand, and which part feels unclear?",
+        "ما الدولة التي تريد الدراسة فيها، وما جنسيتك، وهل البرنامج قصير أم طويل؟",
     )
     for text in good: assert runner.deterministic_assessment_check(text, none)["passed"], text
     accepted = [{"role":"user","content":"Yes, I accept the check.","assessment_intent":"accept"}, {"role":"user","content":"My answer is four.","assessment_intent":"none"}]
@@ -245,6 +260,22 @@ def test_grader_evidence() -> None:
     try: runner.validate_grade(wrong, ["criterion"], transcript)
     except RuntimeError: pass
     else: raise AssertionError("wrong-turn evidence passed")
+    artifact_grade = {
+        "results": [{
+            "verdict": "pass",
+            "evidence": {"source": "artifact", "artifact_path": "course.md", "quote": "invented artifact text"},
+            "reason": "The cited artifact excerpt supplies the requirement.",
+        }]
+    }
+    try:
+        runner.validate_grade(
+            artifact_grade,
+            ["criterion"],
+            transcript,
+            [{"path": "course.md", "content": "Actual grounded artifact text."}],
+        )
+    except RuntimeError: pass
+    else: raise AssertionError("absent artifact evidence passed")
     reasons = ("never demonstrates it", "fails to show it", "omitted", "lacks detail", "missing", "not performed", "promised later", "implicit only", "لا يتضمن ذلك", "يفتقد الدليل", "غائب", "لم ينفذ", "لم يتم تنفيذ", "سيقوم لاحقًا")
     for reason in reasons:
         bad = copy.deepcopy(valid); bad["results"][0]["reason"] = reason
@@ -264,6 +295,10 @@ def test_grader_evidence() -> None:
         (
             "introduced or mastery labels are not announced after every learner message",
             "The response requests missing context without announcing any introduced or mastery label.",
+        ),
+        (
+            "the learner is not blocked by an unnecessary format question",
+            "The learner is not blocked by a format question; the missing subject is the only constraint.",
         ),
     )
     for criterion, reason in negative_passes:
@@ -331,8 +366,45 @@ def test_runner_retry_checkpoint_and_resume() -> None:
         adjusted_criteria = [item for item in corrected_report["results"][0]["criteria"] if item.get("grader_protocol_adjustment")]
         assert len(adjusted_criteria) == 2
         assert all(not item["passed"] and item["verdict"] == "fail" for item in adjusted_criteria)
+        artifact_response=temp/"artifact_response.py"
+        artifact_response.write_text(
+            "import json,sys\n"
+            "p=json.load(sys.stdin); text='A complete teaching explanation with a grounded artifact and useful practical guidance for the learner.'\n"
+            "artifact={'path':'course.md','media_type':'text/markdown','content':'Actual grounded artifact text.','sha256':'a'*64,'bytes':30}\n"
+            "json.dump({'response':text,'artifacts':[],'artifact_evidence':[artifact],'model':'fixture/response-v2','settings':{'deterministic':True},'adapter_version':'fixture-2.0.0','invocation_id':'artifact-response','timing':{'started_at':'x','completed_at':'y','duration_seconds':0},'raw_result':{'response':text}},sys.stdout)\n"
+        )
+        absent_grader=temp/"absent_quote_grader.py"
+        absent_grader.write_text(
+            "import json,sys\n"
+            "p=json.load(sys.stdin); r=p['raw_final_response']; t=[x for x in p['ordered_transcript'] if x['role']=='assistant'][-1]['turn']\n"
+            "bad='BAD_GRADER_EVIDENCE' in [x for x in p['ordered_transcript'] if x['role']=='user'][-1]['content']\n"
+            "e={'source':'artifact','artifact_path':'course.md','quote':'text that does not occur'} if bad else {'source':'response','turn':t,'quote':r[:120]}\n"
+            "items=[{'verdict':'pass','evidence':e,'reason':'The exact excerpt supplies the required behavior.'} for _ in p['criteria']]\n"
+            "json.dump({'model':'fixture/grader-v2','settings':{'deterministic':True},'adapter_version':'fixture-2.0.0','invocation_id':'evidence-grader','timing':{'started_at':'x','completed_at':'y','duration_seconds':0},'usage':{'input_tokens':20,'cached_input_tokens':4,'cache_write_tokens':0,'output_tokens':3,'reasoning_tokens':0,'total_tokens':23},'raw_result':{'results':items},'results':items},sys.stdout)\n"
+        )
+        continued, protocol_report=run_cases(
+            temp,
+            [case("bad-evidence", "BAD_GRADER_EVIDENCE"), case("after-bad-evidence")],
+            absent_grader,
+            ["--protocol-retries", "0"],
+            response=artifact_response,
+        )
+        assert continued.returncode == 1, continued.stderr
+        assert protocol_report["status"] == "complete" and len(protocol_report["results"]) == 2
+        protocol_case, later_case = protocol_report["results"]
+        assert not protocol_case["passed"] and protocol_case["failure_category"] == "grader-protocol"
+        assert all(not item["passed"] for item in protocol_case["criteria"])
+        assert protocol_case["grader_evidence"]["results"][0]["evidence"]["quote"] == "text that does not occur"
+        assert later_case["passed"]
+        assert protocol_report["summary"]["grader_protocol_failures"] == 1
+        assert protocol_report["summary"]["grader_protocol_attempt_failures"] == 1
+        assert protocol_report["summary"]["grader_invocations"] == 2
+        malformed = next(item for item in protocol_report["invocations"] if item["status"] == "malformed-protocol")
+        assert malformed["protocol_result"]["results"][0]["verdict"] == "pass"
+        assert len(malformed["result_sha256"]) == 64
+
         marker=temp/"grader-ready"; bad_grader=temp/"bad_grader.py"
-        bad_grader.write_text(f"from pathlib import Path\nimport runpy\np=Path({str(marker)!r})\nif not p.exists(): p.write_text('ready'); print('not-json')\nelse: runpy.run_path({str(GRADER)!r}, run_name='__main__')\n")
+        bad_grader.write_text(f"from pathlib import Path\nimport runpy\np=Path({str(marker)!r})\nif not p.exists(): p.write_text('ready'); raise SystemExit(9)\nelse: runpy.run_path({str(GRADER)!r}, run_name='__main__')\n")
         interrupted, failed=run_case(temp, case("resume"), bad_grader, ["--protocol-retries","0"])
         assert interrupted.returncode == 2 and failed["status"] == "failed" and failed["active_case"]["stage"] == "grader-invoking"
         resumed, recovered=run_case(temp, case("resume"), bad_grader, ["--resume","--protocol-retries","0"])
@@ -388,11 +460,120 @@ def test_incomplete_case_continues_and_report_is_integral() -> None:
         assert len(incomplete_invocation["result_sha256"]) == 64
 
 
+def test_full_90_case_protocol_simulation() -> None:
+    with tempfile.TemporaryDirectory() as directory:
+        temp = Path(directory)
+        response = temp / "simulated_response.py"
+        grader = temp / "simulated_grader.py"
+        response.write_text(
+            "import json,sys\n"
+            "p=json.load(sys.stdin); prompt=p['prompt']\n"
+            "usage={'input_tokens':10,'cached_input_tokens':2,'cache_write_tokens':0,'output_tokens':5,'reasoning_tokens':0,'total_tokens':15}\n"
+            "base={'model':'fixture/response-v2','settings':{'deterministic':True},'adapter_version':'fixture-2.0.0','invocation_id':'sim-response','timing':{'started_at':'x','completed_at':'y','duration_seconds':0},'usage':usage,'raw_result':{}}\n"
+            "if 'INJECT_INCOMPLETE' in prompt: base.update(response='',artifacts=[],artifact_evidence=[],evaluation_error={'kind':'model-incomplete','status':'incomplete','reason':'max_output_tokens'})\n"
+            "elif 'INJECT_BAD_QUOTE' in prompt: base.update(response='A complete teaching explanation accompanies the grounded artifact for careful review.',artifacts=[],artifact_evidence=[{'path':'audit.md','media_type':'text/markdown','content':'Actual auditable artifact evidence.','sha256':'c'*64,'bytes':35}])\n"
+            "elif 'INJECT_GUARD' in prompt: base.update(response='This explanation is complete and clear. What is 2+2?',artifacts=[],artifact_evidence=[])\n"
+            "elif 'INJECT_HTML' in prompt: base.update(response='A complete HTML learning artifact is ready for review with detailed lessons and practical examples.',artifacts=[],artifact_evidence=[{'path':'lesson.html','media_type':'text/html','content':'<main><h1>Long HTML lesson</h1></main>','sha256':'a'*64,'bytes':43}])\n"
+            "elif 'INJECT_PDF' in prompt: base.update(response='A complete PDF learning artifact is ready for review with detailed lessons and practical examples.',artifacts=[],artifact_evidence=[{'path':'lesson.pdf','media_type':'application/pdf','content':'Validated PDF learning artifact','sha256':'b'*64,'bytes':31}])\n"
+            "else: base.update(response='This is a complete teaching explanation with one clear example and useful guidance.',artifacts=[],artifact_evidence=[])\n"
+            "json.dump(base,sys.stdout)\n"
+        )
+        grader.write_text(
+            "import json,sys\n"
+            "p=json.load(sys.stdin); prompt=[x for x in p['ordered_transcript'] if x['role']=='user'][-1]['content']; response=p['raw_final_response']; turn=[x for x in p['ordered_transcript'] if x['role']=='assistant'][-1]['turn']\n"
+            "reason='The exact excerpt supplies the required observable behavior.'; evidence={'source':'response','turn':turn,'quote':response[:120]}\n"
+            "if 'INJECT_BAD_QUOTE' in prompt: evidence={'source':'artifact','artifact_path':'audit.md','quote':'invented evidence absent from the identified artifact'}\n"
+            "if 'INJECT_CONTRADICTORY' in prompt: reason='The required behavior is absent from the response.'\n"
+            "items=[{'verdict':'pass','evidence':evidence,'reason':reason} for _ in p['criteria']]\n"
+            "usage={'input_tokens':20,'cached_input_tokens':4,'cache_write_tokens':0,'output_tokens':3,'reasoning_tokens':0,'total_tokens':23}\n"
+            "json.dump({'model':'fixture/grader-v2','settings':{'deterministic':True},'adapter_version':'fixture-2.0.0','invocation_id':'sim-grader','timing':{'started_at':'x','completed_at':'y','duration_seconds':0},'usage':usage,'raw_result':{'results':items},'results':items},sys.stdout)\n"
+        )
+        items = [case(f"sim-{index:02d}", f"Normal teaching request {index}.") for index in range(90)]
+        items[3]["prompt"] = "INJECT_BAD_QUOTE"
+        items[9]["prompt"] = "INJECT_CONTRADICTORY"
+        items[17]["prompt"] = "INJECT_INCOMPLETE"
+        items[24]["prompt"] = "INJECT_GUARD"
+        items[40]["prompt"] = "INJECT_HTML"
+        items[40]["routing"].update(artifact_type="html", instructional_scope="substantial")
+        items[40]["capabilities"]["file"] = "executable_temp"
+        items[40]["fixture_refs"] = {"file": "file.disposable-workspace.v1"}
+        items[72]["prompt"] = "INJECT_PDF"
+        items[72]["routing"].update(artifact_type="pdf", instructional_scope="substantial")
+        items[72]["capabilities"].update(file="executable_temp", rendering="executable_temp")
+        items[72]["fixture_refs"] = {
+            "file": "file.disposable-workspace.v1",
+            "rendering": "rendering.pdf-from-html.v1",
+        }
+        previous_key = os.environ.get("OPENAI_API_KEY")
+        os.environ["OPENAI_API_KEY"] = "unit-test-secret-canary"
+        try:
+            completed, report = run_cases(
+                temp,
+                items,
+                grader=grader,
+                response=response,
+                extra=["--protocol-retries", "0", "--pass-threshold", "0.9"],
+            )
+        finally:
+            if previous_key is None:
+                os.environ.pop("OPENAI_API_KEY", None)
+            else:
+                os.environ["OPENAI_API_KEY"] = previous_key
+        assert completed.returncode == 0, completed.stderr
+        assert report["status"] == "complete" and len(report["results"]) == 90
+        assert len(report["resume"]["completed_case_keys"]) == 90 and "active_case" not in report
+        assert report["summary"]["cases"] == 90
+        assert report["summary"]["passed"] == 86 and report["summary"]["failed"] == 4, report["summary"]
+        assert report["summary"]["response_invocations"] == 90
+        assert report["summary"]["grader_invocations"] == 89
+        assert report["summary"]["grader_skipped"] == 1
+        assert report["summary"]["cases"] == report["summary"]["passed"] + report["summary"]["failed"]
+        assert (
+            report["summary"]["response_invocations"] + report["summary"]["grader_invocations"]
+            == len(report["invocations"])
+        )
+        assert report["summary"]["usage"]["records"] == len(report["invocations"])
+        assert report["summary"]["model_protocol_failures"] == 1
+        assert report["summary"]["grader_protocol_failures"] == 1
+        assert report["summary"]["grader_protocol_attempt_failures"] == 1
+        assert report["summary"]["grader_protocol_adjustments"] == 2
+        assert report["summary"]["infrastructure_failures"] == 0
+        assert report["summary"]["usage"] == {
+            "records": 179,
+            "input_tokens": 2680,
+            "cached_input_tokens": 536,
+            "cache_write_tokens": 0,
+            "output_tokens": 717,
+            "reasoning_tokens": 0,
+            "total_tokens": 3397,
+        }
+        by_prompt = {
+            item["raw_transcript"][0]["content"]: item for item in report["results"]
+        }
+        assert by_prompt["INJECT_BAD_QUOTE"]["failure_category"] == "grader-protocol"
+        assert not by_prompt["INJECT_CONTRADICTORY"]["passed"]
+        adjusted = [
+            criterion for criterion in by_prompt["INJECT_CONTRADICTORY"]["criteria"]
+            if criterion.get("grader_protocol_adjustment")
+        ]
+        assert len(adjusted) == 2 and all(not criterion["passed"] for criterion in adjusted)
+        assert by_prompt["INJECT_INCOMPLETE"]["grader_evidence"]["skipped"] is True
+        assert by_prompt["INJECT_GUARD"]["deterministic_preflight_passed"] is False
+        assert by_prompt["INJECT_HTML"]["artifacts"][0]["path"] == "lesson.html"
+        assert by_prompt["INJECT_PDF"]["artifacts"][0]["path"] == "lesson.pdf"
+        serialized = json.dumps(report, ensure_ascii=False)
+        assert "unit-test-secret-canary" not in serialized
+        for invocation in report["invocations"]:
+            assert "result" not in invocation
+            assert len(invocation["result_sha256"]) == 64
+
+
 def main() -> int:
     test_registry_and_cases(); test_semantic_fixture_leakage(); test_reference_routing_and_prompt_boundaries()
     test_artifact_and_environment_safety(); test_assessment_and_consent(); test_terminology_structure_and_child_semantics()
     test_grader_evidence(); test_release_git_binding(); test_runner_retry_checkpoint_and_resume()
     test_incomplete_case_continues_and_report_is_integral()
+    test_full_90_case_protocol_simulation()
     print("Teach Me behavioral evaluator adversarial tests passed")
     return 0
 
