@@ -37,7 +37,7 @@ def inspect_pdf(path: Path, expected: list[str]) -> dict[str, object]:
 
 
 def render(source: Path, output: Path, expected: list[str]) -> dict[str, object]:
-    errors = validate_bidi(source, check_links=True)
+    errors = validate_bidi(source, check_links=True, require_print=True)
     if errors:
         raise ValueError("invalid bilingual HTML: " + "; ".join(errors))
     output.parent.mkdir(parents=True, exist_ok=True)

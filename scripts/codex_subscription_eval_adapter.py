@@ -18,7 +18,7 @@ from typing import Any
 
 
 DEFAULT_MODEL = "gpt-5.6-sol"
-ADAPTER_VERSION = "2.0.0"
+ADAPTER_VERSION = "2.1.0"
 ENV_ALLOWLIST = frozenset({"PATH", "HOME", "CODEX_HOME", "LANG", "LC_ALL", "LC_CTYPE", "TMPDIR", "TEMP", "TMP"})
 
 
@@ -56,6 +56,33 @@ def _safe_artifact_path(value: str) -> PurePosixPath:
     if path.is_absolute() or any(part in {"", ".", ".."} for part in value.split("/")):
         raise ValueError("artifact path must not be absolute, normalized, or traversing")
     return path
+
+
+def invalid_artifact_evidence(raw: dict[str, Any]) -> list[dict[str, Any]]:
+    """Hash rejected structured artifacts without treating them as accepted evidence."""
+    artifacts = raw.get("artifacts")
+    if not isinstance(artifacts, list):
+        return []
+    records: list[dict[str, Any]] = []
+    for index, item in enumerate(artifacts):
+        if not isinstance(item, dict):
+            records.append({"index": index, "accepted": False, "reason": "artifact is not an object"})
+            continue
+        content = item.get("content")
+        record: dict[str, Any] = {
+            "index": index,
+            "path": item.get("path") if isinstance(item.get("path"), str) else None,
+            "media_type": item.get("media_type") if isinstance(item.get("media_type"), str) else None,
+            "accepted": False,
+            "raw_result_ref": f"raw_result.artifacts[{index}]",
+        }
+        if isinstance(content, str):
+            encoded = content.encode("utf-8")
+            record.update({"sha256": hashlib.sha256(encoded).hexdigest(), "bytes": len(encoded)})
+        else:
+            record["reason"] = "artifact content is not text"
+        records.append(record)
+    return records
 
 
 def materialize_artifacts(raw: dict[str, Any], workspace: Path, capabilities: dict[str, str]) -> list[dict[str, Any]]:
@@ -158,9 +185,12 @@ def main() -> int:
         evaluation_error = None
         try:
             artifact_records = materialize_artifacts(raw, temporary, payload.get("prompt_packet", {}).get("capabilities", {})) if args.role == "response" else []
-        except (OSError, ValueError) as exc:
+        except Exception as exc:
             artifact_records = []
             evaluation_error = {"kind": "artifact-validation", "message": str(exc)}
+            invalid_artifacts = invalid_artifact_evidence(raw)
+        else:
+            invalid_artifacts = []
     completed_at = datetime.now(timezone.utc)
     result = dict(raw)
     result.update({
@@ -169,7 +199,9 @@ def main() -> int:
         "timing": {"started_at": started_at.isoformat(), "completed_at": completed_at.isoformat(), "duration_seconds": time.monotonic() - started},
         "raw_result": raw, "effective_prompt_sha256": hashlib.sha256(prompt.encode()).hexdigest(),
     })
-    if args.role == "response": result["artifact_evidence"] = artifact_records
+    if args.role == "response":
+        result["artifact_evidence"] = artifact_records
+        result["invalid_artifact_evidence"] = invalid_artifacts
     if evaluation_error is not None: result["evaluation_error"] = evaluation_error
     print(json.dumps(result, ensure_ascii=False))
     return 0

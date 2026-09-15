@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import re
 import shlex
 import subprocess
@@ -71,7 +72,7 @@ NAVIGATION_CLAUSE = re.compile(
     r"how\s+much\s+time\s+can\s+you\s+(?:spend|set aside|study)(?:.*)?|"
     r"(?:ما|أي)\s+(?:نوع\s+)?(?:عملك|وظيفتك|هدفك|المهام(?:\s+التي)?(?:\s+تريد.*)?|بلد\s+الدراسة|جنسيتك|محل\s+إقامتك|بلد\s+إقامتك|المفهوم|الفكرة|الجزء)|"
     r"ما\s+(?:الدولة|البلد)\s+التي\s+تريد\s+(?:الدراسة|التقديم)\s+فيها|"
-    r"كم\s+(?:وقت(?:ًا|ا)?|ساعة|دقيقة).*(?:تستطيع|يمكنك).*(?:التعلم|التعلّم|الدراسة|تخصيص)|"
+    r"كم\s+(?:وقت(?:ًا|ا)?|ساعة|دقيقة).*(?:تستطيع|يمكنك).*(?:التعلم|التعلّم|للتعلم|للتعلّم|الدراسة|للدراسة|تخصيص).*|"
     r"هل\s+(?:ستقد[ّ]?م|تستخدم|تستعمل).*(?:بلد\s+إقامتك|جهاز|منصة|نظام)|"
     r"هل\s+البرنامج\s+(?:قصير|طويل|قصير\s+أم\s+طويل)"
     r")$",
@@ -86,6 +87,7 @@ NAVIGATION_SPLIT = re.compile(
 def is_navigation_question(text: str) -> bool:
     """Accept only questions whose every comma-delimited clause requests context."""
     cleaned = text.strip().lstrip("-*#> ").rstrip("؟?").strip()
+    cleaned = re.sub(r"^(?:[0-9٠-٩]+|[A-Za-z])[.)]\s*", "", cleaned)
     clauses = NAVIGATION_SPLIT.split(cleaned)
     normalized = [re.sub(r"^(?:and\s+|و(?=(?:ما|أي|هل|كم)\b))", "", clause.strip(), flags=re.I) for clause in clauses]
     return bool(normalized) and all(NAVIGATION_CLAUSE.fullmatch(clause) for clause in normalized)
@@ -125,6 +127,50 @@ SENSITIVE_ARGUMENT = re.compile(r"(?:api[-_]?key|access[-_]?token|password|passw
 ADAPTER_ENV_ALLOWLIST = frozenset({"PATH", "HOME", "CODEX_HOME", "LANG", "LC_ALL", "LC_CTYPE", "TMPDIR", "TEMP", "TMP"})
 OPENAI_API_KEY_ENV = "OPENAI_API_KEY"
 
+FAILURE_TAXONOMY = {
+    "educational": "case-local",
+    "deterministic-guard": "case-local",
+    "model-protocol": "case-local",
+    "artifact-protocol": "case-local",
+    "artifact-validation": "case-local",
+    "grader-protocol": "case-local",
+    "contradictory-grader-verdict": "case-local",
+    "infrastructure": "case-local-when-accounted",
+    "candidate-sha-drift": "global",
+    "credential-boundary": "global",
+    "model-identity-mismatch": "global",
+    "usage-accounting": "global",
+    "cost-ceiling": "global",
+    "report-persistence": "global",
+    "invalid-global-configuration": "global",
+    "operator-interrupt": "global",
+}
+ABORT_PATH_INVENTORY = (
+    {"path": "invalid-adapter-command-or-global-configuration", "classification": "invalid-global-configuration", "disposition": "global-preflight"},
+    {"path": "fresh-report-collision-or-invalid-resume", "classification": "invalid-global-configuration", "disposition": "global-preflight"},
+    {"path": "credential-boundary-or-exposure-risk", "classification": "credential-boundary", "disposition": "global"},
+    {"path": "candidate-sha-drift", "classification": "candidate-sha-drift", "disposition": "global"},
+    {"path": "response-command-error", "classification": "infrastructure", "disposition": "accounted-case-local-or-global"},
+    {"path": "response-timeout", "classification": "infrastructure", "disposition": "accounted-case-local-or-global"},
+    {"path": "response-incomplete", "classification": "model-protocol", "disposition": "case-local"},
+    {"path": "response-malformed-payload", "classification": "model-protocol", "disposition": "accounted-case-local-or-global"},
+    {"path": "response-schema-failure", "classification": "model-protocol", "disposition": "accounted-case-local-or-global"},
+    {"path": "model-identity-mismatch", "classification": "model-identity-mismatch", "disposition": "global"},
+    {"path": "artifact-extraction-failure", "classification": "artifact-protocol", "disposition": "case-local"},
+    {"path": "artifact-validation-failure", "classification": "artifact-validation", "disposition": "case-local"},
+    {"path": "deterministic-guard-failure", "classification": "deterministic-guard", "disposition": "case-local"},
+    {"path": "grader-command-error", "classification": "infrastructure", "disposition": "accounted-case-local-or-global"},
+    {"path": "grader-timeout", "classification": "infrastructure", "disposition": "accounted-case-local-or-global"},
+    {"path": "grader-malformed-payload", "classification": "grader-protocol", "disposition": "accounted-case-local-or-global"},
+    {"path": "grader-schema-failure", "classification": "grader-protocol", "disposition": "accounted-case-local-or-global"},
+    {"path": "invalid-grader-evidence", "classification": "grader-protocol", "disposition": "case-local"},
+    {"path": "contradictory-grader-verdict", "classification": "contradictory-grader-verdict", "disposition": "case-local"},
+    {"path": "report-serialization-or-persistence", "classification": "report-persistence", "disposition": "global"},
+    {"path": "usage-accounting-failure", "classification": "usage-accounting", "disposition": "global"},
+    {"path": "authorized-cost-ceiling", "classification": "cost-ceiling", "disposition": "global-preflight"},
+    {"path": "operator-interrupt", "classification": "operator-interrupt", "disposition": "global"},
+)
+
 
 def safe_adapter_command(command: str) -> list[str]:
     parts = shlex.split(command)
@@ -151,8 +197,8 @@ def stream_metadata(value: str | bytes | None) -> dict[str, Any]:
 def adapter_environment(source: dict[str, str], api_key_env: str | None = None) -> dict[str, str]:
     environment = {name: source[name] for name in ADAPTER_ENV_ALLOWLIST if source.get(name)}
     if api_key_env is not None:
-        if api_key_env != OPENAI_API_KEY_ENV: raise RuntimeError("only OPENAI_API_KEY may be passed to an adapter")
-        if not source.get(api_key_env): raise RuntimeError("requested adapter API key environment variable is missing")
+        if api_key_env != OPENAI_API_KEY_ENV: raise GlobalIntegrityError("only OPENAI_API_KEY may be passed to an adapter")
+        if not source.get(api_key_env): raise GlobalIntegrityError("requested adapter API key environment variable is missing")
         environment[api_key_env] = source[api_key_env]
     return environment
 
@@ -167,11 +213,34 @@ class AdapterInvocationError(RuntimeError):
 
 
 class NonRetryableEvaluationError(RuntimeError):
-    """A completed invocation whose content or artifact validation failed."""
+    """A completed invocation with a case-local content or artifact failure."""
+
+    def __init__(self, kind: str, message: str):
+        super().__init__(message)
+        self.kind = kind
 
 
 class GlobalIntegrityError(RuntimeError):
     """A run-wide safety or release-integrity failure that must abort."""
+
+
+def validate_cost_authorization(
+    authorized_cost_usd: float | None,
+    conservative_max_cost_usd: float | None,
+    required: bool,
+) -> None:
+    supplied = (authorized_cost_usd is not None, conservative_max_cost_usd is not None)
+    if (required and not all(supplied)) or supplied[0] != supplied[1]:
+        raise GlobalIntegrityError("both cost authorization values are required")
+    if not any(supplied):
+        return
+    if not all(
+        math.isfinite(value) and value > 0
+        for value in (authorized_cost_usd, conservative_max_cost_usd)
+    ):
+        raise GlobalIntegrityError("cost authorization values must be finite and positive")
+    if conservative_max_cost_usd > authorized_cost_usd:
+        raise GlobalIntegrityError("conservative maximum cost exceeds authorized cost ceiling")
 
 
 def payload_journal_fields(payload: dict[str, Any]) -> dict[str, Any]:
@@ -274,9 +343,11 @@ def invoke_protocol(
                 raise
             return output, records, validated
         except NonRetryableEvaluationError as exc:
-            records[-1]["status"] = "content-error"; records[-1]["content_error"] = str(exc)
+            records[-1]["status"] = "content-error"
+            records[-1]["content_error"] = str(exc)
+            records[-1]["content_error_kind"] = exc.kind
             if on_record: on_record(records[-1])
-            raise
+            return output, records, exc
         except GlobalIntegrityError:
             raise
         except AdapterInvocationError as exc:
@@ -446,8 +517,41 @@ def compact_case_invocations(journal: list[dict[str, Any]], case_key: str) -> No
                 for field in USAGE_FIELDS
                 if isinstance((value := usage.get(field)), int) and value >= 0
             }
-        if record.get("role") == "grader" and record.get("status") == "malformed-protocol":
+        if record.get("status") == "malformed-protocol":
             record["protocol_result"] = raw_result
+
+
+def valid_usage_record(output: dict[str, Any]) -> bool:
+    usage = output.get("usage")
+    if not isinstance(usage, dict) or set(usage) != set(USAGE_FIELDS):
+        return False
+    if not all(isinstance(usage[field], int) and usage[field] >= 0 for field in USAGE_FIELDS):
+        return False
+    return (
+        usage["total_tokens"] == usage["input_tokens"] + usage["output_tokens"]
+        and usage["cached_input_tokens"] + usage["cache_write_tokens"] <= usage["input_tokens"]
+        and usage["reasoning_tokens"] <= usage["output_tokens"]
+    )
+
+
+def validate_usage_evidence(output: dict[str, Any], role: str, required: bool) -> None:
+    if required and not valid_usage_record(output):
+        raise GlobalIntegrityError(f"{role} usage cannot be accounted for safely")
+
+
+def invocation_failure_is_safely_accounted(error: AdapterInvocationError, credential_env: str | None) -> bool:
+    """A command failure is local only when it is provably zero-cost or carries valid usage."""
+    if credential_env is None:
+        return True
+    result = error.record.get("result")
+    return isinstance(result, dict) and valid_usage_record(result)
+
+
+def result_has_failure_category(result: dict[str, Any], category: str) -> bool:
+    categories = result.get("failure_categories")
+    if isinstance(categories, list):
+        return category in categories
+    return result.get("failure_category") == category
 
 
 def aggregate_usage(invocations: list[dict[str, Any]]) -> dict[str, Any]:
@@ -913,10 +1017,16 @@ def enforce_deterministic_checks(
 
 
 def write_report(path: Path, report: dict[str, Any]) -> None:
+    try:
+        serialized = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
+    except (TypeError, ValueError) as exc:
+        raise GlobalIntegrityError("report serialization failed") from exc
+    if os.environ.get(OPENAI_API_KEY_ENV) and os.environ[OPENAI_API_KEY_ENV] in serialized:
+        raise GlobalIntegrityError("credential exposure risk in report")
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(path.suffix + ".tmp")
     with temporary.open("w", encoding="utf-8") as stream:
-        stream.write(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
+        stream.write(serialized)
         stream.flush(); os.fsync(stream.fileno())
     temporary.replace(path)
 
@@ -944,25 +1054,23 @@ def validate_release_model(output: dict[str, Any], role: str, release_evidence: 
 
 
 def validate_response_output(output: dict[str, Any]) -> str:
+    validate_model_evidence(output, "response")
     evaluation_error = output.get("evaluation_error")
     if isinstance(evaluation_error, dict):
         if evaluation_error.get("kind") != "model-incomplete":
-            raise NonRetryableEvaluationError(
-                f"adapter completed with {evaluation_error.get('kind', 'evaluation-error')}"
-            )
-        validate_model_evidence(output, "response")
+            kind = str(evaluation_error.get("kind") or "model-response-invalid")
+            raise NonRetryableEvaluationError(kind, f"adapter completed with {kind}")
         if output.get("response") not in {None, ""} or output.get("artifact_evidence") not in (None, []):
             raise RuntimeError("incomplete model output must not expose partial response or artifact content")
         return ""
     response = output.get("response")
     if not isinstance(response, str) or not response.strip():
         raise RuntimeError("response adapter returned no non-empty response")
-    validate_model_evidence(output, "response")
     return response
 
 
 def verify_release_commit(candidate: str, root: Path = ROOT) -> dict[str, Any]:
-    if not re.fullmatch(r"[0-9a-f]{40}", candidate or ""): raise RuntimeError("release candidate must be a full lowercase SHA-1")
+    if not re.fullmatch(r"[0-9a-f]{40}", candidate or ""): raise GlobalIntegrityError("release candidate must be a full lowercase SHA-1")
     commands = {
         "head": ["git", "rev-parse", "HEAD"], "origin_main": ["git", "rev-parse", "origin/main"],
         "merge_base": ["git", "merge-base", "HEAD", "origin/main"], "tracked_status": ["git", "status", "--porcelain", "--untracked-files=no"],
@@ -971,9 +1079,9 @@ def verify_release_commit(candidate: str, root: Path = ROOT) -> dict[str, Any]:
     for name, command in commands.items():
         done = subprocess.run(command, cwd=root, text=True, capture_output=True, check=False)
         observed[name] = {"command": command, "returncode": done.returncode, "stdout": done.stdout.strip(), "stderr": done.stderr.strip()}
-        if done.returncode: raise RuntimeError(f"release git verification failed: {name}")
-    if any(observed[name]["stdout"] != candidate for name in ("head", "origin_main", "merge_base")): raise RuntimeError("candidate, HEAD, origin/main, and merge base must match")
-    if observed["tracked_status"]["stdout"]: raise RuntimeError("release evidence requires a clean tracked worktree")
+        if done.returncode: raise GlobalIntegrityError(f"release git verification failed: {name}")
+    if any(observed[name]["stdout"] != candidate for name in ("head", "origin_main", "merge_base")): raise GlobalIntegrityError("candidate, HEAD, origin/main, and merge base must match")
+    if observed["tracked_status"]["stdout"]: raise GlobalIntegrityError("release evidence requires a clean tracked worktree")
     return {"verified_sha": candidate, "checks": observed}
 
 
@@ -996,6 +1104,8 @@ def main() -> int:
     parser.add_argument("--expected-grader-model", default="codex/gpt-5.6-sol")
     parser.add_argument("--response-api-key-env", default=None)
     parser.add_argument("--grader-api-key-env", default=None)
+    parser.add_argument("--authorized-cost-usd", type=float, default=None)
+    parser.add_argument("--conservative-max-cost-usd", type=float, default=None)
     args = parser.parse_args()
 
     if not 0 <= args.pass_threshold <= 1:
@@ -1022,6 +1132,11 @@ def main() -> int:
 
     if args.release_evidence and not args.candidate_commit:
         parser.error("--release-evidence requires --candidate-commit")
+    validate_cost_authorization(
+        args.authorized_cost_usd,
+        args.conservative_max_cost_usd,
+        args.release_evidence,
+    )
     if args.release_evidence and (args.case or case_count < 90 or args.pass_threshold != 0.90):
         parser.error("release evidence requires the full case set and the committed 0.90 threshold")
     git_verification = verify_release_commit(args.candidate_commit) if args.release_evidence else None
@@ -1032,6 +1147,8 @@ def main() -> int:
         if not destination.is_relative_to(reports_root): parser.error("release evidence output must be under reports/")
         ignored = subprocess.run(["git", "check-ignore", "-q", str(destination)], cwd=ROOT, check=False)
         if ignored.returncode != 0: parser.error("release evidence output must be Git-ignored")
+        if args.output.exists() and not args.resume:
+            parser.error("fresh release evidence refuses to overwrite an existing report")
 
     generated_at = datetime.now(timezone.utc)
     run_started = time.monotonic()
@@ -1046,17 +1163,23 @@ def main() -> int:
         "timeout_seconds": args.timeout, "pass_threshold": args.pass_threshold,
         "expected_response_model": args.expected_response_model, "expected_grader_model": args.expected_grader_model,
         "response_credential_env": args.response_api_key_env, "grader_credential_env": args.grader_api_key_env,
+        "authorized_cost_usd": args.authorized_cost_usd,
+        "conservative_max_cost_usd": args.conservative_max_cost_usd,
     }
     configuration_sha256 = hashlib.sha256(json.dumps(run_configuration, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
     report: dict[str, Any] = {
-        "schema_version": "2.1.0", "status": "running", "release_evidence": args.release_evidence,
+        "schema_version": "2.2.0", "status": "running", "release_evidence": args.release_evidence,
         "candidate_commit": git_verification["verified_sha"] if git_verification else None,
         "verified_commit": git_verification, "run_id": f"behavioral-{generated_at.strftime('%Y%m%dT%H%M%S.%fZ')}",
         "generated_at": generated_at.isoformat(), "resume": {"requested": args.resume, "completed_case_keys": []},
         "run_configuration": run_configuration, "run_configuration_sha256": configuration_sha256,
         "commands": {"response": safe_adapter_command(args.response_command), "grader": safe_adapter_command(args.grader_command),
                      "response_credential_env": args.response_api_key_env, "grader_credential_env": args.grader_api_key_env,
-                     "protocol_retries": args.protocol_retries, "timeout_seconds": args.timeout},
+                     "protocol_retries": args.protocol_retries, "timeout_seconds": args.timeout,
+                     "authorized_cost_usd": args.authorized_cost_usd,
+                     "conservative_max_cost_usd": args.conservative_max_cost_usd},
+        "failure_taxonomy": FAILURE_TAXONOMY,
+        "abort_path_inventory": list(ABORT_PATH_INVENTORY),
         "instruction_sources": {}, "prompt_packets": {}, "invocations": invocation_journal, "results": results,
     }
     completed_keys: set[str] = set()
@@ -1113,10 +1236,17 @@ def main() -> int:
                     "prompt_packet": packet,
                 }
                 if pending_generation is not None and turn_index == active.get("turn"):
-                    generated, records, response = pending_generation, pending_records, validate_response_output(pending_generation)
-                    validate_release_model(pending_generation, "response", args.release_evidence, args.expected_response_model)
+                    generated, records = pending_generation, pending_records
+                    validate_usage_evidence(generated, "response", args.response_api_key_env is not None)
+                    validate_release_model(generated, "response", args.release_evidence, args.expected_response_model)
+                    try:
+                        response = validate_response_output(generated)
+                    except NonRetryableEvaluationError as exc:
+                        response = exc
                     pending_generation = None
                 else:
+                    if args.release_evidence:
+                        verify_release_commit(args.candidate_commit)
                     report["active_case"] = {"case_key": case_key, "stage": "response-invoking", "turn": turn_index, "attempts": [],
                         "transcript": history, "attempt_log": attempt_log, "last_generation": generated,
                         "response_attempts": response_attempts, "selected_attempts": selected_attempts,
@@ -1126,23 +1256,76 @@ def main() -> int:
                         if record not in invocation_journal: invocation_journal.append(record)
                         report["active_case"]["attempts"] = [item for item in invocation_journal if item.get("role") == "response" and item.get("case_key") == case_key and item.get("turn_index") == turn_index]
                         write_report(args.output, report)
-                    generated, records, response = invoke_protocol(
-                        args.response_command, generation_payload, args.timeout, "response", args.protocol_retries,
-                        lambda output: (validate_response_output(output), validate_release_model(output, "response", args.release_evidence, args.expected_response_model))[0],
-                        checkpoint_response, args.response_api_key_env,
-                    )
+                    try:
+                        generated, records, response = invoke_protocol(
+                            args.response_command, generation_payload, args.timeout, "response", args.protocol_retries,
+                            lambda output: (
+                                validate_usage_evidence(output, "response", args.response_api_key_env is not None),
+                                validate_release_model(output, "response", args.release_evidence, args.expected_response_model),
+                                validate_response_output(output),
+                            )[2],
+                            checkpoint_response, args.response_api_key_env,
+                        )
+                    except AdapterInvocationError as exc:
+                        if not invocation_failure_is_safely_accounted(exc, args.response_api_key_env):
+                            raise GlobalIntegrityError(
+                                "response invocation failed without auditable usage; spending cannot be accounted for safely"
+                            ) from exc
+                        records = [
+                            item for item in invocation_journal
+                            if item.get("role") == "response"
+                            and item.get("case_key") == case_key
+                            and item.get("turn_index") == turn_index
+                        ]
+                        generated = exc.record.get("result")
+                        generated = dict(generated) if isinstance(generated, dict) else {}
+                        timeout_failure = exc.record.get("retry_cause") == "timeout"
+                        kind = "response-timeout" if timeout_failure else (
+                            "response-protocol" if exc.kind == "malformed-protocol" else "response-command-error"
+                        )
+                        generated["evaluation_error"] = {"kind": kind, "message": str(exc)}
+                        response = NonRetryableEvaluationError(kind, str(exc))
                 report["active_case"].update({"stage": "response", "attempts": records})
                 write_report(args.output, report)
                 response_attempts += len(records)
                 evaluation_error = generated.get("evaluation_error")
-                if isinstance(evaluation_error, dict) and evaluation_error.get("kind") == "model-incomplete":
-                    failure_reason = (
-                        "model response was incomplete; "
-                        f"status={evaluation_error.get('status', 'unknown')}, "
-                        f"reason={evaluation_error.get('reason', 'unknown')}"
-                    )
+                validation_failure = response if isinstance(response, NonRetryableEvaluationError) else None
+                if isinstance(evaluation_error, dict) or validation_failure is not None:
+                    if not isinstance(evaluation_error, dict):
+                        evaluation_error = {
+                            "kind": validation_failure.kind,
+                            "message": str(validation_failure),
+                        }
+                    failure_kind = str(evaluation_error.get("kind") or "model-response-invalid")
+                    if failure_kind == "model-incomplete":
+                        failure_reason = (
+                            "model response was incomplete; "
+                            f"status={evaluation_error.get('status', 'unknown')}, "
+                            f"reason={evaluation_error.get('reason', 'unknown')}"
+                        )
+                    else:
+                        failure_reason = str(
+                            evaluation_error.get("message")
+                            or f"model response failed local validation ({failure_kind})"
+                        )
+                    if failure_kind == "artifact-validation":
+                        failure_category = "artifact-validation"
+                        failure_detail_key = "artifact_validation_failure"
+                        invocation_status = "artifact-validation-error"
+                    elif failure_kind in {"artifact-extraction", "artifact-schema", "artifact-protocol"}:
+                        failure_category = "artifact-protocol"
+                        failure_detail_key = "artifact_protocol_failure"
+                        invocation_status = "artifact-protocol-error"
+                    elif failure_kind in {"response-timeout", "response-command-error"}:
+                        failure_category = "infrastructure"
+                        failure_detail_key = "infrastructure_failure"
+                        invocation_status = "transport-error"
+                    else:
+                        failure_category = "model-protocol"
+                        failure_detail_key = "model_protocol_failure"
+                        invocation_status = "model-protocol-error"
                     for index, record in enumerate(records, response_attempts - len(records) + 1):
-                        record["status"] = "model-protocol-error"
+                        record["status"] = invocation_status
                         attempt_log.append(
                             {
                                 "sequence": index,
@@ -1156,12 +1339,17 @@ def main() -> int:
                                 "accepted": False,
                                 "deterministic_guards": None,
                                 "rejection_reasons": [
-                                    {"check": "model-protocol", "reason": failure_reason}
+                                    {"check": failure_category, "reason": failure_reason}
                                 ],
                             }
                         )
                     selected_attempts.append(response_attempts)
-                    incomplete_history = history + [dict(turn, turn=turn_index)]
+                    failure_history = history + [dict(turn, turn=turn_index)]
+                    rejected_response = generated.get("response")
+                    if isinstance(rejected_response, str) and rejected_response:
+                        failure_history.append(
+                            {"role": "assistant", "turn": turn_index, "content": rejected_response}
+                        )
                     criteria = [
                         {
                             "criterion": criterion,
@@ -1186,11 +1374,12 @@ def main() -> int:
                             "prompt_packet_ref": packet["sha256"],
                             "critical": bool(case.get("critical", False)),
                             "passed": False,
-                            "failure_category": "model-protocol",
-                            "model_protocol_failure": evaluation_error,
+                            "failure_category": failure_category,
+                            "failure_categories": [failure_category],
+                            failure_detail_key: evaluation_error,
                             "criteria": criteria,
                             "deterministic_guards": turn_guard_results,
-                            "raw_transcript": incomplete_history,
+                            "raw_transcript": failure_history,
                             "response_attempts": response_attempts,
                             "attempt_log": attempt_log,
                             "selected_attempts": selected_attempts,
@@ -1200,13 +1389,15 @@ def main() -> int:
                                 **{key: generated.get(key) for key in ("model", "settings", "adapter_version", "invocation_id", "timing")},
                                 **{key: generated[key] for key in ("usage", "api", "effective_prompt_sha256") if key in generated},
                                 "evaluation_error": evaluation_error,
+                                "invalid_artifact_evidence": generated.get("invalid_artifact_evidence", []),
                                 "raw_result_ref": f"attempt_log:{selected_attempts[-1]}",
                             },
                             "grader_evidence": {
                                 "skipped": True,
-                                "reason": "model response was incomplete",
+                                "reason": failure_reason,
                             },
                             "artifacts": all_artifacts,
+                            "invalid_artifacts": generated.get("invalid_artifact_evidence", []),
                         }
                     )
                     compact_case_invocations(invocation_journal, case_key)
@@ -1224,7 +1415,20 @@ def main() -> int:
                     ("terminology", lambda: deterministic_terminology_check(response, prompt)),
                     ("text_quality", lambda: deterministic_text_quality_check(response)),
                 ):
-                    guards[guard_name] = guard_function()
+                    try:
+                        guard_result = guard_function()
+                        if (
+                            not isinstance(guard_result, dict)
+                            or not isinstance(guard_result.get("passed"), bool)
+                            or not isinstance(guard_result.get("reason"), str)
+                        ):
+                            raise ValueError("guard result must contain Boolean passed and text reason")
+                        guards[guard_name] = guard_result
+                    except Exception as exc:
+                        guards[guard_name] = {
+                            "passed": False,
+                            "reason": f"deterministic guard execution failure: {type(exc).__name__}: {exc}",
+                        }
                     report["active_case"].update({"stage": f"guard:{guard_name}", "guards": guards})
                     write_report(args.output, report)
                 turn_guard_results.append({"turn_index": turn_index, "guards": guards})
@@ -1281,6 +1485,8 @@ def main() -> int:
                     "turn or generated-artifact excerpt. FAIL may identify an absent requirement."
                 ),
             }
+            if args.release_evidence:
+                verify_release_commit(args.candidate_commit)
             report["active_case"].update({"stage": "grader-invoking", "grader_attempts": []})
             write_report(args.output, report)
             def checkpoint_grader(record: dict[str, Any]) -> None:
@@ -1298,32 +1504,53 @@ def main() -> int:
                     args.timeout,
                     "grader",
                     args.protocol_retries,
-                    lambda output: (validate_model_evidence(output, "grader"), validate_release_model(output, "grader", args.release_evidence, args.expected_grader_model), validate_grade(output, case_expected, history, artifacts, checkpoint_criterion))[2],
+                    lambda output: (
+                        validate_usage_evidence(output, "grader", args.grader_api_key_env is not None),
+                        validate_model_evidence(output, "grader"),
+                        validate_release_model(output, "grader", args.release_evidence, args.expected_grader_model),
+                        validate_grade(output, case_expected, history, artifacts, checkpoint_criterion),
+                    )[3],
                     checkpoint_grader,
                     args.grader_api_key_env,
                 )
             except AdapterInvocationError as exc:
-                if exc.kind != "malformed-protocol":
-                    raise
+                if not invocation_failure_is_safely_accounted(exc, args.grader_api_key_env):
+                    raise GlobalIntegrityError(
+                        "grader invocation failed without auditable usage; spending cannot be accounted for safely"
+                    ) from exc
                 grader_records = [
                     item for item in invocation_journal
                     if item.get("role") == "grader" and item.get("case_key") == case_key
                 ]
-                failure_reason = f"grader protocol failure: {exc}"
+                timeout_failure = exc.record.get("retry_cause") == "timeout"
+                failure_category = "grader-protocol" if exc.kind == "malformed-protocol" else "infrastructure"
+                failure_detail_key = (
+                    "grader_protocol_failure" if failure_category == "grader-protocol"
+                    else "infrastructure_failure"
+                )
+                failure_reason = (
+                    f"grader protocol failure: {exc}" if failure_category == "grader-protocol"
+                    else f"grader invocation failure: {exc}"
+                )
+                failure_detail = {
+                    "kind": "grader-timeout" if timeout_failure else exc.kind,
+                    "message": str(exc),
+                    "attempts": len(grader_records),
+                }
                 invalid_output = exc.record.get("result")
                 invalid_output = invalid_output if isinstance(invalid_output, dict) else {}
                 report["active_case"].update({
-                    "stage": "grader-protocol-failure",
+                    "stage": f"{failure_category}-failure",
                     "grader_attempts": grader_records,
-                    "grader_protocol_failure": {
-                        "kind": exc.kind,
-                        "message": str(exc),
-                        "attempts": len(grader_records),
-                    },
+                    failure_detail_key: failure_detail,
                 })
                 write_report(args.output, report)
                 selected_records = [attempt_log[sequence - 1] for sequence in selected_attempts]
                 deterministic_preflight_passed = all(item["accepted"] for item in selected_records)
+                grader_failure_categories = [
+                    *(["deterministic-guard"] if not deterministic_preflight_passed else []),
+                    failure_category,
+                ]
                 results.append(
                     {
                         "suite": suite["suite"],
@@ -1335,12 +1562,9 @@ def main() -> int:
                         "prompt_packet_ref": packet["sha256"],
                         "critical": bool(case.get("critical", False)),
                         "passed": False,
-                        "failure_category": "grader-protocol",
-                        "grader_protocol_failure": {
-                            "kind": exc.kind,
-                            "message": str(exc),
-                            "attempts": len(grader_records),
-                        },
+                        "failure_category": failure_category,
+                        "failure_categories": grader_failure_categories,
+                        failure_detail_key: failure_detail,
                         "criteria": failed_protocol_criteria(case_expected, failure_reason),
                         "deterministic_guards": turn_guard_results,
                         "raw_transcript": history,
@@ -1356,9 +1580,9 @@ def main() -> int:
                         },
                         "grader_evidence": {
                             "skipped": False,
-                            "protocol_failure": {"kind": exc.kind, "message": str(exc)},
+                            "failure": failure_detail,
                             **{key: invalid_output.get(key) for key in ("model", "settings", "adapter_version", "raw_result", "invocation_id", "timing")},
-                            **{key: invalid_output[key] for key in ("usage", "api", "effective_prompt_sha256", "results") if key in invalid_output},
+                            **{key: invalid_output[key] for key in ("usage", "api", "effective_prompt_sha256", "results", "evaluation_error") if key in invalid_output},
                         },
                         "artifacts": artifacts,
                     }
@@ -1371,6 +1595,10 @@ def main() -> int:
                 continue
             report["active_case"].update({"stage": "grader", "grader_attempts": grader_records})
             write_report(args.output, report)
+            grader_criteria_passed = all(item["passed"] for item in normalized_grade)
+            has_contradictory_pass = any(
+                item.get("grader_protocol_adjustment") for item in normalized_grade
+            )
             criteria = enforce_deterministic_checks(
                 normalized_grade,
                 response,
@@ -1380,6 +1608,15 @@ def main() -> int:
             )
             selected_records = [attempt_log[sequence - 1] for sequence in selected_attempts]
             deterministic_preflight_passed = all(item["accepted"] for item in selected_records)
+            final_passed = deterministic_preflight_passed and all(item["passed"] for item in criteria)
+            final_failure_categories: list[str] = []
+            if not deterministic_preflight_passed:
+                final_failure_categories.append("deterministic-guard")
+            if not grader_criteria_passed:
+                final_failure_categories.append(
+                    "contradictory-grader-verdict" if has_contradictory_pass else "educational"
+                )
+            final_failure_category = final_failure_categories[0] if final_failure_categories else None
             results.append(
                 {
                     "suite": suite["suite"],
@@ -1390,7 +1627,9 @@ def main() -> int:
                     "fixture_refs": case.get("fixture_refs", {}),
                     "prompt_packet_ref": packet["sha256"],
                     "critical": bool(case.get("critical", False)),
-                    "passed": deterministic_preflight_passed and all(item["passed"] for item in criteria),
+                    "passed": final_passed,
+                    "failure_category": final_failure_category,
+                    "failure_categories": final_failure_categories,
                     "criteria": criteria,
                     "deterministic_guards": turn_guard_results,
                     "raw_transcript": history,
@@ -1426,6 +1665,7 @@ def main() -> int:
             "cases": len(results),
             "passed": passed,
             "failed": len(results) - passed,
+            "unfinished": case_count - len(results),
             "pass_rate": pass_rate,
             "threshold": args.pass_threshold,
             "critical_failures": critical_failures,
@@ -1438,10 +1678,29 @@ def main() -> int:
                 for criterion in result["criteria"]
             ),
             "model_protocol_failures": sum(
-                result.get("failure_category") == "model-protocol" for result in results
+                result_has_failure_category(result, "model-protocol") for result in results
             ),
             "grader_protocol_failures": sum(
-                result.get("failure_category") == "grader-protocol" for result in results
+                result_has_failure_category(result, "grader-protocol") for result in results
+            ),
+            "artifact_protocol_failures": sum(
+                result_has_failure_category(result, "artifact-protocol") for result in results
+            ),
+            "artifact_validation_failures": sum(
+                result_has_failure_category(result, "artifact-validation") for result in results
+            ),
+            "deterministic_guard_failures": sum(
+                result_has_failure_category(result, "deterministic-guard") for result in results
+            ),
+            "educational_failures": sum(
+                result_has_failure_category(result, "educational") for result in results
+            ),
+            "contradictory_grader_verdict_failures": sum(
+                result_has_failure_category(result, "contradictory-grader-verdict")
+                for result in results
+            ),
+            "case_infrastructure_failures": sum(
+                result_has_failure_category(result, "infrastructure") for result in results
             ),
             "grader_protocol_attempt_failures": sum(
                 item.get("role") == "grader" and item.get("status") == "malformed-protocol"
@@ -1449,6 +1708,9 @@ def main() -> int:
             ),
             "infrastructure_failures": sum(
                 item.get("status") == "transport-error" for item in invocation_journal
+            ),
+            "usage_unavailable_invocations": sum(
+                not isinstance(item.get("usage"), dict) for item in invocation_journal
             ),
             "usage": aggregate_usage(invocation_journal),
         },
@@ -1462,13 +1724,13 @@ def main() -> int:
 if __name__ == "__main__":
     try:
         raise SystemExit(main())
-    except (KeyboardInterrupt, OSError, RuntimeError, subprocess.TimeoutExpired, yaml.YAMLError) as exc:
+    except (KeyboardInterrupt, OSError, RuntimeError, TypeError, ValueError, subprocess.TimeoutExpired, yaml.YAMLError) as exc:
         if _ACTIVE_REPORT is not None:
             path, diagnostic = _ACTIVE_REPORT
             diagnostic["status"] = "failed"
             diagnostic["failure"] = {"type": type(exc).__name__, "message": str(exc)}
             diagnostic["completed_at"] = datetime.now(timezone.utc).isoformat()
             try: write_report(path, diagnostic)
-            except OSError: pass
+            except (OSError, TypeError, ValueError): pass
         print(f"Behavioral eval failed: {exc}", file=sys.stderr)
         raise SystemExit(2)

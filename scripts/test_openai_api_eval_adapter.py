@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import os
 import sys
@@ -47,10 +48,12 @@ class FakeResponses:
         *,
         status: str = "completed",
         incomplete_reason: str | None = None,
+        output_text: str | None = None,
     ) -> None:
         self.raw = raw
         self.status = status
         self.incomplete_reason = incomplete_reason
+        self.output_text = output_text
         self.calls: list[dict[str, object]] = []
 
     def create(self, **kwargs: object) -> SimpleNamespace:
@@ -58,7 +61,11 @@ class FakeResponses:
         return SimpleNamespace(
             status=self.status,
             incomplete_details=SimpleNamespace(reason=self.incomplete_reason),
-            output_text=json.dumps(self.raw) if self.status == "completed" else "{truncated",
+            output_text=(
+                self.output_text
+                if self.output_text is not None
+                else json.dumps(self.raw) if self.status == "completed" else "{truncated"
+            ),
             model="gpt-5.6-sol",
             id="resp_test",
             _request_id="req_test",
@@ -79,9 +86,12 @@ def fake_client(
     *,
     status: str = "completed",
     incomplete_reason: str | None = None,
+    output_text: str | None = None,
 ) -> SimpleNamespace:
     return SimpleNamespace(
-        responses=FakeResponses(raw, status=status, incomplete_reason=incomplete_reason)
+        responses=FakeResponses(
+            raw, status=status, incomplete_reason=incomplete_reason, output_text=output_text
+        )
     )
 
 
@@ -90,6 +100,7 @@ def generation_payload(
     artifact_type: str = "chat",
     instructional_scope: str = "brief",
     file_capability: str = "not_required",
+    rendering_capability: str = "not_required",
 ) -> dict[str, object]:
     case = {
         "id": "mock",
@@ -106,8 +117,11 @@ def generation_payload(
         instructional_scope=instructional_scope,
     )
     case["capabilities"]["file"] = file_capability
+    case["capabilities"]["rendering"] = rendering_capability
     if file_capability == "executable_temp":
         case["fixture_refs"] = {"file": "file.disposable-workspace.v1"}
+    if rendering_capability == "executable_temp":
+        case["fixture_refs"]["rendering"] = "rendering.pdf-from-html.v1"
     return {
         "type": "generate",
         "suite": "mock-suite",
@@ -190,6 +204,28 @@ def test_long_artifact_budget_and_incomplete_evidence() -> None:
     assert incomplete["usage"]["output_tokens"] == 30
 
 
+def test_completed_malformed_output_preserves_usage() -> None:
+    client = fake_client({}, output_text="not one JSON object")
+    result = adapter.execute(
+        generation_payload(),
+        "response", "gpt-5.6-sol", 2048, "none", 0.0,
+        adapter.API_KEY_ENV, client, 4096,
+    )
+    assert result["evaluation_error"]["kind"] == "response-schema"
+    assert result["response"] == "" and result["artifact_evidence"] == []
+    assert result["raw_result"]["unparsed_output"] == "not one JSON object"
+    assert result["usage"]["total_tokens"] == 150
+    assert result["model"] == "openai/gpt-5.6-sol"
+
+    grader = adapter.execute(
+        {"type": "grade", "criteria": ["one"]},
+        "grader", "gpt-5.6-sol", 2048, "none", 0.0,
+        adapter.API_KEY_ENV, fake_client({"response": "wrong schema"}), 4096,
+    )
+    assert grader["evaluation_error"]["kind"] == "grader-schema"
+    assert "results" not in grader and grader["usage"]["total_tokens"] == 150
+
+
 def test_output_budget_routing() -> None:
     for artifact_type in ("markdown", "html", "pdf", "curriculum", "learning-pack"):
         payload = generation_payload(
@@ -224,6 +260,61 @@ def test_output_budget_routing() -> None:
     )
     grader_payload["type"] = "grade"
     assert adapter.effective_output_token_limit(grader_payload, 2048, 4096) == 2048
+
+
+def test_invalid_artifact_evidence() -> None:
+    html = (
+        '<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8">'
+        '<style>@page{size:A4;margin:18mm}html,body{direction:rtl}'
+        'bdi,.ltr,code,pre{unicode-bidi:isolate}bdi[dir="ltr"]{white-space:nowrap}'
+        '.ltr,code,pre{direction:ltr}pre,table{break-inside:avoid}</style>'
+        '</head><body><p>محتوى عربي صالح الاتجاه لكنه بلا معلم رئيسي.</p></body></html>'
+    )
+    raw = {
+        "response": "تم حفظ الاستجابة المرفوضة مع دليل تدقيق دون تسليم الملف.",
+        "artifacts": [{"path": "pack.html", "media_type": "text/html", "content": html}],
+    }
+    client = fake_client(raw)
+    original_materialize = adapter.materialize_artifacts
+
+    def reject_invalid_artifact(*_args: object, **_kwargs: object) -> list[dict[str, object]]:
+        raise ValueError("invalid bilingual HTML: missing main landmark")
+
+    adapter.materialize_artifacts = reject_invalid_artifact
+    try:
+        result = adapter.execute(
+            generation_payload(
+                artifact_type="pdf",
+                instructional_scope="substantial",
+                file_capability="executable_temp",
+                rendering_capability="executable_temp",
+            ),
+            "response",
+            "gpt-5.6-sol",
+            2048,
+            "none",
+            0.0,
+            adapter.API_KEY_ENV,
+            client,
+            4096,
+        )
+    finally:
+        adapter.materialize_artifacts = original_materialize
+    assert result["evaluation_error"]["kind"] == "artifact-validation"
+    assert "missing main landmark" in result["evaluation_error"]["message"]
+    assert "direction CSS" not in result["evaluation_error"]["message"]
+    assert result["artifact_evidence"] == []
+    assert result["raw_result"] == raw
+    assert result["model"] == "openai/gpt-5.6-sol"
+    assert result["usage"]["total_tokens"] == 150
+    assert result["api"]["request_id"] == "req_test"
+    assert set(result["timing"]) == {"started_at", "completed_at", "duration_seconds"}
+    assert result["settings"]["max_output_tokens"] == 4096
+    rejected = result["invalid_artifact_evidence"]
+    assert len(rejected) == 1 and rejected[0]["accepted"] is False
+    assert rejected[0]["path"] == "pack.html"
+    assert rejected[0]["sha256"] == hashlib.sha256(html.encode()).hexdigest()
+    assert rejected[0]["bytes"] == len(html.encode())
 
 
 def test_grader_schema_and_normalization() -> None:
@@ -297,7 +388,9 @@ def test_secret_boundaries_and_release_identity() -> None:
 def main() -> int:
     test_generation_request()
     test_long_artifact_budget_and_incomplete_evidence()
+    test_completed_malformed_output_preserves_usage()
     test_output_budget_routing()
+    test_invalid_artifact_evidence()
     test_grader_schema_and_normalization()
     test_secret_boundaries_and_release_identity()
     print("Teach Me OpenAI API adapter mocked tests passed")
