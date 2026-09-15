@@ -4,7 +4,7 @@ cases:
 - id: whole-book-artifact-first
   prompt: اشرح لي الكتاب كله بالتفصيل بالعربية الفصحى المبسطة
   expected:
-  - a navigable Markdown or requested PDF curriculum is created before a long lesson
+  - a navigable curriculum artifact appropriate to the requested locale and available capabilities is created before a long lesson
   - the chat response is a short orientation rather than an unstructured lecture
   - the curriculum is divided into modules and lessons with demonstrable outcomes
   locale: ar-MSA
@@ -32,7 +32,7 @@ cases:
     file: file.disposable-workspace.v1
     context: context.curriculum-delivery.whole-book-artifact-first.v1
 - id: markdown-default-ltr
-  prompt: Teach me this broad field from zero; I did not choose a file format.
+  prompt: Teach me data analysis for operational reporting from zero; I did not choose a file format.
   expected:
   - an editable Markdown curriculum is the default artifact
   - the learner is not blocked by an unnecessary format question

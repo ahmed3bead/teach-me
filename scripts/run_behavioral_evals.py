@@ -60,27 +60,37 @@ ASSESSMENT_QUESTION = re.compile(
     r"what|which|who|when|where|why|how|can\s+you\s+explain|did\s+you\s+understand|do\s+you\s+understand|got\s+it)\b.*[؟?]$",
     flags=re.IGNORECASE,
 )
-NAVIGATION_CONTEXT = re.compile(
-    r"(?:topic|subject|book|source|video|link|url|title|author|edition|operating system|device|goal|"
-    r"available time|budget|file|chapter|lesson|curriculum|course|framework|skill|language|platform|outcome|result|"
-    r"prior knowledge|experience|learners?|students?|age|grade|duration|version|access|completion date|hours|time|"
-    r"tool|used|build|want to (?:create|learn|do)|"
-    r"الموضوع|المادة|الكتاب|المصدر|الفيديو|الرابط|العنوان|المؤلف|الطبعة|نظام التشغيل|الجهاز|الهدف|"
-    r"الوقت|وقت|الميزانية|الملف|الفصل|الدرس|المنهج|الكورس|المهارة|اللغة)",
-    flags=re.IGNORECASE,
-)
-NAVIGATION_QUESTION = re.compile(
+NAVIGATION_CLAUSE = re.compile(
     r"^(?:"
-    r"what\s+(?:would\s+you\s+like\s+to|are\s+you\s+hoping\s+to)\s+(?:learn|study|use|build|create|do)|"
+    r"what\s+(?:would\s+you\s+like\s+to|are\s+you\s+hoping\s+to)\s+(?:learn|study|use|build|create|do)(?:\s+next|\s+it\s+for)?|"
     r"(?:what|which)\s+(?:operating system|device|platform|language|book|source|course)\s+do\s+you\s+use|"
+    r"what\s+(?:concept|idea|topic|subject)\s+(?:are\s+you\s+trying\s+to|do\s+you\s+want\s+to)\s+(?:understand|learn|study|work\s+on)|"
+    r"what\s+(?:concept|idea|topic|subject)\s+do\s+you\s+want(?:\s+to\s+(?:understand|learn|study|work\s+on))?|"
+    r"(?:what|which)\s+part\s+(?:feels|is)\s+(?:unclear|confusing)|"
     r"(?:what|which)\s+(?:is|are)\s+your\s+(?:job|work|goal|country|nationality|citizenship|residence|jurisdiction)|"
-    r"how\s+much\s+time\s+can\s+you\s+(?:spend|set aside|study)|"
-    r"(?:ما|أي)\s+(?:نوع\s+)?(?:عملك|وظيفتك|هدفك|المهام(?:\s+التي)?|بلد\s+الدراسة|جنسيتك|محل\s+إقامتك|بلد\s+إقامتك)|"
+    r"how\s+much\s+time\s+can\s+you\s+(?:spend|set aside|study)(?:.*)?|"
+    r"(?:ما|أي)\s+(?:نوع\s+)?(?:عملك|وظيفتك|هدفك|المهام(?:\s+التي)?(?:\s+تريد.*)?|بلد\s+الدراسة|جنسيتك|محل\s+إقامتك|بلد\s+إقامتك|المفهوم|الفكرة|الجزء)|"
+    r"ما\s+(?:الدولة|البلد)\s+التي\s+تريد\s+(?:الدراسة|التقديم)\s+فيها|"
     r"كم\s+(?:وقت(?:ًا|ا)?|ساعة|دقيقة).*(?:تستطيع|يمكنك).*(?:التعلم|التعلّم|الدراسة|تخصيص)|"
-    r"هل\s+(?:ستقد[ّ]?م|تستخدم|تستعمل).*(?:بلد\s+إقامتك|جهاز|منصة|نظام)"
-    r")\b.*[؟?]$",
+    r"هل\s+(?:ستقد[ّ]?م|تستخدم|تستعمل).*(?:بلد\s+إقامتك|جهاز|منصة|نظام)|"
+    r"هل\s+البرنامج\s+(?:قصير|طويل|قصير\s+أم\s+طويل)"
+    r")$",
     flags=re.IGNORECASE,
 )
+NAVIGATION_SPLIT = re.compile(
+    r"[،,]\s*(?=(?:and\s+)?(?:what|which|who|when|where|why|how|can)\b|و?(?:ما|أي|هل|كم)\b)",
+    flags=re.IGNORECASE,
+)
+
+
+def is_navigation_question(text: str) -> bool:
+    """Accept only questions whose every comma-delimited clause requests context."""
+    cleaned = text.strip().lstrip("-*#> ").rstrip("؟?").strip()
+    clauses = NAVIGATION_SPLIT.split(cleaned)
+    normalized = [re.sub(r"^(?:and\s+|و(?=(?:ما|أي|هل|كم)\b))", "", clause.strip(), flags=re.I) for clause in clauses]
+    return bool(normalized) and all(NAVIGATION_CLAUSE.fullmatch(clause) for clause in normalized)
+
+
 ASSESSMENT_OFFER = re.compile(
     r"(?:اختبار|تحق[ّ]?ق|مراجعة|أسئلة|تمارين|check|quiz|test|questions?|exercises?)",
     flags=re.IGNORECASE,
@@ -158,6 +168,10 @@ class AdapterInvocationError(RuntimeError):
 
 class NonRetryableEvaluationError(RuntimeError):
     """A completed invocation whose content or artifact validation failed."""
+
+
+class GlobalIntegrityError(RuntimeError):
+    """A run-wide safety or release-integrity failure that must abort."""
 
 
 def payload_journal_fields(payload: dict[str, Any]) -> dict[str, Any]:
@@ -253,7 +267,7 @@ def invoke_protocol(
             records.append(record)
             if on_record: on_record(record)
             try: validated = validator(output) if validator else None
-            except NonRetryableEvaluationError: raise
+            except (NonRetryableEvaluationError, GlobalIntegrityError): raise
             except RuntimeError:
                 record["status"] = "malformed-protocol"
                 if on_record: on_record(record)
@@ -262,6 +276,8 @@ def invoke_protocol(
         except NonRetryableEvaluationError as exc:
             records[-1]["status"] = "content-error"; records[-1]["content_error"] = str(exc)
             if on_record: on_record(records[-1])
+            raise
+        except GlobalIntegrityError:
             raise
         except AdapterInvocationError as exc:
             records.append(exc.record)
@@ -306,7 +322,7 @@ NEGATIVE_CRITERION = re.compile(
     flags=re.IGNORECASE,
 )
 NEGATIVE_SATISFACTION_REASON = re.compile(
-    r"(?:\b(?:does not|do not|without|no |never |stops?|remains? internal|avoids?)\b|"
+    r"(?:\b(?:does not|do not|not|without|no |never |stops?|remains? internal|avoids?)\b|"
     r"لا يتضمن|لا يحتوي|من دون|دون |يوقف|يتوقف|تبقى داخلية)",
     flags=re.IGNORECASE,
 )
@@ -388,6 +404,66 @@ def expected_criteria(case: dict[str, Any]) -> list[str]:
     if isinstance(locale, str) and locale.strip():
         expected.append(locale_criterion(locale.strip()))
     return expected
+
+
+USAGE_FIELDS = (
+    "input_tokens",
+    "cached_input_tokens",
+    "cache_write_tokens",
+    "output_tokens",
+    "reasoning_tokens",
+    "total_tokens",
+)
+
+
+def failed_protocol_criteria(expected: list[str], reason: str) -> list[dict[str, Any]]:
+    """Fail every criterion when no grader verdict can be trusted."""
+    return [
+        {
+            "criterion": criterion,
+            "passed": False,
+            "verdict": "fail",
+            "evidence": {"source": "absent", "quote": f"ABSENT: {reason}"[:800]},
+            "reason": reason,
+        }
+        for criterion in expected
+    ]
+
+
+def compact_case_invocations(journal: list[dict[str, Any]], case_key: str) -> None:
+    """Hash raw adapter results while retaining invalid grader output for audit."""
+    for record in [item for item in journal if item.get("case_key") == case_key]:
+        raw_result = record.pop("result", None)
+        if raw_result is None:
+            continue
+        record["result_sha256"] = hashlib.sha256(
+            json.dumps(raw_result, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest()
+        usage = raw_result.get("usage") if isinstance(raw_result, dict) else None
+        if isinstance(usage, dict):
+            record["usage"] = {
+                field: value
+                for field in USAGE_FIELDS
+                if isinstance((value := usage.get(field)), int) and value >= 0
+            }
+        if record.get("role") == "grader" and record.get("status") == "malformed-protocol":
+            record["protocol_result"] = raw_result
+
+
+def aggregate_usage(invocations: list[dict[str, Any]]) -> dict[str, Any]:
+    """Aggregate auditable usage from every invocation, including failed attempts."""
+    totals = {field: 0 for field in USAGE_FIELDS}
+    records = 0
+    for invocation in invocations:
+        usage = invocation.get("usage")
+        if not isinstance(usage, dict):
+            continue
+        records += 1
+        for field in USAGE_FIELDS:
+            value = usage.get(field, 0)
+            if isinstance(value, int) and value >= 0:
+                totals[field] += value
+    return {"records": records, **totals}
 
 
 def deterministic_language_check(text: str, locale: str | None) -> dict[str, Any]:
@@ -530,7 +606,7 @@ def assessment_prompt_match(text: str) -> AssessmentMatch | None:
     """Find an actual knowledge task without treating navigation or quoted examples as assessment."""
     visible = re.sub(r"```.*?```|`[^`]*`|«[^»]*»|“[^”]*”|\"[^\"]*\"", " ", text, flags=re.DOTALL)
     question_lines = [line for line in visible.splitlines() if "?" in line or "؟" in line]
-    navigation_questionnaire = bool(question_lines) and all(NAVIGATION_CONTEXT.search(line) for line in question_lines)
+    navigation_questionnaire = bool(question_lines) and all(is_navigation_question(line) for line in question_lines)
     outside_fence = True
     for original in text.splitlines():
         line = original.strip().lstrip("-*#> ")
@@ -553,10 +629,9 @@ def assessment_prompt_match(text: str) -> AssessmentMatch | None:
                 continue
             if GENERIC_START_INVITATION.search(candidate) and ASSESSMENT_OFFER.search(line):
                 continue
-            if NAVIGATION_QUESTION.search(candidate):
+            if is_navigation_question(candidate):
                 continue
             if ASSESSMENT_QUESTION.search(candidate):
-                if NAVIGATION_CONTEXT.search(candidate): continue
                 return AssessmentMatch(candidate)
             task_candidate = re.sub(r"^(?:current action|your action|الخطوة الحالية|إجراءك الحالي|الإجراء الآن)\s*[:：-]?\s*", "", candidate, flags=re.I)
             task_candidate = re.sub(r"^(?:if you want|إذا أردت|إن أردت|إن أحببت)[،,]?\s*", "", task_candidate, flags=re.I)
@@ -862,10 +937,10 @@ def validate_model_evidence(output: dict[str, Any], role: str) -> None:
 def validate_release_model(output: dict[str, Any], role: str, release_evidence: bool, expected_model: str) -> None:
     if not release_evidence: return
     if not re.fullmatch(r"[^/\s]+/[^/\s]+", expected_model):
-        raise RuntimeError(f"{role} expected model must be an exact provider/model identifier")
+        raise GlobalIntegrityError(f"{role} expected model must be an exact provider/model identifier")
     requested_model = expected_model.split("/", 1)[1]
     if output.get("model") != expected_model or output.get("settings", {}).get("model") != requested_model:
-        raise RuntimeError(f"{role} release evidence does not match expected model {expected_model}")
+        raise GlobalIntegrityError(f"{role} release evidence does not match expected model {expected_model}")
 
 
 def validate_response_output(output: dict[str, Any]) -> str:
@@ -974,7 +1049,7 @@ def main() -> int:
     }
     configuration_sha256 = hashlib.sha256(json.dumps(run_configuration, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
     report: dict[str, Any] = {
-        "schema_version": "2.0.0", "status": "running", "release_evidence": args.release_evidence,
+        "schema_version": "2.1.0", "status": "running", "release_evidence": args.release_evidence,
         "candidate_commit": git_verification["verified_sha"] if git_verification else None,
         "verified_commit": git_verification, "run_id": f"behavioral-{generated_at.strftime('%Y%m%dT%H%M%S.%fZ')}",
         "generated_at": generated_at.isoformat(), "resume": {"requested": args.resume, "completed_case_keys": []},
@@ -1134,12 +1209,7 @@ def main() -> int:
                             "artifacts": all_artifacts,
                         }
                     )
-                    for record in [item for item in invocation_journal if item.get("case_key") == case_key]:
-                        raw_result = record.pop("result", None)
-                        if raw_result is not None:
-                            record["result_sha256"] = hashlib.sha256(
-                                json.dumps(raw_result, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
-                            ).hexdigest()
+                    compact_case_invocations(invocation_journal, case_key)
                     completed_keys.add(case_key)
                     report["resume"]["completed_case_keys"] = sorted(completed_keys)
                     report.pop("active_case", None)
@@ -1221,16 +1291,84 @@ def main() -> int:
                 report["active_case"].setdefault("validated_grader_results", []).append(result)
                 report["active_case"]["stage"] = f"grader-result:{index}"
                 write_report(args.output, report)
-            graded, grader_records, normalized_grade = invoke_protocol(
-                args.grader_command,
-                grade_payload,
-                args.timeout,
-                "grader",
-                args.protocol_retries,
-                lambda output: (validate_model_evidence(output, "grader"), validate_release_model(output, "grader", args.release_evidence, args.expected_grader_model), validate_grade(output, case_expected, history, artifacts, checkpoint_criterion))[2],
-                checkpoint_grader,
-                args.grader_api_key_env,
-            )
+            try:
+                graded, grader_records, normalized_grade = invoke_protocol(
+                    args.grader_command,
+                    grade_payload,
+                    args.timeout,
+                    "grader",
+                    args.protocol_retries,
+                    lambda output: (validate_model_evidence(output, "grader"), validate_release_model(output, "grader", args.release_evidence, args.expected_grader_model), validate_grade(output, case_expected, history, artifacts, checkpoint_criterion))[2],
+                    checkpoint_grader,
+                    args.grader_api_key_env,
+                )
+            except AdapterInvocationError as exc:
+                if exc.kind != "malformed-protocol":
+                    raise
+                grader_records = [
+                    item for item in invocation_journal
+                    if item.get("role") == "grader" and item.get("case_key") == case_key
+                ]
+                failure_reason = f"grader protocol failure: {exc}"
+                invalid_output = exc.record.get("result")
+                invalid_output = invalid_output if isinstance(invalid_output, dict) else {}
+                report["active_case"].update({
+                    "stage": "grader-protocol-failure",
+                    "grader_attempts": grader_records,
+                    "grader_protocol_failure": {
+                        "kind": exc.kind,
+                        "message": str(exc),
+                        "attempts": len(grader_records),
+                    },
+                })
+                write_report(args.output, report)
+                selected_records = [attempt_log[sequence - 1] for sequence in selected_attempts]
+                deterministic_preflight_passed = all(item["accepted"] for item in selected_records)
+                results.append(
+                    {
+                        "suite": suite["suite"],
+                        "case_id": case["id"],
+                        "locale": case["locale"],
+                        "routing": case["routing"],
+                        "capabilities": case["capabilities"],
+                        "fixture_refs": case.get("fixture_refs", {}),
+                        "prompt_packet_ref": packet["sha256"],
+                        "critical": bool(case.get("critical", False)),
+                        "passed": False,
+                        "failure_category": "grader-protocol",
+                        "grader_protocol_failure": {
+                            "kind": exc.kind,
+                            "message": str(exc),
+                            "attempts": len(grader_records),
+                        },
+                        "criteria": failed_protocol_criteria(case_expected, failure_reason),
+                        "deterministic_guards": turn_guard_results,
+                        "raw_transcript": history,
+                        "response_attempts": response_attempts,
+                        "attempt_log": attempt_log,
+                        "selected_attempts": selected_attempts,
+                        "selected_attempt": selected_attempts[-1],
+                        "deterministic_preflight_passed": deterministic_preflight_passed,
+                        "response_evidence": {
+                            **{key: generated.get(key) for key in ("model", "settings", "adapter_version", "invocation_id", "timing")},
+                            **{key: generated[key] for key in ("usage", "api", "effective_prompt_sha256") if key in generated},
+                            "raw_result_ref": f"attempt_log:{selected_attempts[-1]}",
+                        },
+                        "grader_evidence": {
+                            "skipped": False,
+                            "protocol_failure": {"kind": exc.kind, "message": str(exc)},
+                            **{key: invalid_output.get(key) for key in ("model", "settings", "adapter_version", "raw_result", "invocation_id", "timing")},
+                            **{key: invalid_output[key] for key in ("usage", "api", "effective_prompt_sha256", "results") if key in invalid_output},
+                        },
+                        "artifacts": artifacts,
+                    }
+                )
+                compact_case_invocations(invocation_journal, case_key)
+                completed_keys.add(case_key)
+                report["resume"]["completed_case_keys"] = sorted(completed_keys)
+                report.pop("active_case", None)
+                write_report(args.output, report)
+                continue
             report["active_case"].update({"stage": "grader", "grader_attempts": grader_records})
             write_report(args.output, report)
             criteria = enforce_deterministic_checks(
@@ -1273,10 +1411,7 @@ def main() -> int:
                     "artifacts": artifacts,
                 }
             )
-            for record in [item for item in invocation_journal if item.get("case_key") == case_key]:
-                raw_result = record.pop("result", None)
-                if raw_result is not None:
-                    record["result_sha256"] = hashlib.sha256(json.dumps(raw_result, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+            compact_case_invocations(invocation_journal, case_key)
             completed_keys.add(case_key)
             report["resume"]["completed_case_keys"] = sorted(completed_keys)
             report.pop("active_case", None)
@@ -1296,6 +1431,7 @@ def main() -> int:
             "critical_failures": critical_failures,
             "response_invocations": sum(item.get("role") == "response" for item in invocation_journal),
             "grader_invocations": sum(item.get("role") == "grader" for item in invocation_journal),
+            "grader_skipped": sum(bool(result.get("grader_evidence", {}).get("skipped")) for result in results),
             "grader_protocol_adjustments": sum(
                 bool(criterion.get("grader_protocol_adjustment"))
                 for result in results
@@ -1305,12 +1441,16 @@ def main() -> int:
                 result.get("failure_category") == "model-protocol" for result in results
             ),
             "grader_protocol_failures": sum(
+                result.get("failure_category") == "grader-protocol" for result in results
+            ),
+            "grader_protocol_attempt_failures": sum(
                 item.get("role") == "grader" and item.get("status") == "malformed-protocol"
                 for item in invocation_journal
             ),
             "infrastructure_failures": sum(
                 item.get("status") == "transport-error" for item in invocation_journal
             ),
+            "usage": aggregate_usage(invocation_journal),
         },
     })
     write_report(args.output, report)

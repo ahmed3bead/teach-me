@@ -85,7 +85,12 @@ def fake_client(
     )
 
 
-def generation_payload(*, long_artifact: bool = False) -> dict[str, object]:
+def generation_payload(
+    *,
+    artifact_type: str = "chat",
+    instructional_scope: str = "brief",
+    file_capability: str = "not_required",
+) -> dict[str, object]:
     case = {
         "id": "mock",
         "locale": "en",
@@ -96,9 +101,12 @@ def generation_payload(*, long_artifact: bool = False) -> dict[str, object]:
         "capabilities": copy.deepcopy(CAPABILITIES),
         "fixture_refs": {},
     }
-    if long_artifact:
-        case["routing"]["artifact_type"] = "curriculum"
-        case["capabilities"]["file"] = "executable_temp"
+    case["routing"].update(
+        artifact_type=artifact_type,
+        instructional_scope=instructional_scope,
+    )
+    case["capabilities"]["file"] = file_capability
+    if file_capability == "executable_temp":
         case["fixture_refs"] = {"file": "file.disposable-workspace.v1"}
     return {
         "type": "generate",
@@ -141,7 +149,7 @@ def test_long_artifact_budget_and_incomplete_evidence() -> None:
     raw = {"response": "A complete teaching explanation with one clear example.", "artifacts": []}
     long_client = fake_client(raw)
     long_result = adapter.execute(
-        generation_payload(long_artifact=True),
+        generation_payload(artifact_type="curriculum", instructional_scope="substantial", file_capability="executable_temp"),
         "response",
         "gpt-5.6-sol",
         2048,
@@ -159,7 +167,7 @@ def test_long_artifact_budget_and_incomplete_evidence() -> None:
         {}, status="incomplete", incomplete_reason="max_output_tokens"
     )
     incomplete = adapter.execute(
-        generation_payload(long_artifact=True),
+        generation_payload(artifact_type="curriculum", instructional_scope="substantial", file_capability="executable_temp"),
         "response",
         "gpt-5.6-sol",
         2048,
@@ -180,6 +188,42 @@ def test_long_artifact_budget_and_incomplete_evidence() -> None:
     }
     assert incomplete["response"] == "" and incomplete["artifact_evidence"] == []
     assert incomplete["usage"]["output_tokens"] == 30
+
+
+def test_output_budget_routing() -> None:
+    for artifact_type in ("markdown", "html", "pdf", "curriculum", "learning-pack"):
+        payload = generation_payload(
+            artifact_type=artifact_type,
+            instructional_scope="substantial",
+            file_capability="executable_temp",
+        )
+        assert adapter.uses_long_artifact_budget(payload), artifact_type
+        assert adapter.effective_output_token_limit(payload, 2048, 4096) == 4096
+
+    ordinary = (
+        generation_payload(),
+        generation_payload(
+            artifact_type="html",
+            instructional_scope="brief",
+            file_capability="executable_temp",
+        ),
+        generation_payload(
+            artifact_type="pdf",
+            instructional_scope="substantial",
+            file_capability="not_required",
+        ),
+    )
+    for payload in ordinary:
+        assert not adapter.uses_long_artifact_budget(payload)
+        assert adapter.effective_output_token_limit(payload, 2048, 4096) == 2048
+
+    grader_payload = generation_payload(
+        artifact_type="curriculum",
+        instructional_scope="journey",
+        file_capability="executable_temp",
+    )
+    grader_payload["type"] = "grade"
+    assert adapter.effective_output_token_limit(grader_payload, 2048, 4096) == 2048
 
 
 def test_grader_schema_and_normalization() -> None:
@@ -253,6 +297,7 @@ def test_secret_boundaries_and_release_identity() -> None:
 def main() -> int:
     test_generation_request()
     test_long_artifact_budget_and_incomplete_evidence()
+    test_output_budget_routing()
     test_grader_schema_and_normalization()
     test_secret_boundaries_and_release_identity()
     print("Teach Me OpenAI API adapter mocked tests passed")

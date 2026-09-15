@@ -113,7 +113,7 @@ cases:
   prompt: خلصنا الوحدة كاملة وعاوز أتأكد إني استفدت
   expected:
   - one authentic low-pressure application is preferred over several tiny classification questions
-  - feedback informs the next lesson without making a score the goal
+  - the learner's explicit request is treated as consent and the check begins without another confirmation or a score-focused frame
   routing:
     audience: learner
     mode: topic-led
@@ -140,7 +140,7 @@ cases:
   prompt: خلصنا صفحتين من الفصل ولسه الدرس مكمل، تسألني دلوقتي؟
   expected:
   - an unfinished page slice is not treated as a completed learning-unit boundary
-  - the connected explanation continues without starting or offering a routine quiz
+  - the connected explanation continues without starting, previewing, promising, or offering a routine quiz
   routing:
     audience: learner
     mode: topic-led

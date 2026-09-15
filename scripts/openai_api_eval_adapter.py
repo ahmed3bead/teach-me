@@ -24,8 +24,9 @@ from codex_subscription_eval_adapter import materialize_artifacts, output_schema
 DEFAULT_MODEL = "gpt-5.6-sol"
 DEFAULT_MAX_OUTPUT_TOKENS = 2048
 DEFAULT_LONG_ARTIFACT_MAX_OUTPUT_TOKENS = 4096
-LONG_ARTIFACT_TYPES = frozenset({"curriculum", "learning-pack"})
-ADAPTER_VERSION = "1.1.0"
+LONG_ARTIFACT_TYPES = frozenset({"markdown", "html", "pdf", "curriculum", "learning-pack"})
+LONG_ARTIFACT_SCOPES = frozenset({"substantial", "journey"})
+ADAPTER_VERSION = "1.2.0"
 API_KEY_ENV = "OPENAI_API_KEY"
 
 
@@ -97,7 +98,7 @@ def usage_record(response: Any) -> dict[str, int]:
 
 
 def uses_long_artifact_budget(payload: dict[str, Any]) -> bool:
-    """Reserve the larger bound only for file-backed curriculum artifacts."""
+    """Reserve the larger bound only for substantial file-backed deliverables."""
     if payload.get("type") != "generate":
         return False
     packet = payload.get("prompt_packet", {})
@@ -105,6 +106,7 @@ def uses_long_artifact_budget(payload: dict[str, Any]) -> bool:
     capabilities = packet.get("capabilities", {}) if isinstance(packet, dict) else {}
     return (
         routing.get("artifact_type") in LONG_ARTIFACT_TYPES
+        and routing.get("instructional_scope") in LONG_ARTIFACT_SCOPES
         and capabilities.get("file") == "executable_temp"
     )
 
