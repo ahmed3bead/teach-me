@@ -99,6 +99,8 @@ def main() -> int:
         skill_name = skill_frontmatter.get("name")
         if plugin_manifest.get("name") != skill_name:
             failures.append("Claude Code plugin name does not match SKILL.md")
+        if plugin_manifest.get("skills") != "./":
+            failures.append("Claude Code plugin must explicitly expose its root skill for legacy clients")
         if "displayName" in plugin_manifest:
             failures.append("Claude Code plugin manifest must avoid displayName for legacy client compatibility")
         if "version" in plugin_manifest:
