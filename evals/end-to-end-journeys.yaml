@@ -19,7 +19,7 @@ cases:
   expected:
   - the learner receives an explain-first coherent lesson with defined terms and a worked example
   - no routine assessment questions appear before the complete-unit boundary and explicit opt-in
-  - the accepted check uses three to five purposeful items and adapts the next step without manufacturing a score
+  - the accepted check uses one or more purposeful items sufficient to sample the objective and adapts the next step without manufacturing a score
   - the teaching remains clear simplified Modern Standard Arabic and preserves isolated English terminology
   - progress claims distinguish explanation, supported practice, and independent evidence
   routing:

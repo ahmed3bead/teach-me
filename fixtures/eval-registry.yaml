@@ -445,19 +445,25 @@ fixtures:
   authorized: true
   provenance: case-specific simulated source capture
   captured_at: '2026-09-14T00:00:00Z'
-  content_sha256: 55c28fde8a0e462ddbef2c32b030776e9101f0bebeee0df77fd79dd9ac1398fd
+  content_sha256: 824908db50fb97ab5d6a80a08c600934e9c0280a616aded77b614da78253e663
   simulated: true
   result:
     tool_result_type: simulated_source
     data:
       title: Primary science curriculum
+      source_id: CURR-PRIMARY-SCI-01
       outcomes:
-      - observe evaporation
-      - describe condensation
+      - objective_id: OBJ-EVAP-01
+        statement: observe evaporation
+      - objective_id: OBJ-COND-02
+        statement: describe condensation
       materials:
-      - cup
-      - water
-      - paper
+      - material_id: MAT-CUP-01
+        item: cup
+      - material_id: MAT-WATER-02
+        item: water
+      - material_id: MAT-PAPER-03
+        item: paper
 - id: source.golden-teaching.ddia-senior-developer.v1
   capability: source
   state: supplied_result
@@ -875,16 +881,20 @@ fixtures:
   authorized: true
   provenance: case-specific simulated web capture
   captured_at: '2026-09-14T00:00:00Z'
-  content_sha256: 6f15a5eca8deadda289c48781b80811071c7ef07913df87626f8b125773854bb
+  content_sha256: 100f63713f039cf1176bb00fba687d94dcffdcb2fa6581f9a7cd650faf2f539c
   simulated: true
   result:
     tool_result_type: simulated_web
     data:
       results:
-      - url: https://official.example.test/framework/releases
-        authority: official synthetic framework documentation
+      - url: https://laravel.example.test/docs/releases
+        authority: official synthetic Laravel release documentation
         published: '2026-09-10'
-        fact: The current fixture release is 13.2; version 12 entered security maintenance.
+        fact: The current fixture release is Laravel 13.2; Laravel 12 entered security maintenance.
+      - url: https://independent.example.test/laravel-13-practice
+        authority: independent synthetic practitioner guide
+        published: '2026-09-11'
+        fact: A beginner walkthrough applies Laravel 13 routing and controllers without changing the official behavior.
 - id: source.broad-research-sweep.paid-course-discovery.v1
   capability: source
   state: supplied_result
@@ -923,20 +933,20 @@ fixtures:
   authorized: true
   provenance: case-specific simulated web capture
   captured_at: '2026-09-14T00:00:00Z'
-  content_sha256: e36f0c089457986357161df98380bd789922f30fd2cc8db4f96ae2912ff6b539
+  content_sha256: 0de681f35dee4af2d591f8be44f7936cdb52ae1c687cf179181159c2de4e478c
   simulated: true
   result:
     tool_result_type: simulated_web
     data:
       results:
-      - url: https://ar.example.test/topic
+      - url: https://ar.example.test/database-indexes
         language: ar
         authority: synthetic university
-        fact: Arabic overview defines the core concept.
-      - url: https://en.example.test/topic
+        fact: Arabic overview explains that a database index speeds selected lookups by maintaining a searchable structure.
+      - url: https://en.example.test/database-indexes
         language: en
-        authority: synthetic standards body
-        fact: English specification defines implementation constraints.
+        authority: synthetic database documentation
+        fact: English reference documents index maintenance costs and query-planner constraints.
 - id: source.broad-research-sweep.popular-but-weak-source.v1
   capability: source
   state: supplied_result
@@ -1251,3 +1261,75 @@ fixtures:
         exit_code: 0
         stdout: synthetic check passed
       tool_network: disabled
+- id: context.integration-core.resume-without-reonboarding.v1
+  capability: context
+  state: supplied_result
+  authorized: true
+  provenance: case-specific simulated learner/session context
+  captured_at: '2026-09-16T00:00:00Z'
+  content_sha256: e336be0acc6cc9821d965f136556f606c7a655da31928c60747a80e0a1268a3d
+  simulated: true
+  result:
+    tool_result_type: simulated_context
+    data:
+      session_id: session
+      active_goal: Use the SUM function in a simple expense table
+      checkpoint:
+        module_id: M01
+        lesson_id: L02
+        state: after guided example
+      validated_links:
+      - M01
+      - L02
+- id: source.integration-core.corrected-claim-propagates.v1
+  capability: source
+  state: supplied_result
+  authorized: true
+  provenance: case-specific simulated authoritative source capture
+  captured_at: '2026-09-16T00:00:00Z'
+  content_sha256: c1291f692cc5ba1b1549715234099cc8d764230670db73c2bd0bf735018baa26
+  simulated: true
+  result:
+    tool_result_type: simulated_source
+    data:
+      title: Official synthetic database reliability guide
+      claim_id: CLM-REP-01
+      fact: Database replication maintains synchronized data copies for availability; it is not a substitute for
+        an independently recoverable backup.
+      source_id: SRC-DB-01
+- id: context.integration-core.corrected-claim-propagates.v1
+  capability: context
+  state: supplied_result
+  authorized: true
+  provenance: case-specific simulated learner/session context
+  captured_at: '2026-09-16T00:00:00Z'
+  content_sha256: 7443c02e0b34e70e81c565a3c429b30df0c2508be7bb9d345c565bd38ebe88b8
+  simulated: true
+  result:
+    tool_result_type: simulated_context
+    data:
+      claim_id: CLM-REP-01
+      prior_claim: Database replication is a daily backup.
+      dependent_objectives:
+      - OBJ-RELIABILITY-02
+      dependent_lessons:
+      - LESSON-REPLICATION-01
+- id: context.retention-accessibility.simple-pack-surface.v1
+  capability: context
+  state: supplied_result
+  authorized: true
+  provenance: case-specific simulated learning-pack manifest
+  captured_at: '2026-09-16T00:00:00Z'
+  content_sha256: 0d92ee102c59b72e6c8032d6ac44a28f747880192195285ef391f4c47561fe85
+  simulated: true
+  result:
+    tool_result_type: simulated_context
+    data:
+      created_files:
+      - START-HERE.md
+      - lessons/L01.md
+      - internal/claim-ledger.json
+      entry_point: START-HERE.md
+      current_lesson: lessons/L01.md
+      uncreated_future_lessons:
+      - lessons/L02.md

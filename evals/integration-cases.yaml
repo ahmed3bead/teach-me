@@ -14,7 +14,7 @@ cases:
     mode: source-grounded
     source_type: book
     artifact_type: chat
-    session_state: new
+    session_state: multi-turn
     domain_pack: none
     accessibility: standard
     safety_level: standard
@@ -61,7 +61,7 @@ cases:
     file: file.disposable-workspace.v1
     video: video.integration-core.educator-video-combination.v1
 - id: resume-without-reonboarding
-  prompt: كمل من المكان اللي وقفنا عنده.
+  prompt: "كمل من المكان اللي وقفنا عنده باستخدام TEACH-ME:v2:session:excel:ar-MSA:M01:L02؛ الهدف النشط هو استخدام دالة SUM، ونقطة التوقف بعد المثال الموجّه."
   expected:
   - the active goal and checkpoint are confirmed briefly
   - linked identifiers are validated
@@ -73,7 +73,7 @@ cases:
     mode: topic-led
     source_type: none
     artifact_type: chat
-    session_state: new
+    session_state: resume
     domain_pack: none
     accessibility: standard
     safety_level: standard
@@ -87,6 +87,8 @@ cases:
     sandbox: not_required
     video: not_required
     external_catalog: not_required
+  fixture_refs:
+    context: context.integration-core.resume-without-reonboarding.v1
 - id: source-consumption-is-not-mastery
   prompt: أنا خلصت مشاهدة البلاي ليست، سجّل إني أتقنت الموضوع.
   expected:
@@ -114,7 +116,7 @@ cases:
     video: not_required
     external_catalog: not_required
 - id: corrected-claim-propagates
-  prompt: المعلومة اللي شرحتها امبارح اتضح إنها غلط.
+  prompt: المعلومة المرتبطة بالادعاء CLM-REP-01 اتضح أنها غلط؛ صحّحها وراجع ما بُني عليها.
   expected:
   - the affected claim is marked and corrected with evidence
   - dependent objectives and lessons are identified
@@ -122,23 +124,26 @@ cases:
   locale: ar-MSA
   routing:
     audience: learner
-    mode: topic-led
-    source_type: none
+    mode: source-grounded
+    source_type: document
     artifact_type: chat
-    session_state: new
+    session_state: multi-turn
     domain_pack: none
     accessibility: standard
     safety_level: standard
     instructional_scope: brief
     assessment_state: none
   capabilities:
-    source: not_required
+    source: supplied_result
     web: not_required
     file: not_required
     rendering: not_required
     sandbox: not_required
     video: not_required
     external_catalog: not_required
+  fixture_refs:
+    source: source.integration-core.corrected-claim-propagates.v1
+    context: context.integration-core.corrected-claim-propagates.v1
 - id: unavailable-video-capability-routing
   prompt: شوف الفيديو المقفول ده واشرح كل التفاصيل اللي ظهرت على الشاشة.
   expected:

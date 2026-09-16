@@ -13,7 +13,7 @@ cases:
     mode: topic-led
     source_type: none
     artifact_type: chat
-    session_state: new
+    session_state: multi-turn
     domain_pack: none
     accessibility: standard
     safety_level: standard
@@ -40,7 +40,7 @@ cases:
     mode: topic-led
     source_type: none
     artifact_type: chat
-    session_state: new
+    session_state: multi-turn
     domain_pack: none
     accessibility: standard
     safety_level: standard
@@ -109,7 +109,7 @@ cases:
   fixture_refs:
     context: context.retention-accessibility.screen-reader-access.v1
 - id: simple-pack-surface
-  prompt: فتحت الملفات ومش عارف أبدأ منين
+  prompt: فتحت حزمة التعلم الحالية ومش عارف أبدأ منين؛ استخدم قائمة الملفات المتاحة فقط.
   expected:
   - START-HERE is the only entry point and names one current action
   - internal ledgers are not presented as learner tasks
@@ -119,12 +119,12 @@ cases:
     audience: learner
     mode: topic-led
     source_type: none
-    artifact_type: chat
-    session_state: new
+    artifact_type: learning-pack
+    session_state: resume
     domain_pack: none
     accessibility: standard
     safety_level: standard
-    instructional_scope: brief
+    instructional_scope: journey
     assessment_state: none
   capabilities:
     source: not_required
@@ -134,6 +134,8 @@ cases:
     sandbox: not_required
     video: not_required
     external_catalog: not_required
+  fixture_refs:
+    context: context.retention-accessibility.simple-pack-surface.v1
 - id: stale-learner-observation
   prompt: الطريقة دي كانت مناسبة زمان بس دلوقتي مش نافعة
   expected:
@@ -145,7 +147,7 @@ cases:
     mode: topic-led
     source_type: none
     artifact_type: chat
-    session_state: new
+    session_state: multi-turn
     domain_pack: none
     accessibility: standard
     safety_level: standard

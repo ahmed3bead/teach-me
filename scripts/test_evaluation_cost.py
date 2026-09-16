@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import sys
 import tempfile
@@ -15,6 +16,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import run_behavioral_evals as runner
 from evaluation_cost import (
     cost_accounting_snapshot,
+    cost_sensitive_paths,
     derive_cost_plan,
     hard_spend_cap_decision,
     invocation_reservation,
@@ -39,21 +41,37 @@ GRADER_COMMAND = (
 )
 
 
-def current_plan() -> dict:
+def accounting_test_plan() -> dict:
+    """Build an accounting-only plan; this does not make the stale committed policy releasable."""
     paths = sorted((ROOT / "evals").glob("*.yaml")) + sorted(
         (ROOT / "domain-packs").glob("*/evals.yaml")
     )
     suites = runner.load_suites(paths, None)
-    policy = load_cost_policy(POLICY, ROOT)
+    raw = json.loads(POLICY.read_text(encoding="utf-8"))
+    raw["cost_sensitive_source_sha256"] = {
+        path.relative_to(ROOT).as_posix(): hashlib.sha256(
+            path.read_text(encoding="utf-8").replace("\r\n", "\n").encode("utf-8")
+        ).hexdigest()
+        for path in cost_sensitive_paths(ROOT)
+    }
+    with tempfile.TemporaryDirectory() as directory:
+        temporary = Path(directory) / "policy.json"
+        temporary.write_text(json.dumps(raw), encoding="utf-8")
+        policy = load_cost_policy(temporary, ROOT)
+    policy["policy_path"] = str(POLICY.resolve())
     return derive_cost_plan(
-        policy,
-        suites,
-        RESPONSE_COMMAND,
-        GRADER_COMMAND,
-        0,
-        "openai/gpt-5.6-sol",
-        "openai/gpt-5.6-sol",
+        policy, suites, RESPONSE_COMMAND, GRADER_COMMAND, 0,
+        "openai/gpt-5.6-sol", "openai/gpt-5.6-sol",
     )
+
+
+def test_committed_policy_is_fail_closed_after_request_shape_changes() -> None:
+    try:
+        load_cost_policy(POLICY, ROOT)
+    except ValueError as exc:
+        assert "cost-sensitive source changed" in str(exc)
+    else:
+        raise AssertionError("stale paid-evaluation pricing policy remained usable")
 
 
 def grade_payload(response: str = "A grounded response.") -> dict:
@@ -104,8 +122,8 @@ def test_independent_token_prices_without_double_counting() -> None:
         raise AssertionError("overlapping input categories were double-counted")
 
 
-def test_exact_current_release_ceiling_and_authorization() -> None:
-    plan = current_plan()
+def test_last_authorized_baseline_ceiling_and_authorization() -> None:
+    plan = accounting_test_plan()
     assert plan["request_ceiling"] == {
         "response_requests": 95,
         "grader_requests": 90,
@@ -142,7 +160,7 @@ def test_exact_current_release_ceiling_and_authorization() -> None:
 
 
 def test_interrupted_and_partial_report_cost_integrity() -> None:
-    plan = current_plan()
+    plan = accounting_test_plan()
     known_usage = {
         "input_tokens": 100168,
         "cached_input_tokens": 0,
@@ -204,7 +222,7 @@ def test_interrupted_and_partial_report_cost_integrity() -> None:
 
 
 def test_hard_spend_cap_dispatch_and_interruption_integrity() -> None:
-    plan = current_plan()
+    plan = accounting_test_plan()
     completed_reservation = {
         "role": "response",
         "maximum_cost_usd": 1.0,
@@ -297,6 +315,12 @@ def test_hard_spend_cap_dispatch_and_interruption_integrity() -> None:
 
 def test_pricing_policy_fails_closed_when_stale_or_incomplete() -> None:
     raw = json.loads(POLICY.read_text(encoding="utf-8"))
+    raw["cost_sensitive_source_sha256"] = {
+        path.relative_to(ROOT).as_posix(): hashlib.sha256(
+            path.read_text(encoding="utf-8").replace("\r\n", "\n").encode("utf-8")
+        ).hexdigest()
+        for path in cost_sensitive_paths(ROOT)
+    }
     for mutation in (
         lambda item: item["prices_usd_per_million_tokens"].pop("cache_write"),
         lambda item: item["cost_sensitive_source_sha256"].update({"SKILL.md": "0" * 64}),
@@ -316,8 +340,9 @@ def test_pricing_policy_fails_closed_when_stale_or_incomplete() -> None:
 
 
 def main() -> int:
+    test_committed_policy_is_fail_closed_after_request_shape_changes()
     test_independent_token_prices_without_double_counting()
-    test_exact_current_release_ceiling_and_authorization()
+    test_last_authorized_baseline_ceiling_and_authorization()
     test_interrupted_and_partial_report_cost_integrity()
     test_hard_spend_cap_dispatch_and_interruption_integrity()
     test_pricing_policy_fails_closed_when_stale_or_incomplete()
