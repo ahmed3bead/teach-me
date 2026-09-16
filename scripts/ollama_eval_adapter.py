@@ -9,10 +9,14 @@ caller explicitly opts into a remote host.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
 import sys
+import time
+import uuid
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 from urllib import error, parse, request
@@ -22,6 +26,7 @@ from locale_policy import canonical_locale, infer_locale, unicode_phrase_boundar
 
 
 LOCAL_HOSTS = {"localhost", "127.0.0.1", "::1"}
+ADAPTER_VERSION = "1.1.0"
 ARABIC_TEACHER_CONTEXT = """
 أنت معلّم صبور ودقيق، ويُقاس نجاحك بما يستطيع المتعلم فعله بعد الشرح، لا بطول الرد.
 
@@ -85,6 +90,76 @@ def load_skill_context(skill_root: Path) -> str:
         relative = path.relative_to(skill_root)
         chunks.append(f"\n--- {relative} ---\n{path.read_text(encoding='utf-8')}")
     return "".join(chunks)
+
+
+def load_prompt_packet_context(payload: dict[str, Any]) -> str:
+    """Load and authenticate the immutable instruction packet for static evals."""
+    packet = payload.get("prompt_packet")
+    if not isinstance(packet, dict) or not isinstance(packet.get("instruction_sources"), list):
+        raise ValueError("response payload requires an immutable prompt packet")
+    packet_copy = dict(packet)
+    declared_packet_hash = packet_copy.pop("sha256", None)
+    encoded = json.dumps(
+        packet_copy,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    if declared_packet_hash != hashlib.sha256(encoded).hexdigest():
+        raise ValueError("prompt packet content hash mismatch")
+    chunks = []
+    for source in packet["instruction_sources"]:
+        if not isinstance(source, dict):
+            raise ValueError("instruction source must be an object")
+        path = source.get("path")
+        content = source.get("content")
+        declared_source_hash = source.get("sha256")
+        if not all(isinstance(value, str) and value for value in (path, content, declared_source_hash)):
+            raise ValueError("instruction source path, content, and sha256 are required")
+        if declared_source_hash != hashlib.sha256(content.encode("utf-8")).hexdigest():
+            raise ValueError("instruction source content hash mismatch")
+        chunks.append(f"\n--- {path} sha256={declared_source_hash} ---\n{content}")
+    return "".join(chunks)
+
+
+def add_invocation_evidence(
+    raw: dict[str, Any],
+    *,
+    model: str,
+    host: str,
+    num_ctx: int,
+    num_predict: int,
+    seed: int,
+    started_at: datetime,
+    started: float,
+    invocation_id: str,
+) -> dict[str, Any]:
+    """Add the provider-neutral evidence required by the behavioral runner."""
+    completed_at = datetime.now(timezone.utc)
+    result = dict(raw)
+    result.update(
+        {
+            "settings": {
+                "model": model,
+                "host": host,
+                "num_ctx": num_ctx,
+                "num_predict": num_predict,
+                "seed": seed,
+                "structured_output": {"type": "json_schema"},
+                "model_transport": "ollama-local",
+                "external_source_access": "controlled-fixtures-only",
+            },
+            "adapter_version": ADAPTER_VERSION,
+            "invocation_id": invocation_id,
+            "timing": {
+                "started_at": started_at.isoformat(),
+                "completed_at": completed_at.isoformat(),
+                "duration_seconds": time.monotonic() - started,
+            },
+            "raw_result": dict(raw),
+        }
+    )
+    return result
 
 
 def teacher_skill_context(skill_root: Path, payload: dict[str, Any]) -> str:
@@ -370,6 +445,17 @@ def text_schema(field: str) -> dict[str, Any]:
 
 
 def grade_schema(count: int) -> dict[str, Any]:
+    evidence = {
+        "type": "object",
+        "properties": {
+            "source": {"type": "string", "enum": ["response", "artifact", "absent"]},
+            "turn": {"type": "integer", "minimum": 1},
+            "artifact_path": {"type": "string"},
+            "quote": {"type": "string", "minLength": 1, "maxLength": 800},
+        },
+        "required": ["source", "quote"],
+        "additionalProperties": False,
+    }
     return {
         "type": "object",
         "properties": {
@@ -380,10 +466,11 @@ def grade_schema(count: int) -> dict[str, Any]:
                 "items": {
                     "type": "object",
                     "properties": {
-                        "passed": {"type": "boolean"},
-                        "reason": {"type": "string", "minLength": 1, "maxLength": 300},
+                        "verdict": {"type": "string", "enum": ["pass", "fail"]},
+                        "evidence": evidence,
+                        "reason": {"type": "string", "minLength": 1, "maxLength": 800},
                     },
-                    "required": ["passed", "reason"],
+                    "required": ["verdict", "evidence", "reason"],
                     "additionalProperties": False,
                 },
             }
@@ -598,6 +685,27 @@ def messages_and_schema(payload: dict[str, Any], skill_context: str | None) -> t
     if kind == "simulation-grade":
         raise ValueError("simulation-grade must be decomposed into isolated score and criterion requests")
 
+    if kind == "grade" and payload.get("evaluation_mode") != "simulation-criterion":
+        criteria = payload.get("criteria")
+        if not isinstance(criteria, list) or not criteria or not all(
+            isinstance(criterion, str) and criterion.strip() for criterion in criteria
+        ):
+            raise ValueError("static grader payload requires non-empty criteria")
+        system = (
+            "You are an independent strict grader. Return one verdict per criterion in the same order. "
+            "PASS requires an exact quote and the correct assistant response turn or generated artifact path. "
+            "For response and non-HTML artifact evidence, copy the quote verbatim without normalizing whitespace, "
+            "adding or removing diacritics, translating, paraphrasing, or citing learner text. For HTML artifacts, "
+            "quote one contiguous learner-visible text span in reading order. FAIL may use source absent with a quote "
+            "that starts with ABSENT:. Never pass missing, implicit, deferred, or unperformed behavior. For source "
+            "response include turn; for source artifact include artifact_path; for source absent include neither. "
+            "Give a concise reason explaining how the evidence supports the verdict. Return only the required JSON object."
+        )
+        return [
+            {"role": "system", "content": system},
+            {"role": "user", "content": json.dumps(payload, ensure_ascii=False)},
+        ], grade_schema(len(criteria)), 0.0
+
     expected = payload.get("expected", [])
     simulation_criterion = payload.get("evaluation_mode") == "simulation-criterion"
     criterion_evidence_rule_en = (
@@ -728,8 +836,13 @@ def main() -> int:
             raise ValueError(f"payload type {payload['type']} requires --role {expected_role}")
         host = normalize_host(args.host)
         require_local_host(host, args.allow_remote)
+        invocation_id = str(uuid.uuid4())
+        started_at = datetime.now(timezone.utc)
+        started = time.monotonic()
         skill_context = None
-        if args.role in {"response", "teacher"}:
+        if args.role == "response":
+            skill_context = load_prompt_packet_context(payload)
+        elif args.role == "teacher":
             skill_context = teacher_skill_context(Path(payload["skill_root"]), payload)
         if payload["type"] == "simulation-grade":
             scoring_results: dict[str, dict[str, Any]] = {}
@@ -823,11 +936,11 @@ def main() -> int:
                     phase: scoring_results[phase]["retry_reason"] for phase in ("baseline", "transfer")
                 },
             }
-        elif payload["type"] == "grade" and len(payload.get("expected", [])) > 1:
+        elif payload["type"] == "grade" and len(payload.get("criteria", [])) > 1:
             combined_results: list[dict[str, Any]] = []
             result_model = "ollama/" + args.model
-            for criterion in payload["expected"]:
-                criterion_payload = {**payload, "expected": [criterion]}
+            for criterion in payload["criteria"]:
+                criterion_payload = {**payload, "criteria": [criterion]}
                 messages, schema, temperature = messages_and_schema(criterion_payload, skill_context)
                 criterion_result = ollama_chat(
                     host,
@@ -879,6 +992,17 @@ def main() -> int:
                 adapter_attempts = 2
             result["adapter_attempts"] = adapter_attempts
             result["adapter_retry_reason"] = adapter_retry_reason
+        result = add_invocation_evidence(
+            result,
+            model=args.model,
+            host=host,
+            num_ctx=args.num_ctx,
+            num_predict=args.num_predict,
+            seed=args.seed,
+            started_at=started_at,
+            started=started,
+            invocation_id=invocation_id,
+        )
         print(json.dumps(result, ensure_ascii=False))
         return 0
     except (KeyError, OSError, ValueError, RuntimeError, json.JSONDecodeError) as exc:
