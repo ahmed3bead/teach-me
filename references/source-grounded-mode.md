@@ -49,6 +49,16 @@ Keep the learner moving with this fallback:
 6. State prominently that the path is topic-equivalent only where evidence supports that conclusion and is not a summary, reproduction, or verified representation of the inaccessible source.
 7. If even the topic or outcomes cannot be verified, ask the learner to describe their goal rather than guessing.
 
+When the available public metadata already establishes the broad topic or outcomes and lawful authoritative sources are available, execute this fallback immediately. Give the learner a compact independent path or first verified unit in the same response. Do not merely offer to create it later, ask for permission to begin, or ask questions whose answers are already present in the source and learner context.
+
+Make the boundary unmistakable in the learner-facing response:
+
+- name the public metadata that was actually available;
+- name the paid or closed lesson content that remained inaccessible;
+- label the result an independent path built from the cited accessible sources, not the same course, a reconstruction, a summary, or a verified representation of it.
+
+Use a short path when the request is brief: ordered objectives, the accessible source supporting each objective, one concrete first teaching step, and one current action. Add questions only for unresolved choices that would materially change that path.
+
 ## Video and playlist workflow
 
 When tools permit, combine transcript, audio, sampled and event-driven frames, OCR, chapters, descriptions, and linked materials. Increase frame density around demonstrations, slide changes, code edits, diagrams, or references such as “click here.” Preserve timestamps.

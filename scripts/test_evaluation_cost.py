@@ -116,25 +116,25 @@ def test_exact_current_release_ceiling_and_authorization() -> None:
         "protocol_retries": 0,
         "aggregate_output_tokens": 417792,
     }
-    assert plan["token_ceiling"]["aggregate_input_tokens"] == 1910427
+    assert plan["token_ceiling"]["aggregate_input_tokens"] == 2111257
     assert plan["token_ceiling"]["maximum_planned_input_tokens_per_request"] == 200000
     assert plan["high_context_pricing"]["threshold_input_tokens"] == 272000
     assert plan["conservative_cost"] == {
         "worst_case_input_category": "cache_write",
-        "input_usd": 9.552135,
+        "input_usd": 10.556285,
         "output_usd": 8.35584,
-        "total_usd": 17.907975,
+        "total_usd": 18.912125,
     }
     try:
-        runner.validate_cost_authorization(16.0, 17.907975, 17.907975, True)
+        runner.validate_cost_authorization(16.0, 18.912125, 18.912125, True)
     except runner.GlobalIntegrityError as exc:
         assert "exceeds authorized" in str(exc)
     else:
         raise AssertionError("a $16 authorization incorrectly passed preflight")
-    runner.validate_cost_authorization(17.907975, 17.907975, 17.907975, True)
-    for declared in (15.997548, 17.91):
+    runner.validate_cost_authorization(18.912125, 18.912125, 18.912125, True)
+    for declared in (15.997548, 17.907975):
         try:
-            runner.validate_cost_authorization(20.0, declared, 17.907975, True)
+            runner.validate_cost_authorization(20.0, declared, 18.912125, True)
         except runner.GlobalIntegrityError as exc:
             assert "does not match" in str(exc)
         else:
@@ -179,7 +179,7 @@ def test_interrupted_and_partial_report_cost_integrity() -> None:
     assert len(snapshot["unresolved_invocations"]) == 1
     assert snapshot["unresolved_maximum_cost_usd"] == reservation["maximum_cost_usd"]
     assert snapshot["known_cost_usd"] < snapshot["current_upper_bound_cost_usd"]
-    assert snapshot["current_upper_bound_cost_usd"] <= 17.907975
+    assert snapshot["current_upper_bound_cost_usd"] <= 18.912125
 
     active = cost_accounting_snapshot(invocations[:1], plan, reservation)
     assert active["unresolved_invocations"][0]["status"] == "interrupted-in-flight"
@@ -244,7 +244,7 @@ def test_hard_spend_cap_dispatch_and_interruption_integrity() -> None:
         }
     )
     snapshot = cost_accounting_snapshot(invocations, plan, hard_spend_cap_usd=7.0)
-    assert snapshot["theoretical_full_run_ceiling_usd"] == 17.907975
+    assert snapshot["theoretical_full_run_ceiling_usd"] == 18.912125
     assert snapshot["hard_spend_cap_usd"] == 7.0
     assert snapshot["recorded_cost_usd"] == 6.664
     assert snapshot["unresolved_reservations_usd"] == 0.25
