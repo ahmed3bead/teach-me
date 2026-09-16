@@ -40,8 +40,8 @@ cases:
   locale: en
   routing:
     audience: learner
-    mode: topic-led
-    source_type: none
+    mode: source-grounded
+    source_type: website
     artifact_type: chat
     session_state: new
     domain_pack: none
@@ -90,15 +90,15 @@ cases:
     source: source.broad-research-sweep.paid-course-discovery.v1
     web: web.broad-research-sweep.paid-course-discovery.v1
 - id: multilingual-source-search
-  prompt: اشرحلي الموضوع بالفصحى المبسطة وماتعتمدش على المصادر العربي بس.
+  prompt: اشرح لي مفهوم فهارس قواعد البيانات بالفصحى المبسطة، ولا تعتمد على المصادر العربية فقط.
   expected:
   - research includes the learner language and other high-value source languages
   - teaching remains in simplified Modern Standard Arabic with useful original terminology
   locale: ar-MSA
   routing:
     audience: learner
-    mode: topic-led
-    source_type: none
+    mode: source-grounded
+    source_type: website
     artifact_type: chat
     session_state: new
     domain_pack: none
@@ -166,7 +166,7 @@ cases:
     assessment_state: none
   capabilities:
     source: not_required
-    web: not_required
+    web: unavailable
     file: not_required
     rendering: not_required
     sandbox: not_required

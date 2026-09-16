@@ -166,7 +166,7 @@ def validate_case_contract(case: dict[str, Any], registry: dict[str, dict[str, A
 def reference_paths(case: dict[str, Any]) -> list[Path]:
     validate_case_contract(case)
     r, c = case["routing"], case["capabilities"]
-    names = ["teaching-contract.md"]
+    names = ["core-teaching-policy.md", "teaching-contract.md"]
     if r["audience"] == "educator": names.append("educator-mode.md")
     if r["mode"] == "source-grounded": names.extend(["source-grounded-mode.md", "evidence-policy.md"])
     if r["source_type"] in {"video", "playlist"} or c["video"] != "not_required": names.append("multimodal-video.md")

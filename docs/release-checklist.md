@@ -6,6 +6,7 @@
 - [ ] Fresh Linux/macOS and Windows installation keeps `SKILL.md` at `teach-me/SKILL.md`.
 - [ ] Update uses a fast-forward Git pull; removal is recoverable.
 - [ ] All local structural, schema, integration, resume, and runner tests pass.
+- [ ] The source-bound paid-evaluation pricing policy matches every cost-sensitive source and has fresh explicit authorization; a stale policy blocks release.
 - [ ] The always-loaded skill and routed references pass `scripts/check_context_budget.py`.
 - [ ] `skills-ref validate` or the host's official Agent Skills validator passes when available.
 

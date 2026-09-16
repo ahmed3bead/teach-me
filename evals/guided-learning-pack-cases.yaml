@@ -113,7 +113,7 @@ cases:
   fixture_refs:
     file: file.disposable-workspace.v1
 - id: chat-only-resume
-  prompt: علمني هنا بس لأن الشات مش بيطلع ملفات
+  prompt: علّمني أساسيات صيغ Excel هنا فقط لأن الشات لا يخرج ملفات؛ هدفي جمع مصروفات أسبوع واحد في جدول بسيط.
   expected:
   - one bounded lesson is taught and no file creation is claimed
   - a valid non-sensitive TEACH-ME v2 resume code with a session identifier is included

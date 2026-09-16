@@ -1,0 +1,385 @@
+{
+  "schema_version": "1.0.0",
+  "evidence_report": "reports/openai-api-behavioral-evals-2db575c03fa3bab92eb365dab31e0b536e7ee39a-fresh-20260916T115844Z.json",
+  "evidence_report_sha256": "b0e3d54d06d86bc9c8ac15d68dea77acab460d7d57947f05c52e191653cb1a08",
+  "evidence_report_commit": "2db575c03fa3bab92eb365dab31e0b536e7ee39a",
+  "verified_main": "ff01ed1ef9cf4b77ec84c00ed30bad504e011116",
+  "reviewed_fields": [
+    "original response and ordered transcript",
+    "deterministic guard evidence",
+    "grader verdicts and exact quoted evidence",
+    "accepted and rejected artifacts",
+    "routing and capability metadata",
+    "controlled fixture inputs",
+    "expected criteria"
+  ],
+  "category_counts": {
+    "artifact-validator defect": 1,
+    "deterministic-guard false positive": 9,
+    "genuine Teach Me policy/teaching defect": 8,
+    "grader-protocol defect": 13,
+    "model-only failure that should not cause a product change": 14
+  },
+  "cases": [
+    {
+      "case": "core-teaching/ar-msa-beginner-adaptation",
+      "classification": "deterministic-guard false positive",
+      "root_cause": "assessment-navigation-heuristic",
+      "finding": "Guard treated learner context questions as an unconsented knowledge check.",
+      "shared_fix": "assessment-semantic-navigation",
+      "disposition": "remediated"
+    },
+    {
+      "case": "core-teaching/en-transfer-not-acknowledgement",
+      "classification": "deterministic-guard false positive",
+      "root_cause": "assessment-navigation-heuristic",
+      "finding": "Guard treated topic-choice and optional-check language as an assessment item.",
+      "shared_fix": "assessment-semantic-navigation",
+      "disposition": "remediated"
+    },
+    {
+      "case": "core-teaching/msa-changing-fact",
+      "classification": "deterministic-guard false positive",
+      "root_cause": "assessment-navigation-heuristic",
+      "finding": "Guard treated safe context navigation as an assessment item.",
+      "shared_fix": "assessment-semantic-navigation",
+      "disposition": "remediated"
+    },
+    {
+      "case": "conversational-teaching/unfinished-slice-is-not-boundary",
+      "classification": "genuine Teach Me policy/teaching defect",
+      "root_cause": "conversation-reference-routing",
+      "finding": "A continuation case was routed as a new brief session, omitting the dedicated conversational policy.",
+      "shared_fix": "session-routing-correction",
+      "disposition": "remediated"
+    },
+    {
+      "case": "conversational-teaching/completed-unit-offer-before-questions",
+      "classification": "genuine Teach Me policy/teaching defect",
+      "root_cause": "conversation-reference-routing",
+      "finding": "A completed-unit continuation was routed as new, weakening boundary and offer-before-question guidance.",
+      "shared_fix": "session-routing-correction",
+      "disposition": "remediated"
+    },
+    {
+      "case": "conversational-teaching/exam-preparation-exception",
+      "classification": "grader-protocol defect",
+      "root_cause": "non-verbatim-grader-evidence",
+      "finding": "The grader added an Arabic diacritic to an otherwise supporting quote, so exact evidence validation correctly rejected it.",
+      "shared_fix": "verbatim-grader-contract",
+      "disposition": "remediated"
+    },
+    {
+      "case": "curriculum-delivery/arabic-pdf-quality",
+      "classification": "artifact-validator defect",
+      "root_cause": "undisclosed-pdf-source-cardinality",
+      "finding": "The response returned two HTML artifacts because the adapter had not disclosed that the renderer requires exactly one validated HTML source.",
+      "shared_fix": "pdf-artifact-contract",
+      "disposition": "remediated"
+    },
+    {
+      "case": "curriculum-delivery/traceable-modular-course",
+      "classification": "model-only failure that should not cause a product change",
+      "root_cause": "missed-stable-source-identifiers",
+      "finding": "Routed curriculum policy already required stable IDs and traceability; the response did not follow it.",
+      "shared_fix": "none",
+      "disposition": "no-product-change"
+    },
+    {
+      "case": "curriculum-delivery/file-tools-unavailable",
+      "classification": "grader-protocol defect",
+      "root_cause": "underspecified-evaluation-input",
+      "finding": "The case demanded a complete curriculum without supplying a subject, outcome, level, or duration.",
+      "shared_fix": "case-input-grounding",
+      "disposition": "remediated"
+    },
+    {
+      "case": "educator-mode/ar-msa-primary-science",
+      "classification": "grader-protocol defect",
+      "root_cause": "html-visible-text-evidence",
+      "finding": "Supporting learner-visible words were separated only by HTML markup, which raw-substring validation could not recognize.",
+      "shared_fix": "html-visible-evidence",
+      "disposition": "remediated"
+    },
+    {
+      "case": "educator-mode/en-adult-manager-training",
+      "classification": "model-only failure that should not cause a product change",
+      "root_cause": "missed-educator-layering",
+      "finding": "The routed educator policy already required core/support/extension layers and a separate rubric.",
+      "shared_fix": "none",
+      "disposition": "no-product-change"
+    },
+    {
+      "case": "end-to-end-journeys/zero-knowledge-learner-complete-unit",
+      "classification": "grader-protocol defect",
+      "root_cause": "criterion-policy-conflict",
+      "finding": "The expected fixed three-to-five-item check conflicted with policy permitting one integrated authentic application.",
+      "shared_fix": "criterion-alignment",
+      "disposition": "remediated"
+    },
+    {
+      "case": "end-to-end-journeys/educator-source-map-approval-lesson",
+      "classification": "grader-protocol defect",
+      "root_cause": "invalid-grader-citations-and-source-input",
+      "finding": "The grader cited learner/noncontiguous text, and the source-map journey requires an explicit controlled curriculum source.",
+      "shared_fix": "grader-contract-and-source-fixture",
+      "disposition": "remediated"
+    },
+    {
+      "case": "golden-teaching/ddia-senior-developer",
+      "classification": "model-only failure that should not cause a product change",
+      "root_cause": "response-replaced-teaching-with-onboarding",
+      "finding": "The committed policy already required useful teaching before avoidable onboarding.",
+      "shared_fix": "none",
+      "disposition": "no-product-change"
+    },
+    {
+      "case": "golden-teaching/primary-school-concept",
+      "classification": "model-only failure that should not cause a product change",
+      "root_cause": "response-missed-zero-start-and-consent",
+      "finding": "The response did not explicitly honor the zero start and made practice mandatory; policy already covered both.",
+      "shared_fix": "none",
+      "disposition": "no-product-change"
+    },
+    {
+      "case": "golden-teaching/photography-no-jargon",
+      "classification": "genuine Teach Me policy/teaching defect",
+      "root_cause": "missing-domain-pack-route",
+      "finding": "The photography case did not route the existing observable-result domain pack.",
+      "shared_fix": "domain-pack-routing",
+      "disposition": "remediated"
+    },
+    {
+      "case": "golden-teaching/failed-first-explanation",
+      "classification": "model-only failure that should not cause a product change",
+      "root_cause": "response-did-not-recheck-prerequisite",
+      "finding": "The teaching contract already requires a materially different representation and prerequisite recheck.",
+      "shared_fix": "none",
+      "disposition": "no-product-change"
+    },
+    {
+      "case": "golden-teaching/premature-solution",
+      "classification": "model-only failure that should not cause a product change",
+      "root_cause": "response-supplied-solution-too-early",
+      "finding": "The teaching contract already forbids replacing learner work with a premature solution.",
+      "shared_fix": "none",
+      "disposition": "no-product-change"
+    },
+    {
+      "case": "golden-teaching/retained-claim",
+      "classification": "model-only failure that should not cause a product change",
+      "root_cause": "response-omitted-meaningful-delay",
+      "finding": "The response omitted delayed retrieval although the teaching contract already defines retention evidence.",
+      "shared_fix": "none",
+      "disposition": "no-product-change"
+    },
+    {
+      "case": "guided-learning-pack/beginner-start-here",
+      "classification": "grader-protocol defect",
+      "root_cause": "html-visible-text-evidence",
+      "finding": "A supporting artifact quote crossed markup boundaries but remained one contiguous learner-visible span.",
+      "shared_fix": "html-visible-evidence",
+      "disposition": "remediated"
+    },
+    {
+      "case": "guided-learning-pack/transferable-expertise",
+      "classification": "deterministic-guard false positive",
+      "root_cause": "assessment-navigation-heuristic",
+      "finding": "Guard treated transferable-experience context questions as assessment.",
+      "shared_fix": "assessment-semantic-navigation",
+      "disposition": "remediated"
+    },
+    {
+      "case": "guided-learning-pack/chat-only-resume",
+      "classification": "grader-protocol defect",
+      "root_cause": "underspecified-evaluation-input",
+      "finding": "The case required a bounded lesson and resume code without naming any topic or outcome.",
+      "shared_fix": "case-input-grounding",
+      "disposition": "remediated"
+    },
+    {
+      "case": "hardening/code-switch-is-not-language-switch",
+      "classification": "deterministic-guard false positive",
+      "root_cause": "code-counted-as-prose-language",
+      "finding": "Fenced code dominated the script ratio even though the teaching prose used the requested language.",
+      "shared_fix": "language-prose-only",
+      "disposition": "remediated"
+    },
+    {
+      "case": "hardening/unavailable-audio-fallback",
+      "classification": "deterministic-guard false positive",
+      "root_cause": "assessment-navigation-heuristic",
+      "finding": "A safe request for accessible input was misclassified as assessment.",
+      "shared_fix": "assessment-semantic-navigation",
+      "disposition": "remediated"
+    },
+    {
+      "case": "hardening/legacy-resume-state-is-untrusted",
+      "classification": "deterministic-guard false positive",
+      "root_cause": "required-resume-checkpoint-blocked",
+      "finding": "The guard blocked the evidence checkpoint required for a validated legacy or partial resume locator.",
+      "shared_fix": "preserved-pr41-resume-exception",
+      "disposition": "preserved-pr41"
+    },
+    {
+      "case": "integration-core/learner-book-connected-flow",
+      "classification": "genuine Teach Me policy/teaching defect",
+      "root_cause": "missing-integration-route",
+      "finding": "A continuity-and-progress case was routed as a new brief session, omitting integration and learner-model references.",
+      "shared_fix": "session-routing-correction",
+      "disposition": "remediated"
+    },
+    {
+      "case": "integration-core/resume-without-reonboarding",
+      "classification": "grader-protocol defect",
+      "root_cause": "underspecified-resume-input",
+      "finding": "The case asserted an active checkpoint and linked IDs without providing either and marked the session new.",
+      "shared_fix": "case-input-grounding",
+      "disposition": "remediated"
+    },
+    {
+      "case": "integration-core/corrected-claim-propagates",
+      "classification": "grader-protocol defect",
+      "root_cause": "underspecified-correction-input",
+      "finding": "The case supplied no claim, authoritative correction, or dependency identifiers while grading all three.",
+      "shared_fix": "case-input-grounding",
+      "disposition": "remediated"
+    },
+    {
+      "case": "integration-foundation/screen-transcript-conflict",
+      "classification": "grader-protocol defect",
+      "root_cause": "missing-timestamp-and-video-route",
+      "finding": "The expected timestamp provenance was absent from the input and the case was not routed as video evidence.",
+      "shared_fix": "case-input-grounding",
+      "disposition": "remediated"
+    },
+    {
+      "case": "integration-foundation/external-skill-catalog",
+      "classification": "model-only failure that should not cause a product change",
+      "root_cause": "response-ignored-supplied-catalog",
+      "finding": "The response ignored the supplied catalog; the grader also cited learner text, but an independent educational miss remained.",
+      "shared_fix": "none",
+      "disposition": "no-product-change"
+    },
+    {
+      "case": "integration-foundation/avoid-overbuilt-pack",
+      "classification": "deterministic-guard false positive",
+      "root_cause": "assessment-navigation-heuristic",
+      "finding": "A request for the learner-selected concept was misclassified as assessment.",
+      "shared_fix": "assessment-semantic-navigation",
+      "disposition": "remediated"
+    },
+    {
+      "case": "integration-foundation/research-rigor-review",
+      "classification": "model-only failure that should not cause a product change",
+      "root_cause": "response-omitted-required-rigor-checks",
+      "finding": "The routed research and evidence policies already required authority, freshness, convergence, and contradiction checks.",
+      "shared_fix": "none",
+      "disposition": "no-product-change"
+    },
+    {
+      "case": "broad-research-sweep/named-book-broad-sweep",
+      "classification": "model-only failure that should not cause a product change",
+      "root_cause": "response-underused-supplied-sources",
+      "finding": "The response ignored available controlled sources despite complete research routing.",
+      "shared_fix": "none",
+      "disposition": "no-product-change"
+    },
+    {
+      "case": "broad-research-sweep/named-fast-moving-framework",
+      "classification": "grader-protocol defect",
+      "root_cause": "fixture-topic-mismatch",
+      "finding": "A generic synthetic framework fixture could not establish any current Laravel version.",
+      "shared_fix": "case-input-grounding",
+      "disposition": "remediated"
+    },
+    {
+      "case": "broad-research-sweep/paid-course-discovery",
+      "classification": "genuine Teach Me policy/teaching defect",
+      "root_cause": "delayed-independent-paid-source-fallback",
+      "finding": "The source workflow delayed the independent fallback after closed paid content.",
+      "shared_fix": "preserved-pr41-source-fallback",
+      "disposition": "preserved-pr41"
+    },
+    {
+      "case": "broad-research-sweep/multilingual-source-search",
+      "classification": "grader-protocol defect",
+      "root_cause": "underspecified-evaluation-input",
+      "finding": "The prompt and fixture used a generic unnamed topic while expecting multilingual subject research.",
+      "shared_fix": "case-input-grounding",
+      "disposition": "remediated"
+    },
+    {
+      "case": "broad-research-sweep/research-without-tools",
+      "classification": "deterministic-guard false positive",
+      "root_cause": "assessment-navigation-heuristic",
+      "finding": "The no-web disclosure and request for usable scope were misclassified as assessment; capability routing also now states unavailable.",
+      "shared_fix": "assessment-semantic-navigation",
+      "disposition": "remediated"
+    },
+    {
+      "case": "retention-accessibility/failed-retrieval-adaptation",
+      "classification": "genuine Teach Me policy/teaching defect",
+      "root_cause": "missing-retention-route",
+      "finding": "A case with prior and current evidence was routed as a new session, omitting retention adaptation guidance.",
+      "shared_fix": "session-routing-correction",
+      "disposition": "remediated"
+    },
+    {
+      "case": "retention-accessibility/simple-pack-surface",
+      "classification": "grader-protocol defect",
+      "root_cause": "missing-pack-manifest",
+      "finding": "The case graded links and learner-facing files without providing an actual pack manifest.",
+      "shared_fix": "case-input-grounding",
+      "disposition": "remediated"
+    },
+    {
+      "case": "retention-accessibility/stale-learner-observation",
+      "classification": "genuine Teach Me policy/teaching defect",
+      "root_cause": "missing-retention-route",
+      "finding": "A changed-context observation was routed as a new session and had no declared context fixture.",
+      "shared_fix": "session-routing-correction",
+      "disposition": "remediated"
+    },
+    {
+      "case": "source-grounded/paid-course-fallback-ar-msa",
+      "classification": "genuine Teach Me policy/teaching defect",
+      "root_cause": "delayed-independent-paid-source-fallback",
+      "finding": "The source workflow asked the learner to locate paid material instead of immediately teaching from accessible authoritative evidence.",
+      "shared_fix": "preserved-pr41-source-fallback",
+      "disposition": "preserved-pr41"
+    },
+    {
+      "case": "domain-photography/no-gear-upsell",
+      "classification": "model-only failure that should not cause a product change",
+      "root_cause": "response-missed-visible-success-criteria",
+      "finding": "The routed photography pack already required no-cost, visible-result success criteria.",
+      "shared_fix": "none",
+      "disposition": "no-product-change"
+    },
+    {
+      "case": "domain-photography/distinguish-image-failures",
+      "classification": "model-only failure that should not cause a product change",
+      "root_cause": "response-did-not-complete-comparison",
+      "finding": "The routed photography pack already required distinguishing exposure, blur, focus, color, noise, and composition by visible symptoms.",
+      "shared_fix": "none",
+      "disposition": "no-product-change"
+    },
+    {
+      "case": "domain-programming/syntax-memorizer",
+      "classification": "model-only failure that should not cause a product change",
+      "root_cause": "response-omitted-independent-variant",
+      "finding": "The routed programming pack already required predict, modify, and fresh independent application.",
+      "shared_fix": "none",
+      "disposition": "no-product-change"
+    },
+    {
+      "case": "domain-programming/copied-solution",
+      "classification": "model-only failure that should not cause a product change",
+      "root_cause": "response-omitted-fresh-transfer",
+      "finding": "The routed programming pack already distinguishes copied execution from independent transfer.",
+      "shared_fix": "none",
+      "disposition": "no-product-change"
+    }
+  ]
+}

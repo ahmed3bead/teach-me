@@ -57,7 +57,7 @@ def run_cases(
 
 def test_registry_and_cases() -> None:
     assert core_validator.top_level_case_ids("- id: case-one\n  fixture:\n  - id: nested-fixture\n- id: case-two\n") == ["case-one", "case-two"]
-    registry = load_fixture_registry(); assert len(registry) == 78
+    registry = load_fixture_registry(); assert len(registry) == 82
     cases = {}
     for path in sorted((ROOT / "evals").glob("*.yaml")) + sorted((ROOT / "domain-packs").glob("*/evals.yaml")):
         data = yaml.safe_load(path.read_text())
@@ -79,6 +79,39 @@ def test_registry_and_cases() -> None:
         [{"role": "user", "content": meaningful["prompt"]}]
     )
     assert "without another confirmation" in meaningful["expected"][1]
+    for key in (
+        "conversational-teaching/unfinished-slice-is-not-boundary",
+        "conversational-teaching/completed-unit-offer-before-questions",
+        "golden-teaching/retained-claim",
+        "integration-core/learner-book-connected-flow",
+        "integration-core/corrected-claim-propagates",
+        "retention-accessibility/delayed-retention-review",
+        "retention-accessibility/failed-retrieval-adaptation",
+        "retention-accessibility/stale-learner-observation",
+    ):
+        assert cases[key]["routing"]["session_state"] == "multi-turn", key
+    assert cases["integration-core/resume-without-reonboarding"]["routing"]["session_state"] == "resume"
+    assert cases["retention-accessibility/simple-pack-surface"]["routing"]["session_state"] == "resume"
+    assert cases["golden-teaching/photography-no-jargon"]["routing"]["domain_pack"] == "photography"
+    assert cases["integration-foundation/screen-transcript-conflict"]["routing"]["source_type"] == "video"
+    assert cases["broad-research-sweep/research-without-tools"]["capabilities"]["web"] == "unavailable"
+    assert "three to five" not in " ".join(cases["end-to-end-journeys/zero-knowledge-learner-complete-unit"]["expected"])
+    assert "spreadsheet data" in cases["curriculum-delivery/file-tools-unavailable"]["prompt"]
+    assert "Excel" in cases["guided-learning-pack/chat-only-resume"]["prompt"]
+    assert "Laravel 13.2" in json.dumps(registry["web.broad-research-sweep.named-fast-moving-framework.v1"], ensure_ascii=False)
+    assert "database index" in json.dumps(registry["web.broad-research-sweep.multilingual-source-search.v1"], ensure_ascii=False).casefold()
+    matrix = json.loads((ROOT / "fixtures" / "eval-regressions" / "paid-report-remediation-20260916.json").read_text())
+    allowed_categories = {
+        "genuine Teach Me policy/teaching defect",
+        "deterministic-guard false positive",
+        "grader-protocol defect",
+        "artifact-validator defect",
+        "model-only failure that should not cause a product change",
+    }
+    assert matrix["evidence_report_sha256"] == "b0e3d54d06d86bc9c8ac15d68dea77acab460d7d57947f05c52e191653cb1a08"
+    assert len(matrix["cases"]) == 45 and len({item["case"] for item in matrix["cases"]}) == 45
+    assert {item["classification"] for item in matrix["cases"]} <= allowed_categories
+    assert sum(matrix["category_counts"].values()) == 45
     unfinished = cases["conversational-teaching/unfinished-slice-is-not-boundary"]
     assert "previewing, promising" in unfinished["expected"][1]
     whole_book = cases["curriculum-delivery/whole-book-artifact-first"]
@@ -127,7 +160,7 @@ def test_semantic_fixture_leakage() -> None:
 
 def test_reference_routing_and_prompt_boundaries() -> None:
     simple = case("simple")
-    assert {p.name for p in reference_paths(simple)} == {"SKILL.md", "teaching-contract.md", "diagnostic-engine.md", "teaching-engine.md"}
+    assert {p.name for p in reference_paths(simple)} == {"SKILL.md", "core-teaching-policy.md", "teaching-contract.md", "diagnostic-engine.md", "teaching-engine.md"}
     skill_policy = (ROOT / "SKILL.md").read_text()
     conversation_policy = (ROOT / "references" / "conversational-teaching.md").read_text()
     assert "without previewing or promising a routine check" in skill_policy
@@ -158,11 +191,17 @@ def test_reference_routing_and_prompt_boundaries() -> None:
     assert immutable_prompt_packet("test-suite", hidden_changed) == packet
     prompt = render_prompt({"type":"generate", "locale":"ar-MSA", "prompt":"تعلم", "history":[], "prompt_packet":packet}, "response")
     assert all(source["content"] in prompt and len(source["sha256"]) == 64 for source in packet["instruction_sources"])
+    assert "exactly one self-contained printable text/html artifact" in prompt
+    assert "Do not return a PDF body or any additional HTML artifact" in prompt
     case_json = json.loads(prompt.split("CASE DATA:\n", 1)[1])
     assert "expected" not in case_json and "critical" not in case_json
     grader_prompt = render_prompt({"type":"grade", "criteria":["observable behavior"]}, "grader")
     assert "behavior required by the criterion is absent" in grader_prompt
     assert "criterion that explicitly requires the absence" in grader_prompt
+    assert "response and non-HTML evidence" in grader_prompt
+    assert "do not normalize whitespace, add or remove diacritics" in grader_prompt
+    assert "never splice noncontiguous text" in grader_prompt
+    assert "cite user text as response evidence" in grader_prompt
     tampered = copy.deepcopy(packet); tampered["instruction_sources"][0]["content"] += "tamper"
     try: render_prompt({"type":"generate", "locale":"ar-MSA", "prompt":"تعلم", "history":[], "prompt_packet":tampered}, "response")
     except ValueError: pass
@@ -198,10 +237,19 @@ def test_artifact_and_environment_safety() -> None:
         rendered = materialize_artifacts({"artifacts":[{"path":"pack.html","media_type":"text/html","content":html}]}, root, dict(CAPS, file="executable_temp", rendering="executable_temp"))
         pdf = next(item for item in rendered if item["media_type"] == "application/pdf")
         assert pdf["sha256"] == hashlib.sha256((root / pdf["path"]).read_bytes()).hexdigest() and pdf["validation"]["pages"] >= 1
+    for artifacts in ([], [
+        {"path":"one.html","media_type":"text/html","content":html},
+        {"path":"two.html","media_type":"text/html","content":html},
+    ]):
+        with tempfile.TemporaryDirectory() as directory:
+            try: materialize_artifacts({"artifacts":artifacts}, Path(directory), dict(CAPS, file="executable_temp", rendering="executable_temp"))
+            except ValueError as exc: assert "exactly one generated HTML artifact" in str(exc)
+            else: raise AssertionError("PDF renderer accepted other than exactly one HTML source")
 
 
 def test_assessment_and_consent() -> None:
     forensic = json.loads((ROOT / "fixtures" / "eval-regressions" / "behavioral-forensic.json").read_text())
+    for item in forensic["assessment_false_positives"]: assert runner.deterministic_assessment_check(item["text"], item["turns"])["passed"], item["case"]
     for item in forensic["assessment_negative_controls"]: assert not runner.deterministic_assessment_check(item["text"], item["turns"])["passed"], item["text"]
     none = [{"role":"user", "content":"Continue.", "assessment_intent":"none"}]
     bad = ("Answer these questions now.", "Read this and answer why it changed.", "If you want, solve 2+2 now.", "Here is the explanation. Why is the sky blue?", "What is 2+2?", "Current action: write your answer now.", "إن أردت، حل 2+2 الآن.", "اقرأ المثال وأجب لماذا تغيرت القيمة؟")
@@ -212,6 +260,10 @@ def test_assessment_and_consent() -> None:
     assert not runner.deterministic_assessment_check(
         "What concept are you trying to understand, and what is 2+2?", none
     )["passed"]
+    assert not runner.deterministic_assessment_check("What concept is an API?", none)["passed"]
+    assert not runner.deterministic_assessment_check("What is your answer to this problem?", none)["passed"]
+    assert not runner.deterministic_assessment_check("ما مفهوم API؟", none)["passed"]
+    assert not runner.deterministic_assessment_check("Which is correct?\n- A. first option.\n- B. second option.", none)["passed"]
     good = (
         "Send the book title.",
         "Which operating system do you use?",
@@ -282,6 +334,13 @@ def test_terminology_structure_and_child_semantics() -> None:
     assert not runner.deterministic_child_onboarding_check("I have never seen an apple before. Here is a paper circle and a friendly explanation.", child_prompt)["passed"]
     ar_prompt = "اشرح الكسور لطفل في المرحلة الابتدائية"
     assert runner.deterministic_child_onboarding_check("سنبدأ من الصفر في الكسور. تخيل تفاحة مقسمة إلى أجزاء متساوية، وسنفهمها بهدوء.", ar_prompt)["passed"]
+    ordered = "نقسم التفاحة أولًا إلى أجزاء متساوية. ربعها يكتب 1/4 ونصفها يكتب 1/2."
+    notation_first = "نكتب 1/4 أولًا، ثم نقول إن التفاحة مقسمة إلى أجزاء متساوية."
+    assert runner.deterministic_child_concept_order_check(ordered, ar_prompt)["passed"]
+    assert not runner.deterministic_child_concept_order_check(notation_first, ar_prompt)["passed"]
+    arabic_with_code = "هذا شرح عربي واضح ومبسّط يقدّم الفكرة خطوة خطوة، ثم يربطها بمثال عملي مناسب للمتعلم.\n```python\n" + ("print('latin code')\n" * 30) + "```"
+    assert runner.deterministic_language_check(arabic_with_code, "ar-MSA")["passed"]
+    assert not runner.deterministic_language_check("This answer is entirely English prose and contradicts the requested Arabic language.", "ar-MSA")["passed"]
 
 
 def test_grader_evidence() -> None:
@@ -340,6 +399,17 @@ def test_grader_evidence() -> None:
         unsupported = copy.deepcopy(valid); unsupported["results"][0]["reason"] = "The required behavior is absent."
         adjusted = runner.validate_grade(unsupported, [criterion], transcript)[0]
         assert not adjusted["passed"] and adjusted["grader_protocol_adjustment"]
+    html_grade = {"results":[{"verdict":"pass","evidence":{"source":"artifact","artifact_path":"lesson.html","quote":"هدف واضح خطوة تالية"},"reason":"The contiguous visible text demonstrates the criterion."}]}
+    html_artifact = [{"path":"lesson.html","media_type":"text/html","content":"<p><strong>هدف</strong> واضح</p><p>خطوة تالية</p><script>هدف مزيف</script>"}]
+    assert runner.validate_grade(html_grade, ["criterion"], transcript, html_artifact)[0]["passed"]
+    hidden = copy.deepcopy(html_grade); hidden["results"][0]["evidence"]["quote"] = "هدف مزيف"
+    try: runner.validate_grade(hidden, ["criterion"], transcript, html_artifact)
+    except RuntimeError: pass
+    else: raise AssertionError("hidden script text passed as learner-visible evidence")
+    diacritic = copy.deepcopy(valid); diacritic["results"][0]["evidence"]["quote"] = "safe procédurè"
+    try: runner.validate_grade(diacritic, ["criterion"], transcript)
+    except RuntimeError: pass
+    else: raise AssertionError("normalized response evidence passed without an exact quote")
     absent = {"results":[{"verdict":"fail","evidence":{"source":"absent","quote":"ABSENT: criterion"},"reason":"No evidence."}]}
     assert not runner.validate_grade(absent, ["criterion"], transcript)[0]["passed"]
 
