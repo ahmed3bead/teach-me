@@ -148,7 +148,7 @@ cases:
     video: video.curriculum-delivery.traceable-modular-course.v1
     context: context.curriculum-delivery.traceable-modular-course.v1
 - id: file-tools-unavailable
-  prompt: Create a complete curriculum, but this environment cannot save files.
+  prompt: Create a complete four-week beginner curriculum for cleaning spreadsheet data for operational reports, at three study hours per week, but this environment cannot save files.
   expected:
   - structured Markdown is provided in chat as a disclosed fallback
   - the agent does not pretend a file was created
