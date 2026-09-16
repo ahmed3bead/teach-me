@@ -7,6 +7,7 @@ import hashlib
 import json
 import re
 import shlex
+import copy
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
@@ -29,6 +30,7 @@ PRICE_FIELDS = (
 LONG_ARTIFACT_TYPES = frozenset({"markdown", "html", "pdf", "curriculum", "learning-pack"})
 LONG_ARTIFACT_SCOPES = frozenset({"substantial", "journey"})
 OFFICIAL_PRICING_PREFIX = "https://developers.openai.com/"
+REQUEST_METADATA_TOKEN_ALLOWANCE = 100
 
 
 def _decimal(value: Any, label: str) -> Decimal:
@@ -56,7 +58,9 @@ def cost_sensitive_paths(root: Path) -> list[Path]:
         root / "fixtures" / "eval-registry.yaml",
         root / "scripts" / "behavioral_eval_contract.py",
         root / "scripts" / "codex_subscription_eval_adapter.py",
+        root / "scripts" / "evaluation_cost.py",
         root / "scripts" / "openai_api_eval_adapter.py",
+        root / "scripts" / "run_behavioral_evals.py",
         *sorted((root / "references").glob("*.md")),
         *sorted((root / "evals").glob("*.yaml")),
         *sorted((root / "domain-packs").glob("*/PACK.md")),
@@ -206,6 +210,15 @@ def derive_cost_plan(
         raise ValueError("pricing policy requires the official response and grader roles")
     if _option(response_parts, "--model") != provider_model or _option(grader_parts, "--model") != provider_model:
         raise ValueError("adapter command models do not match the pricing policy")
+    for role, parts in (("response", response_parts), ("grader", grader_parts)):
+        if _option(parts, "--reasoning-effort") != "none":
+            raise ValueError(f"{role} command must use reasoning-effort none for the bounded request plan")
+        try:
+            temperature = Decimal(_option(parts, "--temperature"))
+        except Exception as exc:
+            raise ValueError(f"{role} command temperature must be numeric") from exc
+        if not temperature.is_finite() or temperature != 0:
+            raise ValueError(f"{role} command must use temperature 0 for the bounded request plan")
 
     response_max = _positive_int_option(response_parts, "--max-output-tokens")
     response_long_max = _positive_int_option(response_parts, "--long-artifact-max-output-tokens")
@@ -322,10 +335,105 @@ def invocation_usage(record: dict[str, Any]) -> dict[str, int] | None:
     return usage if isinstance(usage, dict) else None
 
 
-def invocation_reservation(cost_plan: dict[str, Any], role: str, max_output_tokens: int) -> dict[str, Any]:
+def _provider_schema(schema: dict[str, Any]) -> dict[str, Any]:
+    """Mirror the official adapter's strict-schema expansion for cost bounding."""
+    result = copy.deepcopy(schema)
+
+    def visit(node: Any) -> None:
+        if not isinstance(node, dict):
+            return
+        if node.get("type") == "object":
+            properties = node.get("properties", {})
+            required = set(node.get("required", []))
+            for name, child in properties.items():
+                visit(child)
+                if name not in required:
+                    properties[name] = {"anyOf": [child, {"type": "null"}]}
+            node["required"] = list(properties)
+            node["additionalProperties"] = False
+        if node.get("type") == "array":
+            visit(node.get("items"))
+        for choice in node.get("anyOf", []):
+            visit(choice)
+
+    visit(result)
+    return result
+
+
+def request_input_token_bound(
+    payload: dict[str, Any],
+    role: str,
+    cost_plan: dict[str, Any],
+    max_output_tokens: int,
+) -> dict[str, Any]:
+    """Bound one actual request without falling back to the provider-wide limit."""
+    if role not in {"response", "grader"} or payload.get("type") != ("generate" if role == "response" else "grade"):
+        raise ValueError("request role and payload type do not match")
+    if not isinstance(max_output_tokens, int) or max_output_tokens <= 0:
+        raise ValueError("request output-token limit must be a positive integer")
+    try:
+        from codex_subscription_eval_adapter import output_schema, render_prompt
+
+        provider_model = str(cost_plan["model"]).split("/", 1)[1]
+        prompt = render_prompt(payload, role, provider_model)
+        schema = _provider_schema(output_schema(payload))
+        request_body = {
+            "model": provider_model,
+            "input": prompt,
+            "store": False,
+            "tools": [],
+            "parallel_tool_calls": False,
+            "service_tier": cost_plan["service_tier"],
+            "truncation": "disabled",
+            "max_output_tokens": max_output_tokens,
+            "reasoning": {"effort": "none"},
+            "temperature": 0,
+            "text": {
+                "format": {
+                    "type": "json_schema",
+                    "name": f"teach_me_{role}",
+                    "strict": True,
+                    "schema": schema,
+                },
+                "verbosity": "low",
+            },
+        }
+        submitted_bytes = len(
+            json.dumps(request_body, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        )
+    except (KeyError, TypeError, ValueError, IndexError) as exc:
+        raise ValueError(f"cannot calculate a safe request-specific input bound: {exc}") from exc
+    maximum_input_tokens = submitted_bytes + REQUEST_METADATA_TOKEN_ALLOWANCE
+    planned_limit = cost_plan["token_ceiling"]["maximum_planned_input_tokens_per_request"]
+    provider_limit = cost_plan["token_ceiling"]["provider_max_input_tokens_per_request"]
+    if maximum_input_tokens > planned_limit:
+        raise ValueError(
+            "request-specific input bound exceeds the committed planned per-request limit; "
+            "recalculate the pricing policy"
+        )
+    if maximum_input_tokens > provider_limit:
+        raise ValueError("request-specific input bound exceeds the provider input limit")
+    return {
+        "method": "utf8-request-byte-upper-bound",
+        "submitted_request_bytes": submitted_bytes,
+        "metadata_token_allowance": REQUEST_METADATA_TOKEN_ALLOWANCE,
+        "maximum_input_tokens": maximum_input_tokens,
+    }
+
+
+def invocation_reservation(
+    cost_plan: dict[str, Any],
+    role: str,
+    payload: dict[str, Any],
+    max_output_tokens: int,
+) -> dict[str, Any]:
     prices = cost_plan["prices_usd_per_million_tokens"]
-    input_tokens = cost_plan["token_ceiling"]["provider_max_input_tokens_per_request"]
-    input_rate = max(_decimal(prices[name], f"price {name}") for name in ("uncached_input", "cached_input", "cache_write"))
+    input_bound = request_input_token_bound(payload, role, cost_plan, max_output_tokens)
+    input_tokens = input_bound["maximum_input_tokens"]
+    input_category, input_rate = max(
+        ((name, _decimal(prices[name], f"price {name}")) for name in ("uncached_input", "cached_input", "cache_write")),
+        key=lambda item: item[1],
+    )
     high_context = cost_plan["high_context_pricing"]
     input_multiplier = Decimal(1)
     output_multiplier = Decimal(1)
@@ -338,8 +446,11 @@ def invocation_reservation(cost_plan: dict[str, Any], role: str, max_output_toke
     )
     return {
         "role": role,
+        "input_bound": input_bound,
         "maximum_input_tokens": input_tokens,
         "maximum_output_tokens": max_output_tokens,
+        "worst_case_input_category": input_category,
+        "cache_write_possible": True,
         "high_context_pricing_applied": input_multiplier > 1,
         "maximum_cost_usd": _number(maximum),
         "status": "in-flight",
@@ -350,6 +461,7 @@ def cost_accounting_snapshot(
     invocations: list[dict[str, Any]],
     cost_plan: dict[str, Any],
     active_reservation: dict[str, Any] | None = None,
+    hard_spend_cap_usd: float | None = None,
 ) -> dict[str, Any]:
     """Price known usage and bound every credentialed invocation without usage."""
     totals = {name: 0 for name in USAGE_FIELDS}
@@ -359,6 +471,14 @@ def cost_accounting_snapshot(
         usage = invocation_usage(record)
         if usage is not None:
             reconciled = reconcile_usage(usage)
+            if record.get("credential_env"):
+                reservation = record.get("cost_reservation")
+                if not isinstance(reservation, dict):
+                    raise ValueError("credentialed invocation with usage lacks its request-specific reservation")
+                actual = Decimal(str(price_usage(usage, cost_plan["prices_usd_per_million_tokens"])["total_usd"]))
+                maximum = _decimal(reservation.get("maximum_cost_usd"), "reservation maximum cost")
+                if actual > maximum:
+                    raise ValueError("provider-reported usage exceeds the request-specific reservation")
             records += 1
             for name in USAGE_FIELDS:
                 totals[name] += reconciled[name]
@@ -379,14 +499,47 @@ def cost_accounting_snapshot(
     unresolved_max = sum(Decimal(str(item["maximum_cost_usd"])) for item in unresolved)
     known_cost = Decimal(str(priced["total_usd"]))
     run_ceiling = Decimal(str(cost_plan["conservative_cost"]["total_usd"]))
-    upper_bound = min(run_ceiling, known_cost + unresolved_max) if unresolved else known_cost
+    upper_bound = known_cost + unresolved_max
+    if upper_bound > run_ceiling:
+        raise ValueError("recorded cost plus unresolved reservations exceed the theoretical full-run ceiling")
+    hard_cap = _decimal(hard_spend_cap_usd, "hard spend cap") if hard_spend_cap_usd is not None else None
+    if hard_cap is not None and upper_bound > hard_cap:
+        raise ValueError("recorded cost plus unresolved reservations exceed the hard spend cap")
+    remaining = hard_cap - upper_bound if hard_cap is not None else None
     return {
         "known_usage_records": records,
         "known_usage": priced["usage"],
         "known_cost_components_usd": priced["components"],
         "known_cost_usd": priced["total_usd"],
+        "recorded_cost_usd": priced["total_usd"],
         "unresolved_invocations": unresolved,
+        "unresolved_reservations": unresolved,
         "unresolved_maximum_cost_usd": _number(unresolved_max),
+        "unresolved_reservations_usd": _number(unresolved_max),
         "current_upper_bound_cost_usd": _number(upper_bound),
         "conservative_run_ceiling_usd": _number(run_ceiling),
+        "theoretical_full_run_ceiling_usd": _number(run_ceiling),
+        "hard_spend_cap_usd": _number(hard_cap) if hard_cap is not None else None,
+        "remaining_spendable_budget_usd": _number(remaining) if remaining is not None else None,
+    }
+
+
+def hard_spend_cap_decision(
+    accounting: dict[str, Any],
+    next_reservation: dict[str, Any],
+    hard_spend_cap_usd: float,
+) -> dict[str, Any]:
+    """Apply the pre-dispatch hard-cap inequality using exact decimal arithmetic."""
+    hard_cap = _decimal(hard_spend_cap_usd, "hard spend cap")
+    recorded = Decimal(str(accounting["recorded_cost_usd"]))
+    outstanding = Decimal(str(accounting["unresolved_reservations_usd"]))
+    next_maximum = _decimal(next_reservation.get("maximum_cost_usd"), "next-request maximum cost")
+    exposure_after_dispatch = recorded + outstanding + next_maximum
+    return {
+        "recorded_cost_usd": _number(recorded),
+        "outstanding_reservations_usd": _number(outstanding),
+        "next_request_maximum_usd": _number(next_maximum),
+        "exposure_after_dispatch_usd": _number(exposure_after_dispatch),
+        "hard_spend_cap_usd": _number(hard_cap),
+        "dispatch_permitted": exposure_after_dispatch <= hard_cap,
     }

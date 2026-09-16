@@ -27,8 +27,11 @@ from behavioral_eval_contract import immutable_prompt_packet, validate_case_cont
 from evaluation_cost import (
     cost_accounting_snapshot,
     derive_cost_plan,
+    hard_spend_cap_decision,
     invocation_reservation,
+    invocation_usage,
     load_cost_policy,
+    price_usage,
     reconcile_usage,
     uses_long_artifact_budget,
 )
@@ -148,6 +151,7 @@ FAILURE_TAXONOMY = {
     "model-identity-mismatch": "global",
     "usage-accounting": "global",
     "cost-ceiling": "global",
+    "hard-spend-cap": "safe-partial",
     "report-persistence": "global",
     "invalid-global-configuration": "global",
     "operator-interrupt": "global",
@@ -175,6 +179,7 @@ ABORT_PATH_INVENTORY = (
     {"path": "report-serialization-or-persistence", "classification": "report-persistence", "disposition": "global"},
     {"path": "usage-accounting-failure", "classification": "usage-accounting", "disposition": "global"},
     {"path": "authorized-cost-ceiling", "classification": "cost-ceiling", "disposition": "global-preflight"},
+    {"path": "hard-spend-cap-stop", "classification": "hard-spend-cap", "disposition": "safe-partial-before-dispatch"},
     {"path": "operator-interrupt", "classification": "operator-interrupt", "disposition": "global"},
 )
 
@@ -231,6 +236,10 @@ class GlobalIntegrityError(RuntimeError):
     """A run-wide safety or release-integrity failure that must abort."""
 
 
+class HardSpendCapReached(RuntimeError):
+    """The next bounded paid request cannot fit under the configured hard cap."""
+
+
 def validate_cost_authorization(
     authorized_cost_usd: float | None,
     conservative_max_cost_usd: float | None,
@@ -253,6 +262,21 @@ def validate_cost_authorization(
         raise GlobalIntegrityError("declared conservative maximum does not match the calculated pricing ceiling")
     if conservative_max_cost_usd > authorized_cost_usd:
         raise GlobalIntegrityError("conservative maximum cost exceeds authorized cost ceiling")
+
+
+def validate_hard_spend_cap(
+    hard_spend_cap_usd: float | None,
+    cost_plan: dict[str, Any] | None,
+    authorized_cost_usd: float | None,
+) -> None:
+    if hard_spend_cap_usd is None:
+        return
+    if not isinstance(hard_spend_cap_usd, (int, float)) or not 0 < hard_spend_cap_usd < float("inf"):
+        raise GlobalIntegrityError("hard spend cap must be finite and positive")
+    if not isinstance(cost_plan, dict):
+        raise GlobalIntegrityError("hard spend cap requires a verified pricing file and cost plan")
+    if authorized_cost_usd is not None and hard_spend_cap_usd > authorized_cost_usd:
+        raise GlobalIntegrityError("hard spend cap cannot exceed the authorized cost ceiling")
 
 
 def payload_journal_fields(payload: dict[str, Any]) -> dict[str, Any]:
@@ -590,6 +614,7 @@ def refresh_cost_accounting(report: dict[str, Any]) -> None:
             report.get("invocations", []),
             cost_plan,
             reservation if isinstance(reservation, dict) else None,
+            report.get("run_configuration", {}).get("hard_spend_cap_usd"),
         )
     except ValueError as exc:
         raise GlobalIntegrityError(f"unsafe spending accounting: {exc}") from exc
@@ -598,12 +623,29 @@ def refresh_cost_accounting(report: dict[str, Any]) -> None:
 def reserve_invocation_cost(
     report: dict[str, Any],
     role: str,
+    payload: dict[str, Any],
     max_output_tokens: int,
 ) -> dict[str, Any] | None:
     cost_plan = report.get("cost_plan")
     if not isinstance(cost_plan, dict):
         return None
-    reservation = invocation_reservation(cost_plan, role, max_output_tokens)
+    try:
+        reservation = invocation_reservation(cost_plan, role, payload, max_output_tokens)
+    except ValueError as exc:
+        raise GlobalIntegrityError(f"cannot safely bound the next paid request: {exc}") from exc
+    hard_cap = report.get("run_configuration", {}).get("hard_spend_cap_usd")
+    if hard_cap is not None:
+        refresh_cost_accounting(report)
+        decision = hard_spend_cap_decision(report["cost_accounting"], reservation, hard_cap)
+        if not decision["dispatch_permitted"]:
+            report["hard_spend_cap_stop"] = {
+                "reason": "remaining budget cannot safely cover the next request",
+                "next_request": reservation,
+                "decision": decision,
+            }
+            raise HardSpendCapReached(
+                "remaining hard-cap budget cannot cover the next request-specific maximum charge"
+            )
     report["active_case"]["cost_reservation"] = reservation
     refresh_cost_accounting(report)
     return reservation
@@ -615,10 +657,33 @@ def checkpoint_invocation_cost(
     reservation: dict[str, Any] | None,
 ) -> None:
     if reservation is not None:
-        record.setdefault("cost_reservation", reservation)
+        reconciled_reservation = dict(reservation)
+        usage = invocation_usage(record)
+        if usage is None:
+            reconciled_reservation["status"] = "unresolved-spent"
+        else:
+            try:
+                actual = price_usage(usage, report["cost_plan"]["prices_usd_per_million_tokens"])["total_usd"]
+            except ValueError as exc:
+                raise GlobalIntegrityError(f"unsafe spending accounting: {exc}") from exc
+            if actual > reservation["maximum_cost_usd"]:
+                raise GlobalIntegrityError("provider-reported usage exceeds the request-specific reservation")
+            reconciled_reservation.update({"status": "reconciled", "recorded_cost_usd": actual})
+        record["cost_reservation"] = reconciled_reservation
     active = report.get("active_case")
     if isinstance(active, dict):
         active.pop("cost_reservation", None)
+    refresh_cost_accounting(report)
+
+
+def finalize_hard_spend_cap_stop(report: dict[str, Any], error: HardSpendCapReached) -> None:
+    """Make a hard-cap stop explicit, partial, and unusable as release evidence."""
+    report["status"] = "stopped-hard-spend-cap"
+    report["release_evidence_requested"] = bool(report.get("release_evidence"))
+    report["release_evidence"] = False
+    report["release_evidence_disqualification"] = "run stopped before completion by the hard spend cap"
+    report["failure"] = {"type": type(error).__name__, "message": str(error)}
+    report["completed_at"] = datetime.now(timezone.utc).isoformat()
     refresh_cost_accounting(report)
 
 
@@ -1159,6 +1224,7 @@ def main() -> int:
     parser.add_argument("--pricing-file", type=Path, default=None)
     parser.add_argument("--authorized-cost-usd", type=float, default=None)
     parser.add_argument("--conservative-max-cost-usd", type=float, default=None)
+    parser.add_argument("--hard-spend-cap-usd", type=float, default=None)
     args = parser.parse_args()
 
     if not 0 <= args.pass_threshold <= 1:
@@ -1209,6 +1275,7 @@ def main() -> int:
         cost_plan["conservative_cost"]["total_usd"] if cost_plan else None,
         args.release_evidence,
     )
+    validate_hard_spend_cap(args.hard_spend_cap_usd, cost_plan, args.authorized_cost_usd)
     if args.release_evidence and (args.case or case_count < 90 or args.pass_threshold != 0.90):
         parser.error("release evidence requires the full case set and the committed 0.90 threshold")
     git_verification = verify_release_commit(args.candidate_commit) if args.release_evidence else None
@@ -1237,11 +1304,13 @@ def main() -> int:
         "response_credential_env": args.response_api_key_env, "grader_credential_env": args.grader_api_key_env,
         "authorized_cost_usd": args.authorized_cost_usd,
         "conservative_max_cost_usd": args.conservative_max_cost_usd,
+        "hard_spend_cap_usd": args.hard_spend_cap_usd,
         "pricing_policy_sha256": cost_plan["policy_sha256"] if cost_plan else None,
     }
     configuration_sha256 = hashlib.sha256(json.dumps(run_configuration, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
     report: dict[str, Any] = {
-        "schema_version": "2.2.0", "status": "running", "release_evidence": args.release_evidence,
+        "schema_version": "2.3.0", "status": "running", "release_evidence": args.release_evidence,
+        "release_evidence_requested": args.release_evidence,
         "candidate_commit": git_verification["verified_sha"] if git_verification else None,
         "verified_commit": git_verification, "run_id": f"behavioral-{generated_at.strftime('%Y%m%dT%H%M%S.%fZ')}",
         "generated_at": generated_at.isoformat(), "resume": {"requested": args.resume, "completed_case_keys": []},
@@ -1252,6 +1321,7 @@ def main() -> int:
                      "protocol_retries": args.protocol_retries, "timeout_seconds": args.timeout,
                      "authorized_cost_usd": args.authorized_cost_usd,
                      "conservative_max_cost_usd": args.conservative_max_cost_usd,
+                     "hard_spend_cap_usd": args.hard_spend_cap_usd,
                      "calculated_max_cost_usd": cost_plan["conservative_cost"]["total_usd"] if cost_plan else None,
                      "pricing_policy_sha256": cost_plan["policy_sha256"] if cost_plan else None},
         "failure_taxonomy": FAILURE_TAXONOMY,
@@ -1336,7 +1406,7 @@ def main() -> int:
                             else "response_max_output_tokens"
                         ]
                     response_reservation = reserve_invocation_cost(
-                        report, "response", response_limit
+                        report, "response", generation_payload, response_limit
                     ) if response_limit else None
                     write_report(args.output, report)
                     def checkpoint_response(record: dict[str, Any]) -> None:
@@ -1578,7 +1648,7 @@ def main() -> int:
             report["active_case"].update({"stage": "grader-invoking", "grader_attempts": []})
             grader_limit = cost_plan["request_ceiling"]["grader_max_output_tokens"] if cost_plan else 0
             grader_reservation = reserve_invocation_cost(
-                report, "grader", grader_limit
+                report, "grader", grade_payload, grader_limit
             ) if grader_limit else None
             write_report(args.output, report)
             def checkpoint_grader(record: dict[str, Any]) -> None:
@@ -1819,6 +1889,19 @@ def main() -> int:
 if __name__ == "__main__":
     try:
         raise SystemExit(main())
+    except HardSpendCapReached as exc:
+        if _ACTIVE_REPORT is None:
+            print(f"Behavioral eval failed before hard-cap report initialization: {exc}", file=sys.stderr)
+            raise SystemExit(2)
+        path, diagnostic = _ACTIVE_REPORT
+        try:
+            finalize_hard_spend_cap_stop(diagnostic, exc)
+            write_report(path, diagnostic)
+        except (OSError, RuntimeError, TypeError, ValueError) as persistence_error:
+            print(f"Behavioral eval failed to persist hard-cap stop: {persistence_error}", file=sys.stderr)
+            raise SystemExit(2)
+        print(f"Behavioral eval stopped safely: {exc}", file=sys.stderr)
+        raise SystemExit(3)
     except (KeyboardInterrupt, OSError, RuntimeError, TypeError, ValueError, subprocess.TimeoutExpired, yaml.YAMLError) as exc:
         if _ACTIVE_REPORT is not None:
             path, diagnostic = _ACTIVE_REPORT
