@@ -8,6 +8,8 @@ Build a sufficiently broad, current, and traceable knowledge base for the learne
 
 Research may discover both paid and free sources. Never bypass authentication, paywalls, DRM, robots restrictions, platform terms, or access controls. For inaccessible paid material, record only lawful public metadata, previews, samples, syllabi, reviews, creator statements, and citations. Do not claim its closed content was inspected. Prefer an authorized learner copy when fidelity to that exact source matters; otherwise build a clearly independent synthesis from accessible authoritative sources.
 
+If supplied public metadata and accessible authoritative results already establish a safe first objective, use them directly. Distinguish the inaccessible product from the independent synthesis, then deliver the compact path or first verified unit in the same response. Do not repeat the search, ask the learner to restate known context, or defer all useful teaching behind optional setup questions.
+
 ## Establish the research target
 
 Resolve only choices that change the sweep:

@@ -46,6 +46,8 @@ For Arabic HTML and PDF output, isolate every English term, identifier, number, 
 7. If learning failed, diagnose whether the cause is missing prerequisite, terminology, example, pace, misconception, accessibility, or motivation. Change strategy rather than paraphrasing the same explanation.
 8. Record only useful progress when persistent workspace files are available. Never claim memory that does not exist.
 
+Do not replace useful work with onboarding. When the request, supplied context, and available evidence already determine a safe first objective, begin that objective in the same response and state any non-blocking assumption briefly. Ask a clarifying question first only when its answer would materially change safety, source fidelity, or the next lesson.
+
 If a relevant teaching pack exists in `domain-packs/`, read its `PACK.md` after diagnosing the learner. A pack may specialize prerequisite maps, practice types, mastery evidence, common misconceptions, and source standards. It must not override this skill's evidence, privacy, safety, or learner-control rules. Treat a pack marked `needs-qualified-review` as experimental guidance, verify consequential domain claims independently, and never present it as expert-reviewed.
 
 For detailed instructional decisions, read [references/teaching-contract.md](references/teaching-contract.md). For a multi-session learner, also read [references/learner-model.md](references/learner-model.md).
@@ -65,6 +67,8 @@ Research when claims are current, specialized, disputed, safety-relevant, or out
 The teaching behavior is evidence-informed but bounded; see [docs/pedagogy-basis.md](docs/pedagogy-basis.md) for the research mapping and limitations. Do not turn a general finding into a diagnosis, fixed learning style, or guaranteed outcome.
 
 When the learner names a book, field, course, tool, framework, or other defined subject as the basis of learning, perform a broad research sweep before substantial instruction. Build a source-diverse knowledge base rather than relying on the first source or one medium. Read [references/research-sweep.md](references/research-sweep.md). If research access is unavailable, say so and narrow the promised scope instead of presenting prior knowledge as a completed sweep.
+
+Use supplied lawful research results instead of asking the learner to repeat information they already provided. When public metadata and accessible authoritative evidence are sufficient for a safe first unit, deliver that unit or a compact independent path now; do not stop at promising future work or requesting permission to begin.
 
 Internally distinguish `verified`, `corroborated`, `inferred`, `disputed`, and `unverified`. Communicate uncertainty that could change the learner's understanding or decision. If reliable support is unavailable, say so and narrow the lesson.
 

@@ -137,6 +137,9 @@ def test_reference_routing_and_prompt_boundaries() -> None:
     assert "one integrated authentic application" in conversation_policy
     assert "must not announce when a future quiz" in conversation_policy
     assert "changed or unseen context" in conversation_policy
+    source_policy = (ROOT / "references" / "source-grounded-mode.md").read_text()
+    assert "execute this fallback immediately" in source_policy
+    assert "not the same course, a reconstruction, a summary" in source_policy
     rich = case("rich", "Prepare an accessible video curriculum.", "ar-MSA")
     rich["routing"].update(audience="educator", mode="source-grounded", source_type="video", artifact_type="pdf", session_state="multi-turn", accessibility="screen-reader", safety_level="sensitive", instructional_scope="journey", assessment_state="offered")
     rich["capabilities"].update(source="supplied_result", web="supplied_result", file="executable_temp", rendering="executable_temp", video="supplied_result")
@@ -233,6 +236,28 @@ def test_assessment_and_consent() -> None:
     assert not runner.deterministic_assessment_check("Solve another problem.", accepted + [{"role":"user","content":"No more test.","assessment_intent":"decline"}])["passed"]
     contradictory = [{"role":"user","content":"I do not accept the quiz.","assessment_intent":"accept"}]
     assert not runner.deterministic_assessment_check("Solve it.", contradictory)["passed"]
+    resume_routing = dict(ROUTING, session_state="resume", mode="source-grounded", source_type="document")
+    legacy_prompt = "TEACH-ME:v1:k8s:ar-MSA:M02:L03:retained كمل"
+    checkpoint = "ما الفرق بين Pod وService؟"
+    assert runner.requires_untrusted_resume_checkpoint(legacy_prompt, resume_routing)
+    assert runner.deterministic_assessment_check(
+        checkpoint,
+        [{"role":"user","content":legacy_prompt,"assessment_intent":"none"}],
+        routing=resume_routing,
+        prompt=legacy_prompt,
+    )["passed"]
+    assert not runner.deterministic_assessment_check(
+        checkpoint,
+        [{"role":"user","content":legacy_prompt,"assessment_intent":"none"}],
+    )["passed"]
+    valid_v2 = "TEACH-ME:v2:session:k8s:ar-MSA:M02:L03"
+    assert not runner.requires_untrusted_resume_checkpoint(valid_v2, resume_routing)
+    assert not runner.deterministic_assessment_check(
+        checkpoint,
+        [{"role":"user","content":valid_v2,"assessment_intent":"none"}],
+        routing=resume_routing,
+        prompt=valid_v2,
+    )["passed"]
     assert runner.learner_opted_into_assessment([{"role":"user","content":"عندي امتحان غدًا وأريدك أن تختبرني بأسئلة كثيرة"}])
     assert runner.learner_opted_into_assessment([{"role":"user","content":"أريد أن أتأكد أنني استفدت وفهمت الدرس"}])
 
@@ -577,7 +602,7 @@ def test_abort_path_taxonomy_and_static_inventory() -> None:
     runner.validate_cost_authorization(None, None, None, False)
     runner.validate_cost_authorization(16.0, 15.9, 15.9, True)
     runner.validate_hard_spend_cap(None, None, None)
-    runner.validate_hard_spend_cap(7.0, {"verified": True}, 17.907975)
+    runner.validate_hard_spend_cap(7.0, {"verified": True}, 18.912125)
     for authorized, ceiling, calculated in (
         (None, None, None),
         (16.0, None, 15.9),

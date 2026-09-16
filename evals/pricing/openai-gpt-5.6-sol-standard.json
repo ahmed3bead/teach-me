@@ -16,7 +16,7 @@
     "output_multiplier": "1.50"
   },
   "token_ceiling": {
-    "aggregate_input_tokens": 1910427,
+    "aggregate_input_tokens": 2111257,
     "aggregate_output_tokens": 417792,
     "maximum_planned_input_tokens_per_request": 200000,
     "provider_max_input_tokens_per_request": 922000,
@@ -29,7 +29,7 @@
     "protocol_retries": 0
   },
   "cost_sensitive_source_sha256": {
-    "SKILL.md": "fbe937c88badde2be1ce54a650adfa1b274ee3a27a30a5245c16d7ef43c0f41a",
+    "SKILL.md": "4bc814b14a363e77ac4df98f720c8c0a7e693c14c456ace39b65e28277c03331",
     "domain-packs/photography/PACK.md": "f6e568580aef26eef8425544dabf0368bee4b20e27a5e3ffd78330243498b134",
     "domain-packs/photography/evals.yaml": "bb2c910201fd70977f23704b8907970f44c8dcdde301d2db6074b5d1d375ecb1",
     "domain-packs/programming/PACK.md": "d833580828c0edf10c42659e7919feaca68092011bc60e3d3e4ffea66b7749e7",
@@ -65,16 +65,16 @@
     "references/learner-model.md": "f5d690f3ca3f7710722d7e108573b4a4822fe35db5a9e12aec4444a8439afe9c",
     "references/learning-pack-structure.md": "255be7e85741f958650864c1fe8afbc16bb177c7b844431e798d89c6b63383ff",
     "references/multimodal-video.md": "99cea43c5de8d97fce3880a1521a7d8dae1ac90ef3998e4bf7660f3c0091bf3d",
-    "references/research-sweep.md": "d821acf12428b08e323e70f3e7cf60878168dd66817ef53d7831cf507f8c20c7",
+    "references/research-sweep.md": "9d8e7e1287fc1ea1066889ed5b4cc4cb1b9da7363b244aab89d7fc92faf5c4d6",
     "references/retention-adaptation.md": "7909346f0947f2f3c5bd0cb2ca913d6a7cc756b62741feadcbaf6fa7dca8d5dd",
     "references/safety-privacy.md": "de6767bc7ee9c08ca706db453c6dc3e9879387e62d48c352d8eb772a34b982ed",
-    "references/source-grounded-mode.md": "7ec7f9b410c96be8618b05b2981b103c20514f6a88fd89f5181f433d8792a575",
+    "references/source-grounded-mode.md": "ecc10985229496d17d23765af054ae083ee6dec28bbb3b552b626026e30e21e2",
     "references/teaching-contract.md": "7d99d35970cfb9863f4caf0efaa3167436b9cb77abcc9d4a4461e0913c3b991a",
     "references/teaching-engine.md": "5108fdc645dc4a4bf2f85327bf55bd6fa32d2563f67faddd49c594480da208b9",
     "scripts/behavioral_eval_contract.py": "11d2f2fa420d3a3d4c8734aa1cbbe8eb81c5396b7d34898e7024c5030fba60c8",
     "scripts/codex_subscription_eval_adapter.py": "c6aa74653b29447dd1e31f4e2096b11601f1dbb7db6fe7d8089cb1f487c25020",
     "scripts/evaluation_cost.py": "63ed6823ec343e78f1a4247b376d1356735e8d117fe607d720a0343735799988",
     "scripts/openai_api_eval_adapter.py": "913192af73482454aae69836c7440ad46ed31d528900b7fa6262f0caacff9ec1",
-    "scripts/run_behavioral_evals.py": "1855551ede6b109060a371445dea00a47078c9bd1a3952ef6eb64842d48b0afe"
+    "scripts/run_behavioral_evals.py": "e60eb678798e851303835c9b92bb72c1d9c9ee53767e8b6c160d858701b43ba2"
   }
 }

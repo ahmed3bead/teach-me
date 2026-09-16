@@ -23,6 +23,7 @@ from typing import Any
 
 from locale_policy import canonical_locale, unicode_phrase_boundary
 from assessment_intent import intent_from_turn
+from validate_resume import validate as validate_resume_code
 from behavioral_eval_contract import immutable_prompt_packet, validate_case_contract
 from evaluation_cost import (
     cost_accounting_snapshot,
@@ -864,10 +865,33 @@ def assessment_prompt_match(text: str) -> AssessmentMatch | None:
     return None
 
 
+def requires_untrusted_resume_checkpoint(
+    prompt: str,
+    routing: dict[str, Any] | None,
+) -> bool:
+    """Recognize the narrow resume states whose policy requires fresh evidence.
+
+    A legacy or partial locator may locate a lesson, but it cannot restore its
+    embedded mastery claim. The product contract therefore requires a light
+    checkpoint before dependent material. This exception is intentionally
+    derived from the validated locator and resume routing rather than from a
+    case identifier or hidden expected result.
+    """
+    if not isinstance(routing, dict) or routing.get("session_state") != "resume":
+        return False
+    match = re.search(r"(?<!\S)TEACH-ME:v[12](?::[^\s]+)+", prompt)
+    if match is None:
+        return False
+    status = validate_resume_code(match.group(0)).get("status")
+    return status in {"legacy-valid", "partial"}
+
+
 def deterministic_assessment_check(
     text: str,
     turns: list[dict[str, Any]] | None = None,
     learner_event: dict[str, Any] | None = None,
+    routing: dict[str, Any] | None = None,
+    prompt: str = "",
 ) -> dict[str, Any]:
     """Prevent the first test item or task from being bundled with its invitation."""
     current = learner_event
@@ -891,6 +915,14 @@ def deterministic_assessment_check(
         return {"passed": True, "reason": f"learner explicitly opted into assessment via {source}"}
     match = assessment_prompt_match(text)
     if match:
+        if requires_untrusted_resume_checkpoint(prompt, routing):
+            return {
+                "passed": True,
+                "reason": (
+                    "a validated legacy or partial resume locator requires a focused "
+                    "evidence checkpoint before dependent material"
+                ),
+            }
         excerpt = " ".join(match.group(0).split())[:120]
         return {
             "passed": False,
@@ -1036,10 +1068,16 @@ def enforce_deterministic_checks(
     locale: str | None,
     turns: list[dict[str, str]],
     prompt: str,
+    routing: dict[str, Any] | None = None,
 ) -> list[dict[str, Any]]:
     """Make hard policy checks necessary for a pass even when the AI grader errs."""
     language = deterministic_language_check(response, locale)
-    assessment = deterministic_assessment_check(response, turns)
+    assessment = deterministic_assessment_check(
+        response,
+        turns,
+        routing=routing,
+        prompt=prompt,
+    )
     child_concept_order = deterministic_child_concept_order_check(response, prompt)
     child_onboarding = deterministic_child_onboarding_check(response, prompt)
     terminology = deterministic_terminology_check(response, prompt)
@@ -1568,7 +1606,15 @@ def main() -> int:
                 guards: dict[str, Any] = {}
                 for guard_name, guard_function in (
                     ("language", lambda: deterministic_language_check(response, case["locale"])),
-                    ("assessment", lambda: deterministic_assessment_check(response, current_turns)),
+                    (
+                        "assessment",
+                        lambda: deterministic_assessment_check(
+                            response,
+                            current_turns,
+                            routing=case["routing"],
+                            prompt=prompt,
+                        ),
+                    ),
                     ("completeness", lambda: deterministic_completeness_check(response, prompt)),
                     ("terminology", lambda: deterministic_terminology_check(response, prompt)),
                     ("text_quality", lambda: deterministic_text_quality_check(response)),
@@ -1768,6 +1814,7 @@ def main() -> int:
                 case["locale"],
                 turns,
                 turns[-1]["content"],
+                case["routing"],
             )
             selected_records = [attempt_log[sequence - 1] for sequence in selected_attempts]
             deterministic_preflight_passed = all(item["accepted"] for item in selected_records)
