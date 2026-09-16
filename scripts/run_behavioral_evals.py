@@ -10,7 +10,6 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import math
 import re
 import shlex
 import subprocess
@@ -25,6 +24,14 @@ from typing import Any
 from locale_policy import canonical_locale, unicode_phrase_boundary
 from assessment_intent import intent_from_turn
 from behavioral_eval_contract import immutable_prompt_packet, validate_case_contract
+from evaluation_cost import (
+    cost_accounting_snapshot,
+    derive_cost_plan,
+    invocation_reservation,
+    load_cost_policy,
+    reconcile_usage,
+    uses_long_artifact_budget,
+)
 
 try:
     import yaml
@@ -227,18 +234,23 @@ class GlobalIntegrityError(RuntimeError):
 def validate_cost_authorization(
     authorized_cost_usd: float | None,
     conservative_max_cost_usd: float | None,
+    calculated_max_cost_usd: float | None,
     required: bool,
 ) -> None:
-    supplied = (authorized_cost_usd is not None, conservative_max_cost_usd is not None)
-    if (required and not all(supplied)) or supplied[0] != supplied[1]:
-        raise GlobalIntegrityError("both cost authorization values are required")
+    supplied = (
+        authorized_cost_usd is not None,
+        conservative_max_cost_usd is not None,
+        calculated_max_cost_usd is not None,
+    )
+    if (required and not all(supplied)) or len(set(supplied)) != 1:
+        raise GlobalIntegrityError("authorization, declared ceiling, and calculated ceiling are all required")
     if not any(supplied):
         return
-    if not all(
-        math.isfinite(value) and value > 0
-        for value in (authorized_cost_usd, conservative_max_cost_usd)
-    ):
+    values = (authorized_cost_usd, conservative_max_cost_usd, calculated_max_cost_usd)
+    if not all(isinstance(value, (int, float)) and value > 0 and value < float("inf") for value in values):
         raise GlobalIntegrityError("cost authorization values must be finite and positive")
+    if conservative_max_cost_usd != calculated_max_cost_usd:
+        raise GlobalIntegrityError("declared conservative maximum does not match the calculated pricing ceiling")
     if conservative_max_cost_usd > authorized_cost_usd:
         raise GlobalIntegrityError("conservative maximum cost exceeds authorized cost ceiling")
 
@@ -523,15 +535,11 @@ def compact_case_invocations(journal: list[dict[str, Any]], case_key: str) -> No
 
 def valid_usage_record(output: dict[str, Any]) -> bool:
     usage = output.get("usage")
-    if not isinstance(usage, dict) or set(usage) != set(USAGE_FIELDS):
+    try:
+        reconcile_usage(usage)
+    except ValueError:
         return False
-    if not all(isinstance(usage[field], int) and usage[field] >= 0 for field in USAGE_FIELDS):
-        return False
-    return (
-        usage["total_tokens"] == usage["input_tokens"] + usage["output_tokens"]
-        and usage["cached_input_tokens"] + usage["cache_write_tokens"] <= usage["input_tokens"]
-        and usage["reasoning_tokens"] <= usage["output_tokens"]
-    )
+    return True
 
 
 def validate_usage_evidence(output: dict[str, Any], role: str, required: bool) -> None:
@@ -568,6 +576,50 @@ def aggregate_usage(invocations: list[dict[str, Any]]) -> dict[str, Any]:
             if isinstance(value, int) and value >= 0:
                 totals[field] += value
     return {"records": records, **totals}
+
+
+def refresh_cost_accounting(report: dict[str, Any]) -> None:
+    """Keep partial and final reports spend-complete without exposing credentials."""
+    cost_plan = report.get("cost_plan")
+    if not isinstance(cost_plan, dict):
+        return
+    active = report.get("active_case")
+    reservation = active.get("cost_reservation") if isinstance(active, dict) else None
+    try:
+        report["cost_accounting"] = cost_accounting_snapshot(
+            report.get("invocations", []),
+            cost_plan,
+            reservation if isinstance(reservation, dict) else None,
+        )
+    except ValueError as exc:
+        raise GlobalIntegrityError(f"unsafe spending accounting: {exc}") from exc
+
+
+def reserve_invocation_cost(
+    report: dict[str, Any],
+    role: str,
+    max_output_tokens: int,
+) -> dict[str, Any] | None:
+    cost_plan = report.get("cost_plan")
+    if not isinstance(cost_plan, dict):
+        return None
+    reservation = invocation_reservation(cost_plan, role, max_output_tokens)
+    report["active_case"]["cost_reservation"] = reservation
+    refresh_cost_accounting(report)
+    return reservation
+
+
+def checkpoint_invocation_cost(
+    report: dict[str, Any],
+    record: dict[str, Any],
+    reservation: dict[str, Any] | None,
+) -> None:
+    if reservation is not None:
+        record.setdefault("cost_reservation", reservation)
+    active = report.get("active_case")
+    if isinstance(active, dict):
+        active.pop("cost_reservation", None)
+    refresh_cost_accounting(report)
 
 
 def deterministic_language_check(text: str, locale: str | None) -> dict[str, Any]:
@@ -1104,6 +1156,7 @@ def main() -> int:
     parser.add_argument("--expected-grader-model", default="codex/gpt-5.6-sol")
     parser.add_argument("--response-api-key-env", default=None)
     parser.add_argument("--grader-api-key-env", default=None)
+    parser.add_argument("--pricing-file", type=Path, default=None)
     parser.add_argument("--authorized-cost-usd", type=float, default=None)
     parser.add_argument("--conservative-max-cost-usd", type=float, default=None)
     args = parser.parse_args()
@@ -1132,9 +1185,28 @@ def main() -> int:
 
     if args.release_evidence and not args.candidate_commit:
         parser.error("--release-evidence requires --candidate-commit")
+    if args.release_evidence and args.pricing_file is None:
+        parser.error("--release-evidence requires --pricing-file")
+    cost_policy: dict[str, Any] | None = None
+    cost_plan: dict[str, Any] | None = None
+    if args.pricing_file is not None:
+        try:
+            cost_policy = load_cost_policy(args.pricing_file, ROOT)
+            cost_plan = derive_cost_plan(
+                cost_policy,
+                suites,
+                args.response_command,
+                args.grader_command,
+                args.protocol_retries,
+                args.expected_response_model,
+                args.expected_grader_model,
+            )
+        except ValueError as exc:
+            raise GlobalIntegrityError(f"pricing preflight failed: {exc}") from exc
     validate_cost_authorization(
         args.authorized_cost_usd,
         args.conservative_max_cost_usd,
+        cost_plan["conservative_cost"]["total_usd"] if cost_plan else None,
         args.release_evidence,
     )
     if args.release_evidence and (args.case or case_count < 90 or args.pass_threshold != 0.90):
@@ -1165,6 +1237,7 @@ def main() -> int:
         "response_credential_env": args.response_api_key_env, "grader_credential_env": args.grader_api_key_env,
         "authorized_cost_usd": args.authorized_cost_usd,
         "conservative_max_cost_usd": args.conservative_max_cost_usd,
+        "pricing_policy_sha256": cost_plan["policy_sha256"] if cost_plan else None,
     }
     configuration_sha256 = hashlib.sha256(json.dumps(run_configuration, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
     report: dict[str, Any] = {
@@ -1173,15 +1246,19 @@ def main() -> int:
         "verified_commit": git_verification, "run_id": f"behavioral-{generated_at.strftime('%Y%m%dT%H%M%S.%fZ')}",
         "generated_at": generated_at.isoformat(), "resume": {"requested": args.resume, "completed_case_keys": []},
         "run_configuration": run_configuration, "run_configuration_sha256": configuration_sha256,
+        "cost_plan": cost_plan,
         "commands": {"response": safe_adapter_command(args.response_command), "grader": safe_adapter_command(args.grader_command),
                      "response_credential_env": args.response_api_key_env, "grader_credential_env": args.grader_api_key_env,
                      "protocol_retries": args.protocol_retries, "timeout_seconds": args.timeout,
                      "authorized_cost_usd": args.authorized_cost_usd,
-                     "conservative_max_cost_usd": args.conservative_max_cost_usd},
+                     "conservative_max_cost_usd": args.conservative_max_cost_usd,
+                     "calculated_max_cost_usd": cost_plan["conservative_cost"]["total_usd"] if cost_plan else None,
+                     "pricing_policy_sha256": cost_plan["policy_sha256"] if cost_plan else None},
         "failure_taxonomy": FAILURE_TAXONOMY,
         "abort_path_inventory": list(ABORT_PATH_INVENTORY),
         "instruction_sources": {}, "prompt_packets": {}, "invocations": invocation_journal, "results": results,
     }
+    refresh_cost_accounting(report)
     completed_keys: set[str] = set()
     if args.resume and args.output.exists():
         previous = json.loads(args.output.read_text(encoding="utf-8"))
@@ -1251,9 +1328,20 @@ def main() -> int:
                         "transcript": history, "attempt_log": attempt_log, "last_generation": generated,
                         "response_attempts": response_attempts, "selected_attempts": selected_attempts,
                         "turn_guard_results": turn_guard_results, "artifacts": all_artifacts}
+                    response_limit = 0
+                    if cost_plan:
+                        response_limit = cost_plan["request_ceiling"][
+                            "long_artifact_response_max_output_tokens"
+                            if uses_long_artifact_budget(case)
+                            else "response_max_output_tokens"
+                        ]
+                    response_reservation = reserve_invocation_cost(
+                        report, "response", response_limit
+                    ) if response_limit else None
                     write_report(args.output, report)
                     def checkpoint_response(record: dict[str, Any]) -> None:
                         if record not in invocation_journal: invocation_journal.append(record)
+                        checkpoint_invocation_cost(report, record, response_reservation)
                         report["active_case"]["attempts"] = [item for item in invocation_journal if item.get("role") == "response" and item.get("case_key") == case_key and item.get("turn_index") == turn_index]
                         write_report(args.output, report)
                     try:
@@ -1488,9 +1576,14 @@ def main() -> int:
             if args.release_evidence:
                 verify_release_commit(args.candidate_commit)
             report["active_case"].update({"stage": "grader-invoking", "grader_attempts": []})
+            grader_limit = cost_plan["request_ceiling"]["grader_max_output_tokens"] if cost_plan else 0
+            grader_reservation = reserve_invocation_cost(
+                report, "grader", grader_limit
+            ) if grader_limit else None
             write_report(args.output, report)
             def checkpoint_grader(record: dict[str, Any]) -> None:
                 if record not in invocation_journal: invocation_journal.append(record)
+                checkpoint_invocation_cost(report, record, grader_reservation)
                 report["active_case"]["grader_attempts"] = [item for item in invocation_journal if item.get("role") == "grader" and item.get("case_key") == case_key]
                 write_report(args.output, report)
             def checkpoint_criterion(result: dict[str, Any], index: int) -> None:
@@ -1659,6 +1752,7 @@ def main() -> int:
     passed = sum(item["passed"] for item in results)
     pass_rate = passed / len(results)
     critical_failures = [f"{item['suite']}/{item['case_id']}" for item in results if item["critical"] and not item["passed"]]
+    refresh_cost_accounting(report)
     report.update({
         "status": "complete", "completed_at": datetime.now(timezone.utc).isoformat(), "duration_seconds": time.monotonic() - run_started,
         "summary": {
@@ -1713,6 +1807,7 @@ def main() -> int:
                 not isinstance(item.get("usage"), dict) for item in invocation_journal
             ),
             "usage": aggregate_usage(invocation_journal),
+            "cost_accounting": report.get("cost_accounting"),
         },
     })
     write_report(args.output, report)
@@ -1730,7 +1825,9 @@ if __name__ == "__main__":
             diagnostic["status"] = "failed"
             diagnostic["failure"] = {"type": type(exc).__name__, "message": str(exc)}
             diagnostic["completed_at"] = datetime.now(timezone.utc).isoformat()
-            try: write_report(path, diagnostic)
-            except (OSError, TypeError, ValueError): pass
+            try:
+                refresh_cost_accounting(diagnostic)
+                write_report(path, diagnostic)
+            except (OSError, RuntimeError, TypeError, ValueError): pass
         print(f"Behavioral eval failed: {exc}", file=sys.stderr)
         raise SystemExit(2)
