@@ -524,7 +524,7 @@ def test_abort_path_taxonomy_and_static_inventory() -> None:
         "validate_response_output": (3, {"RuntimeError", "NonRetryableEvaluationError"}),
         "validate_usage_evidence": (1, {"GlobalIntegrityError"}),
         "verify_release_commit": (4, {"GlobalIntegrityError"}),
-        "validate_cost_authorization": (3, {"GlobalIntegrityError"}),
+        "validate_cost_authorization": (4, {"GlobalIntegrityError"}),
         "write_report": (2, {"GlobalIntegrityError"}),
     }
 
@@ -572,11 +572,17 @@ def test_abort_path_taxonomy_and_static_inventory() -> None:
         pass
     else:
         raise AssertionError("unsafe usage accounting did not abort globally")
-    runner.validate_cost_authorization(None, None, False)
-    runner.validate_cost_authorization(16.0, 15.9, True)
-    for authorized, ceiling in ((None, None), (16.0, None), (16.0, 16.1), (float("nan"), 15.0)):
+    runner.validate_cost_authorization(None, None, None, False)
+    runner.validate_cost_authorization(16.0, 15.9, 15.9, True)
+    for authorized, ceiling, calculated in (
+        (None, None, None),
+        (16.0, None, 15.9),
+        (16.0, 16.1, 16.1),
+        (float("nan"), 15.0, 15.0),
+        (16.0, 15.9, 15.8),
+    ):
         try:
-            runner.validate_cost_authorization(authorized, ceiling, True)
+            runner.validate_cost_authorization(authorized, ceiling, calculated, True)
         except runner.GlobalIntegrityError:
             pass
         else:
