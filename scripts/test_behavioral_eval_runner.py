@@ -500,6 +500,7 @@ def test_abort_path_taxonomy_and_static_inventory() -> None:
         "grader-malformed-payload", "grader-schema-failure", "invalid-grader-evidence",
         "contradictory-grader-verdict", "report-serialization-or-persistence",
         "usage-accounting-failure", "authorized-cost-ceiling", "operator-interrupt",
+        "hard-spend-cap-stop",
     }
     inventory = {item["path"]: item for item in runner.ABORT_PATH_INVENTORY}
     assert set(inventory) == expected_paths
@@ -525,6 +526,7 @@ def test_abort_path_taxonomy_and_static_inventory() -> None:
         "validate_usage_evidence": (1, {"GlobalIntegrityError"}),
         "verify_release_commit": (4, {"GlobalIntegrityError"}),
         "validate_cost_authorization": (4, {"GlobalIntegrityError"}),
+        "validate_hard_spend_cap": (3, {"GlobalIntegrityError"}),
         "write_report": (2, {"GlobalIntegrityError"}),
     }
 
@@ -574,6 +576,8 @@ def test_abort_path_taxonomy_and_static_inventory() -> None:
         raise AssertionError("unsafe usage accounting did not abort globally")
     runner.validate_cost_authorization(None, None, None, False)
     runner.validate_cost_authorization(16.0, 15.9, 15.9, True)
+    runner.validate_hard_spend_cap(None, None, None)
+    runner.validate_hard_spend_cap(7.0, {"verified": True}, 17.907975)
     for authorized, ceiling, calculated in (
         (None, None, None),
         (16.0, None, 15.9),
@@ -587,6 +591,13 @@ def test_abort_path_taxonomy_and_static_inventory() -> None:
             pass
         else:
             raise AssertionError("unsafe cost authorization did not abort globally")
+    for hard_cap, plan, authorized in ((0.0, {}, 17.0), (7.0, None, 17.0), (18.0, {}, 17.0)):
+        try:
+            runner.validate_hard_spend_cap(hard_cap, plan, authorized)
+        except runner.GlobalIntegrityError:
+            pass
+        else:
+            raise AssertionError("unsafe hard spend cap passed preflight")
     try:
         runner.validate_release_model(
             {"model": "openai/wrong", "settings": {"model": "wrong"}},

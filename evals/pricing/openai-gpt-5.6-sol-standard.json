@@ -73,6 +73,8 @@
     "references/teaching-engine.md": "5108fdc645dc4a4bf2f85327bf55bd6fa32d2563f67faddd49c594480da208b9",
     "scripts/behavioral_eval_contract.py": "11d2f2fa420d3a3d4c8734aa1cbbe8eb81c5396b7d34898e7024c5030fba60c8",
     "scripts/codex_subscription_eval_adapter.py": "c6aa74653b29447dd1e31f4e2096b11601f1dbb7db6fe7d8089cb1f487c25020",
-    "scripts/openai_api_eval_adapter.py": "913192af73482454aae69836c7440ad46ed31d528900b7fa6262f0caacff9ec1"
+    "scripts/evaluation_cost.py": "63ed6823ec343e78f1a4247b376d1356735e8d117fe607d720a0343735799988",
+    "scripts/openai_api_eval_adapter.py": "913192af73482454aae69836c7440ad46ed31d528900b7fa6262f0caacff9ec1",
+    "scripts/run_behavioral_evals.py": "1855551ede6b109060a371445dea00a47078c9bd1a3952ef6eb64842d48b0afe"
   }
 }
