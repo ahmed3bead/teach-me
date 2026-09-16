@@ -145,6 +145,11 @@ def render_prompt(payload: dict[str, Any], role: str, model: str = DEFAULT_MODEL
             "Unavailable and not_required capabilities cannot be used. executable_temp file output must be returned only through structured artifacts. "
             "Never invent tool use or infer hidden grading data. Preserve language and assessment consent."
         )
+        if packet["routing"].get("artifact_type") == "pdf" and packet["capabilities"].get("rendering") == "executable_temp":
+            rules += (
+                " For PDF routing with executable_temp rendering, return exactly one self-contained printable text/html artifact; "
+                "the adapter validates that HTML and derives the PDF. Do not return a PDF body or any additional HTML artifact."
+            )
         return common + rules + "\n\nCOMMITTED CONTRACT:\n" + contract + "\n\nCASE DATA:\n" + json.dumps(case_data, ensure_ascii=False)
     if role == "grader":
         packet = {
@@ -155,6 +160,8 @@ def render_prompt(payload: dict[str, Any], role: str, model: str = DEFAULT_MODEL
         }
         rules = (
             "Act as an independent strict grader. Return one verdict per criterion in order. PASS requires an exact quote and the correct response turn or artifact path. "
+            "For response and non-HTML evidence, copy each quote verbatim from the identified source: do not normalize whitespace, add or remove diacritics, translate, paraphrase, or cite user text as response evidence. "
+            "For HTML artifacts, quote one contiguous learner-visible text span in reading order; omit markup but no visible words, and never splice noncontiguous text. "
             "FAIL may use source absent with an ABSENT: explanation. Never pass absent, implicit, deferred, or unperformed required behavior. "
             "A criterion that explicitly requires the absence, stopping, or internal-only handling of a prohibited behavior may pass when the evidence and reason show that prohibition is satisfied. "
             "Before returning PASS, verify that the reason positively explains how the quoted evidence satisfies the criterion; if the reason says behavior required by the criterion is absent, missing, implicit, deferred, or unperformed, return FAIL with absent evidence instead."

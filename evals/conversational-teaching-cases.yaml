@@ -146,7 +146,7 @@ cases:
     mode: topic-led
     source_type: none
     artifact_type: chat
-    session_state: new
+    session_state: multi-turn
     domain_pack: none
     accessibility: standard
     safety_level: standard
@@ -171,7 +171,7 @@ cases:
     mode: source-grounded
     source_type: book
     artifact_type: chat
-    session_state: new
+    session_state: multi-turn
     domain_pack: none
     accessibility: standard
     safety_level: standard

@@ -18,6 +18,7 @@ import time
 import unicodedata
 import os
 from datetime import datetime, timezone
+from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any
 
@@ -95,13 +96,78 @@ NAVIGATION_SPLIT = re.compile(
 )
 
 
+def is_general_navigation_clause(text: str) -> bool:
+    """Recognize learner context and delivery choices without matching subject knowledge."""
+    folded = text.casefold().strip()
+    if re.search(
+        r"(?:\b(?:answer|calculate|solve|explain\s+why|predict)\b|\d\s*[+*/=]\s*\d|"
+        r"(?:احسب|حل|فسر\s+لماذا|توقع)|[٠-٩]\s*[+*/=]\s*[٠-٩])",
+        folded,
+    ):
+        return False
+    if re.search(
+        r"(?:\b(?:what|which|how)\b.*\b(?:do|can|would)\s+(?:you|the learner|students?)\s+"
+        r"(?:remember|recall|know|understand|explain|predict)\b|"
+        r"(?:(?:ماذا|ما الذي|ما)\s+(?:تتذكر|تذكر|تعرف|تفهم|تشرح|تتوقع)\w*|"
+        r"هل\s+(?:تتذكر|تذكر|تعرف|تفهم)\w*|"
+        r"أي\s+(?:جزء|مفهوم|إجابة|حل)\b.*(?:تشرح|تفسر|تتوقع)\w*))",
+        folded,
+    ):
+        return False
+    english_context = re.search(
+        r"\b(?:subject|topic|field|skill|book|source|course|framework|goal|outcome|experience|"
+        r"level|age|time|deadline|device|platform|operating system|tool|format|audience|language|"
+        r"project|job|work|image|photo|product|problem|approach|lesson)\b", folded,
+    )
+    english_choice = re.search(
+        r"\b(?:you|your|they|their|learner|students?)\b.*\b(?:want|like|hope|need|prefer|use|using|have|"
+        r"available|study|learn|build|create|do|work|forget|forgot|achieve|attach|provide)\b|"
+        r"\b(?:want|like|hope|need|prefer|use|using|have|available|study|learn|build|create|do|work|"
+        r"forget|forgot|achieve|attach|provide)\b.*\b(?:you|your|they|their|learner|students?)\b",
+        folded,
+    )
+    curriculum_scope = re.match(
+        r"^(?:what|which)\s+(?:subject|source|topic|course|book|skill)\b.*\bshould\b.*\b(?:curriculum|course|lesson|material)\b.*\bcover\b",
+        folded,
+    )
+    passive_configuration = re.search(
+        r"^(?:what|which|how)\s+.*\b(?:is|are)\s+(?:being\s+)?(?:used|available|long)\b", folded
+    )
+    audience_question = re.match(r"^who\s+is\s+it\s+for\b", folded)
+    audience_profile = re.match(r"^what\s+are\s+the\s+students?[’']?s?\s+(?:age|grade)\b", folded)
+    learner_profile = re.match(r"^(?:what|which)\s+(?:is|are)\s+your\s+.*", folded) and english_context
+    duration_question = re.match(r"^how\s+long\s+is\b", folded)
+    deadline_question = re.match(r"^when\s+do\s+you\s+need\s+to\s+remember\b", folded)
+    diagnostic_observation = (
+        re.match(r"^what\s+looks\s+wrong\b", folded)
+        or re.match(r"^what\s+is\s+the\s+main\s+problem\s+with\s+the\s+current\s+approach\b", folded)
+    ) and english_context
+    source_request = re.match(r"^can\s+you\s+(?:attach|provide|paste|send)\b", folded)
+    if (english_choice or curriculum_scope or passive_configuration or audience_question or audience_profile
+            or learner_profile or duration_question or deadline_question or diagnostic_observation or source_request):
+        return True
+    arabic_context = re.search(
+        r"(?:موضوع|مجال|مهارة|كتاب|مصدر|دورة|منهج|إطار|هدف|نتيجة|خبرة|مستوى|وقت|موعد|جهاز|"
+        r"منصة|نظام|أداة|صيغة|جمهور|لغة|مشروع|عمل|وظيفة|صورة|منتج|مشكلة|طريقة|مادة|مهمة|"
+        r"إصدار|طبعة|عناصر|ترتيب|قادر|مفهوم)", folded,
+    )
+    arabic_choice = re.search(
+        r"(?:تريد|ترغب|تفضل|تستخدم|تستعمل|لديك|عندك|معك|تستطيع|يمكنك|ستستخدم|ستتعلم|"
+        r"ستصور|ستدرس|تحتاج|نسيت|هدفك|عملك|خبرتك|وقتك|جنسيتك|بلدك|سيمتحنك|تسمح)", folded,
+    )
+    return bool(arabic_context and arabic_choice)
+
+
 def is_navigation_question(text: str) -> bool:
     """Accept only questions whose every comma-delimited clause requests context."""
     cleaned = text.strip().lstrip("-*#> ").rstrip("؟?").strip()
     cleaned = re.sub(r"^(?:[0-9٠-٩]+|[A-Za-z])[.)]\s*", "", cleaned)
     clauses = NAVIGATION_SPLIT.split(cleaned)
     normalized = [re.sub(r"^(?:and\s+|و(?=(?:ما|أي|هل|كم)\b))", "", clause.strip(), flags=re.I) for clause in clauses]
-    return bool(normalized) and all(NAVIGATION_CLAUSE.fullmatch(clause) for clause in normalized)
+    return bool(normalized) and all(
+        NAVIGATION_CLAUSE.fullmatch(clause) or is_general_navigation_clause(clause)
+        for clause in normalized
+    )
 
 
 ASSESSMENT_OFFER = re.compile(
@@ -109,7 +175,7 @@ ASSESSMENT_OFFER = re.compile(
     flags=re.IGNORECASE,
 )
 ASSESSMENT_INVITATION = re.compile(
-    r"^(?:هل\s+(?:تريد|ترغب|تحب).*(?:اختبار|تحق[ّ]?ق|مراجعة|أسئلة|تمارين)|"
+    r"^(?:هل\s+(?:تريد|ترغب|تحب).*(?:فحص|اختبار|تحق[ّ]?ق|مراجعة|أسئلة|تمارين)|"
     r"(?:do\s+you\s+want|would\s+you\s+like).*(?:check|quiz|test|questions?|exercises?)).*[؟?]$",
     flags=re.IGNORECASE,
 )
@@ -445,6 +511,57 @@ def pass_reason_contradicts(criterion: str, reason: str) -> bool:
     return True
 
 
+class _VisibleHTML(HTMLParser):
+    """Extract contiguous learner-visible text without trusting HTML markup."""
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self._hidden_elements: list[str] = []
+        self.parts: list[str] = []
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        folded_tag = tag.casefold()
+        attributes = {name.casefold(): (value or "").casefold() for name, value in attrs}
+        inline_style = attributes.get("style", "")
+        explicitly_hidden = (
+            "hidden" in attributes
+            or attributes.get("aria-hidden") == "true"
+            or bool(re.search(
+                r"(?:^|;)\s*(?:display\s*:\s*none|visibility\s*:\s*hidden)(?:\s*!important)?\s*(?:;|$)",
+                inline_style,
+            ))
+        )
+        if folded_tag in {"head", "script", "style", "template", "noscript"} or explicitly_hidden:
+            self._hidden_elements.append(folded_tag)
+
+    def handle_endtag(self, tag: str) -> None:
+        folded_tag = tag.casefold()
+        if self._hidden_elements and self._hidden_elements[-1] == folded_tag:
+            self._hidden_elements.pop()
+
+    def handle_data(self, data: str) -> None:
+        if not self._hidden_elements and data.strip():
+            self.parts.append(data)
+
+
+def visible_html_text(value: str) -> str:
+    parser = _VisibleHTML()
+    parser.feed(value)
+    parser.close()
+    return " ".join(" ".join(parser.parts).split())
+
+
+def artifact_contains_evidence(artifact: dict[str, Any], quote: str) -> bool:
+    """Accept raw evidence for non-HTML or a contiguous learner-visible HTML span."""
+    content = artifact.get("content", "")
+    if not isinstance(content, str):
+        return False
+    if artifact.get("media_type") != "text/html":
+        return quote in content
+    visible_quote = visible_html_text(quote)
+    return bool(visible_quote) and visible_quote in visible_html_text(content)
+
+
 def validate_grade(grade: dict[str, Any], expected: list[str], transcript: list[dict[str, Any]], artifacts: list[dict[str, Any]] | None = None, on_result: Any | None = None) -> list[dict[str, Any]]:
     results = grade.get("results")
     if not isinstance(results, list) or len(results) != len(expected):
@@ -469,7 +586,7 @@ def validate_grade(grade: dict[str, Any], expected: list[str], transcript: list[
                 raise RuntimeError("evidence quote must occur in the identified assistant turn")
         elif source == "artifact":
             matches = [a for a in (artifacts or []) if a.get("path") == evidence.get("artifact_path")]
-            if len(matches) != 1 or quote not in matches[0].get("content", ""):
+            if len(matches) != 1 or not artifact_contains_evidence(matches[0], quote):
                 raise RuntimeError("evidence quote must occur in the identified artifact")
         elif passed or not quote.startswith("ABSENT:"):
             raise RuntimeError("only FAIL may use ABSENT: evidence")
@@ -696,11 +813,12 @@ def deterministic_language_check(text: str, locale: str | None) -> dict[str, Any
         normalized = canonical_locale(locale)
     except ValueError:
         return {"passed": False, "reason": f"unsupported locale {locale!r}"}
-    arabic = len(ARABIC_LETTER.findall(text))
-    latin = len(LATIN_LETTER.findall(text))
+    prose = re.sub(r"```.*?```|`[^`]*`", " ", text, flags=re.DOTALL)
+    arabic = len(ARABIC_LETTER.findall(prose))
+    latin = len(LATIN_LETTER.findall(prose))
     other = sum(
         1
-        for character in text
+        for character in prose
         if unicodedata.category(character).startswith("L")
         and not ARABIC_LETTER.fullmatch(character)
         and not LATIN_LETTER.fullmatch(character)
@@ -709,7 +827,7 @@ def deterministic_language_check(text: str, locale: str | None) -> dict[str, Any
 
     if normalized == "ar-MSA":
         share = arabic / letters if letters else 0.0
-        markers = sorted(set(COLLOQUIAL_ARABIC_MARKER.findall(text)))
+        markers = sorted(set(COLLOQUIAL_ARABIC_MARKER.findall(prose)))
         dialect_passed = not markers
         passed = arabic >= 20 and share >= 0.55 and other == 0 and dialect_passed
         target = "Arabic"
@@ -829,8 +947,40 @@ def assessment_prompt_match(text: str) -> AssessmentMatch | None:
     visible = re.sub(r"```.*?```|`[^`]*`|«[^»]*»|“[^”]*”|\"[^\"]*\"", " ", text, flags=re.DOTALL)
     question_lines = [line for line in visible.splitlines() if "?" in line or "؟" in line]
     navigation_questionnaire = bool(question_lines) and all(is_navigation_question(line) for line in question_lines)
+    lines = text.splitlines()
+    expository_questions: set[str] = set()
+    numbered_questions = [
+        (candidate, re.sub(r"^(?:[0-9٠-٩]+[.)]\s*)", "", candidate))
+        for original in lines
+        if (candidate := original.strip().lstrip("-*#> ")).endswith(("?", "؟"))
+        and re.match(r"^(?:[0-9٠-٩]+[.)]\s*)", candidate)
+    ]
+    if len(numbered_questions) >= 2 and all(
+        re.search(r"(?:\b(?:will|do)\s+i\b|سأ|هل\s+أحتاج)", unnumbered, re.I)
+        for _candidate, unnumbered in numbered_questions
+    ):
+        for candidate, unnumbered in numbered_questions:
+            expository_questions.update({candidate, unnumbered})
+    for index, original in enumerate(lines):
+        candidate = original.strip().lstrip("-*#> ")
+        if not candidate.endswith(("?", "؟")):
+            continue
+        following_items: list[str] = []
+        for following_line in lines[index + 1:]:
+            following = following_line.strip()
+            if not following:
+                continue
+            if not following.startswith(("- ", "* ")):
+                break
+            following_items.append(following)
+        option_like = any(
+            re.match(r"^[-*]\s*(?:[A-Da-d]|[1-4])[.)]\s+", item) for item in following_items
+        )
+        rhetorical_heading = re.match(r"^(?:لماذا\s+نستخدم\w*|why\s+do\s+we\s+use\b)", candidate, re.I)
+        if rhetorical_heading and not option_like and len(following_items) >= 2 and all(item.endswith((".", "!", "؟", "?")) for item in following_items):
+            expository_questions.add(candidate)
     outside_fence = True
-    for original in text.splitlines():
+    for original in lines:
         line = original.strip().lstrip("-*#> ")
         if line.startswith("```"):
             outside_fence = not outside_fence
@@ -847,6 +997,8 @@ def assessment_prompt_match(text: str) -> AssessmentMatch | None:
             if re.search(r"(?:answer|أجب|جاوب)\s+(?:these|the following|هذه|الآتية)?\s*(?:\w+\s+)?questions|read .*answer|اقرأ .*أجب", candidate, re.I):
                 if navigation_questionnaire: continue
                 return AssessmentMatch(candidate)
+            if candidate in expository_questions:
+                continue
             if ASSESSMENT_INVITATION.search(candidate):
                 continue
             if GENERIC_START_INVITATION.search(candidate) and ASSESSMENT_OFFER.search(line):
@@ -859,6 +1011,8 @@ def assessment_prompt_match(text: str) -> AssessmentMatch | None:
             task_candidate = re.sub(r"^(?:if you want|إذا أردت|إن أردت|إن أحببت)[،,]?\s*", "", task_candidate, flags=re.I)
             imperative = ASSESSMENT_IMPERATIVE.match(task_candidate)
             if imperative:
+                if navigation_questionnaire and re.search(r"(?:answer|أجب|جاوب).*(?:questions|أسئلة)", candidate, re.I):
+                    continue
                 if CONSENT_SELECTION.search(candidate): continue
                 if NON_ASSESSMENT_ACTION.search(candidate) and not re.search(r"(?:answer|solve|explain why|أجب|حل|فسر|لماذا)", candidate, re.I): continue
                 return AssessmentMatch(candidate)
