@@ -22,8 +22,8 @@ Start with one Arabic teaching case:
 ```bash
 python3 scripts/run_behavioral_evals.py \
   --case golden-teaching/primary-school-concept \
-  --response-command "python3 scripts/ollama_eval_adapter.py --role response --model qwen3:8b --num-ctx 8192 --num-predict 768" \
-  --grader-command "python3 scripts/ollama_eval_adapter.py --role grader --model gemma3:4b --num-ctx 8192 --num-predict 768" \
+  --response-command "python3 scripts/ollama_eval_adapter.py --role response --model qwen3:8b --num-ctx 32768 --num-predict 768" \
+  --grader-command "python3 scripts/ollama_eval_adapter.py --role grader --model gemma3:4b --num-ctx 32768 --num-predict 768" \
   --output reports/local-smoke.json \
   --timeout 600
 ```

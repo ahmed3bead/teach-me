@@ -2,8 +2,11 @@
 """Unit tests for the local Ollama evaluation adapter."""
 
 import json
+import hashlib
 import tempfile
+import time
 import unittest
+from datetime import datetime, timezone
 from pathlib import Path
 from unittest import mock
 
@@ -36,6 +39,71 @@ class AdapterTests(unittest.TestCase):
             context = adapter.load_skill_context(root)
         self.assertIn("SKILL.md", context)
         self.assertIn("references/mode.md", context)
+
+    def test_static_response_uses_authenticated_prompt_packet_without_skill_root(self):
+        source = {
+            "path": "SKILL.md",
+            "content": "committed skill contract",
+        }
+        source["sha256"] = hashlib.sha256(source["content"].encode("utf-8")).hexdigest()
+        packet = {
+            "packet_version": "1.1.0",
+            "instruction_sources": [source],
+        }
+        encoded = json.dumps(
+            packet,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+        packet["sha256"] = hashlib.sha256(encoded).hexdigest()
+        context = adapter.load_prompt_packet_context({"type": "generate", "prompt_packet": packet})
+        self.assertIn("SKILL.md", context)
+        self.assertIn("committed skill contract", context)
+
+    def test_static_response_rejects_tampered_prompt_packet(self):
+        source = {
+            "path": "SKILL.md",
+            "content": "committed skill contract",
+        }
+        source["sha256"] = hashlib.sha256(source["content"].encode("utf-8")).hexdigest()
+        packet = {
+            "packet_version": "1.1.0",
+            "instruction_sources": [source],
+        }
+        encoded = json.dumps(
+            packet,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+        packet["sha256"] = hashlib.sha256(encoded).hexdigest()
+        packet["instruction_sources"][0]["content"] = "tampered"
+        with self.assertRaisesRegex(ValueError, "prompt packet content hash mismatch"):
+            adapter.load_prompt_packet_context({"type": "generate", "prompt_packet": packet})
+
+    def test_adds_runner_invocation_evidence(self):
+        started_at = datetime.now(timezone.utc)
+        result = adapter.add_invocation_evidence(
+            {"response": "lesson", "model": "ollama/qwen3:8b"},
+            model="qwen3:8b",
+            host="http://localhost:11434",
+            num_ctx=32768,
+            num_predict=768,
+            seed=42,
+            started_at=started_at,
+            started=time.monotonic(),
+            invocation_id="local-invocation",
+        )
+        self.assertEqual(result["model"], "ollama/qwen3:8b")
+        self.assertEqual(result["settings"]["model_transport"], "ollama-local")
+        self.assertEqual(result["adapter_version"], adapter.ADAPTER_VERSION)
+        self.assertEqual(result["invocation_id"], "local-invocation")
+        self.assertEqual(result["raw_result"]["response"], "lesson")
+        self.assertEqual(
+            set(result["timing"]),
+            {"started_at", "completed_at", "duration_seconds"},
+        )
 
     @mock.patch("ollama_eval_adapter.request.urlopen", return_value=FakeResponse())
     def test_chat_returns_runner_shape_and_model(self, mocked):
@@ -324,23 +392,32 @@ class AdapterTests(unittest.TestCase):
     def test_grader_requires_concrete_evidence_in_order(self):
         payload = {
             "type": "grade",
-            "locale": "ar-MSA",
-            "expected": ["first criterion", "second criterion"],
-            "response": "response",
+            "criteria": ["first criterion", "second criterion"],
+            "ordered_transcript": [
+                {"role": "assistant", "turn": 1, "content": "observable response"}
+            ],
+            "artifacts": [],
         }
         messages, _schema, _temperature = adapter.messages_and_schema(payload, None)
         system = messages[0]["content"]
-        self.assertIn("دليلًا محددًا", system)
-        self.assertIn("ممنوع نسخ نص المعيار", system)
-        self.assertIn("قيّم كل معيار منفصلًا", system)
-        self.assertIn("لا تطلب وجود سؤال قبل الموافقة", system)
+        self.assertIn("exact quote", system)
+        self.assertIn("correct assistant response turn", system)
+        self.assertIn("starts with ABSENT:", system)
+        self.assertIn("artifact_path", system)
 
         _messages, schema, _temperature = adapter.messages_and_schema(payload, None)
-        self.assertEqual(schema["properties"]["results"]["items"]["properties"]["reason"]["maxLength"], 300)
+        item = schema["properties"]["results"]["items"]
+        self.assertEqual(item["properties"]["reason"]["maxLength"], 800)
+        self.assertEqual(item["required"], ["verdict", "evidence", "reason"])
+        self.assertNotIn("passed", item["properties"])
+        self.assertEqual(
+            item["properties"]["evidence"]["required"],
+            ["source", "quote"],
+        )
 
-        one = {**payload, "expected": ["one criterion"]}
+        one = {**payload, "criteria": ["one criterion"]}
         one_messages, _schema, _temperature = adapter.messages_and_schema(one, None)
-        self.assertIn("يوجد معيار واحد فقط", one_messages[0]["content"])
+        self.assertIn("one verdict per criterion", one_messages[0]["content"])
 
     def test_simulation_teacher_stays_inside_authorized_fictional_material(self):
         payload = {
