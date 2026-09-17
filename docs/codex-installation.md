@@ -1,10 +1,10 @@
 # Install Teach Me for Codex
 
-Teach Me for Codex provides the full repository tooling: adaptive teaching plus controlled local files, source workflows, sessions, reports, deterministic validation, and independent evaluation infrastructure. The current public version is the beta `1.0.0-beta.1`.
+Teach Me for Codex provides the full repository tooling: adaptive teaching plus controlled local files, source workflows, sessions, reports, deterministic validation, and independent evaluation infrastructure. The current public version is the beta `1.0.0-beta.2`.
 
 This page documents the installer's default `codex` target. For Claude chat and the `--target-host claude-code` option, see the [`Claude setup guide`](../claude-edition/README.md).
 
-The installers in this repository pin that exact release and its published SHA-256 checksum. They download before changing the installation, verify before extracting, preserve an existing installation as a versioned backup, reject unsafe archive paths, and restore the previous installation if replacement fails. They never require credentials, run model evaluations, start Ollama, or recursively delete an installation.
+The installers in this repository pin that exact release and verify its archive against the published adjacent checksum. They download before changing the installation, verify before extracting, preserve an existing installation as a versioned backup, reject unsafe archive paths, and restore the previous installation if replacement fails. They never require credentials, run model evaluations, start Ollama, or recursively delete an installation.
 
 ## Fastest safe installation
 
@@ -13,13 +13,13 @@ If you already have a trusted checkout of this repository, run one command from 
 ### Linux or macOS
 
 ```bash
-sh installers/install.sh install --version 1.0.0-beta.1
+sh installers/install.sh install --version 1.0.0-beta.2
 ```
 
 ### Windows PowerShell
 
 ```powershell
-.\installers\install.ps1 -Action install -Version 1.0.0-beta.1
+.\installers\install.ps1 -Action install -Version 1.0.0-beta.2
 ```
 
 Reload Codex after installation. The default destination is `${CODEX_HOME}/skills/teach-me` when `CODEX_HOME` is set and otherwise the user-level `.codex/skills/teach-me` directory.
@@ -35,8 +35,8 @@ installer=$(mktemp /tmp/teach-me-installer.XXXXXX)
 curl --fail --location --silent --show-error --proto '=https' --tlsv1.2 \
   https://raw.githubusercontent.com/ahmed3bead/teach-me/main/installers/install.sh \
   --output "$installer"
-printf '%s  %s\n' '5195bfae7f7f920b1da46d97fa4209450f4c4f8b4ee56b8d704fd9795c1ecdc1' "$installer" | sha256sum --check -
-sh "$installer" install --version 1.0.0-beta.1
+printf '%s  %s\n' 'db5fad42350050d8949e9f7ac81fe406fde37d04168b066be3c8201ef884358e' "$installer" | sha256sum --check -
+sh "$installer" install --version 1.0.0-beta.2
 rm -f "$installer"
 ```
 
@@ -47,8 +47,8 @@ installer=$(mktemp /tmp/teach-me-installer.XXXXXX)
 curl --fail --location --silent --show-error --proto '=https' --tlsv1.2 \
   https://raw.githubusercontent.com/ahmed3bead/teach-me/main/installers/install.sh \
   --output "$installer"
-printf '%s  %s\n' '5195bfae7f7f920b1da46d97fa4209450f4c4f8b4ee56b8d704fd9795c1ecdc1' "$installer" | shasum -a 256 --check
-sh "$installer" install --version 1.0.0-beta.1
+printf '%s  %s\n' 'db5fad42350050d8949e9f7ac81fe406fde37d04168b066be3c8201ef884358e' "$installer" | shasum -a 256 --check
+sh "$installer" install --version 1.0.0-beta.2
 rm -f "$installer"
 ```
 
@@ -59,11 +59,11 @@ $installer = Join-Path ([System.IO.Path]::GetTempPath()) "teach-me-install.ps1"
 Invoke-WebRequest -UseBasicParsing `
   -Uri "https://raw.githubusercontent.com/ahmed3bead/teach-me/main/installers/install.ps1" `
   -OutFile $installer
-$expected = "a14624bda518142d8caf654a580824691ba17f9a0bd4313948dd04ab0aa04e66"
+$expected = "ffda6d842150b2016603634ecba24c28e74faa2a04def89780fcb047f9990070"
 if ((Get-FileHash -LiteralPath $installer -Algorithm SHA256).Hash.ToLowerInvariant() -ne $expected) {
     throw "Teach Me installer checksum mismatch; nothing was executed."
 }
-& $installer -Action install -Version "1.0.0-beta.1"
+& $installer -Action install -Version "1.0.0-beta.2"
 Remove-Item -LiteralPath $installer -Force
 ```
 
@@ -76,12 +76,12 @@ Run these from a trusted checkout, or replace the script path with the already v
 | Operation | Linux or macOS | Windows PowerShell |
 |---|---|---|
 | Verify version | `sh installers/install.sh version` | `.\installers\install.ps1 -Action version` |
-| Update to the pinned version | `sh installers/install.sh update --version 1.0.0-beta.1` | `.\installers\install.ps1 -Action update -Version 1.0.0-beta.1` |
+| Update to the pinned version | `sh installers/install.sh update --version 1.0.0-beta.2` | `.\installers\install.ps1 -Action update -Version 1.0.0-beta.2` |
 | Disable safely | `sh installers/install.sh disable` | `.\installers\install.ps1 -Action disable` |
 | Restore after disable | `sh installers/install.sh restore` | `.\installers\install.ps1 -Action restore` |
 | Recover a preserved backup | `sh installers/install.sh recover` | `.\installers\install.ps1 -Action recover` |
 
-An update keeps the prior installation at `teach-me.backup-1.0.0-beta.1`. The installer will not overwrite that backup. Preserve or move it deliberately before another replacement. Disabling moves the active directory to `teach-me.disabled`; restoring moves the same directory back, so learner files are not deleted.
+An update keeps the prior installation at `teach-me.backup-1.0.0-beta.2`. The installer will not overwrite that backup. Preserve or move it deliberately before another replacement. Disabling moves the active directory to `teach-me.disabled`; restoring moves the same directory back, so learner files are not deleted.
 
 ## Custom destination
 
@@ -101,7 +101,7 @@ The target is always a `teach-me` child of the supplied directory. Volume roots 
 
 - A download or checksum failure occurs before extraction and before the current installation changes.
 - An invalid archive layout or version is rejected in a temporary staging directory.
-- If replacement or final version verification fails after a prior installation was moved, the installer quarantines failed files at `teach-me.failed-1.0.0-beta.1` and reactivates the preserved backup.
+- If replacement or final version verification fails after a prior installation was moved, the installer quarantines failed files at `teach-me.failed-1.0.0-beta.2` and reactivates the preserved backup.
 - If an interruption leaves the active path missing and the versioned backup present, run the `recover` action.
 - If both an active installation and a backup exist, the installer leaves both untouched and reports what requires attention.
 - Failed staging data can remain only in an isolated operating-system temporary directory; the installer does not recursively delete broad paths while attempting cleanup.

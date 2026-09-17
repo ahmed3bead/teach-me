@@ -12,7 +12,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-EXCLUDED_PARTS = {".git", ".venv", "__pycache__", "dist", "reports"}
+EXCLUDED_PARTS = {".git", ".venv", "__pycache__", "dist", "reports", ".idea"}
 EXCLUDED_SUFFIXES = {".pyc", ".pyo"}
 
 

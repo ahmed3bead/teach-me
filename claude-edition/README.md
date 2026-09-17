@@ -1,24 +1,19 @@
 # Teach Me for Claude and Claude Code
 
-Teach Me uses the Agent Skills open format supported by Claude and Claude Code. The same verified release archive serves both products: upload it to Claude for ordinary conversations, or install it in Claude Code for local tools and files.
+Version `1.0.0-beta.2` is the first public beta containing the Claude compatibility corrections. For a published installation, use the verified release ZIP and its adjacent checksum. Before the tag is published, use the private development fallback below and do not present a checkout-built package as a published release.
 
-The current public version is `1.0.0-beta.1`. That archive predates the Claude compatibility corrections in this development work, so do not present it as a verified Claude package. Build a development ZIP from a checkout containing these changes for private testing; the next prerelease should publish the first verified Claude-ready archive.
 
 ## Claude chat: easiest setup
 
 Custom skills are available on Claude Free, Pro, Max, Team, and Enterprise when **Code execution and file creation** is enabled. An uploaded personal skill stays private until its owner shares it.
 
-1. From a trusted checkout containing the Claude support changes, build the deterministic development package:
+1. After the `v1.0.0-beta.2` tag is published, download `teach-me-1.0.0-beta.2.zip` and `teach-me-1.0.0-beta.2.zip.sha256` from its GitHub Release assets.
 
-   ```bash
-   python3 scripts/package_claude_skill.py
-   ```
-
-2. Verify the generated ZIP against the adjacent `.sha256` file.
+2. Verify the downloaded ZIP against the adjacent `.sha256` file.
 3. In Claude, open **Settings → Capabilities** and enable **Code execution and file creation**.
 4. Open **Customize → Skills**.
 5. Select **+ → Create skill → Upload a skill**.
-6. Upload `dist/teach-me-claude-1.0.0-beta.1-development.zip` and enable **Teach Me**.
+6. Upload `teach-me-1.0.0-beta.2.zip` and enable **Teach Me**.
 7. Start a fresh chat and write one practical learning goal, or explicitly invoke `/teach-me` when that command is shown.
 8. Keep the skill private during beta and run [`ACCEPTANCE_TESTS.md`](ACCEPTANCE_TESTS.md) before sharing it.
 
@@ -26,7 +21,7 @@ The release archive already has the required layout: one `teach-me/` folder cont
 
 ## Claude Code: marketplace setup
 
-After the Claude marketplace changes are merged into the public repository, add the Teach Me catalog and install the plugin from inside Claude Code:
+Add the Teach Me catalog and install the plugin from inside Claude Code:
 
 ```text
 /plugin marketplace add ahmed3bead/teach-me
@@ -37,7 +32,7 @@ If Claude Code asks for a reload, run `/reload-plugins`. Then ask naturally or i
 
 The repository contains both `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`. The marketplace entry deliberately omits an explicit version, so a changed Git commit is detected as a new plugin version instead of leaving users on a stale cached copy.
 
-This repository marketplace is available as soon as the files are merged. Listing in Anthropic's separate `claude-community` marketplace requires review and approval. Until approval is confirmed, do not advertise `teach-me@claude-community` as installable.
+The self-hosted repository marketplace is included in `v1.0.0-beta.2`. Listing in Anthropic's separate `claude-community` marketplace requires review and approval. Until approval is confirmed, do not advertise `teach-me@claude-community` as installable.
 
 ## Claude Code: private development fallback
 
@@ -48,9 +43,9 @@ First build the development ZIP with `python3 scripts/package_claude_skill.py`. 
 ### Linux or macOS
 
 ```bash
-archive="dist/teach-me-claude-1.0.0-beta.1-development.zip"
+archive="dist/teach-me-claude-1.0.0-beta.2-development.zip"
 checksum=$(awk '{print $1}' "$archive.sha256")
-sh installers/install.sh install --target-host claude-code --version 1.0.0-beta.1 \
+sh installers/install.sh install --target-host claude-code --version 1.0.0-beta.2 \
   --archive "$archive" --checksum "$checksum"
 sh installers/install.sh version --target-host claude-code
 ```
@@ -58,9 +53,9 @@ sh installers/install.sh version --target-host claude-code
 ### Windows PowerShell
 
 ```powershell
-$archive = "dist\teach-me-claude-1.0.0-beta.1-development.zip"
+$archive = "dist\teach-me-claude-1.0.0-beta.2-development.zip"
 $checksum = (Get-Content "$archive.sha256").Split()[0]
-.\installers\install.ps1 -Action install -TargetHost claude-code -Version "1.0.0-beta.1" `
+.\installers\install.ps1 -Action install -TargetHost claude-code -Version "1.0.0-beta.2" `
   -Archive $archive -Checksum $checksum
 .\installers\install.ps1 -Action version -TargetHost claude-code
 ```
@@ -78,7 +73,7 @@ Use the same host option for every lifecycle command so the installer selects Cl
 | Restore | `sh installers/install.sh restore --target-host claude-code` | `.\installers\install.ps1 -Action restore -TargetHost claude-code` |
 | Recover | `sh installers/install.sh recover --target-host claude-code` | `.\installers\install.ps1 -Action recover -TargetHost claude-code` |
 
-The default Claude Code destination is `~/.claude/skills/teach-me`. An explicit `--install-root` or `-InstallRoot` still overrides the default. The installer verifies the supplied package checksum, preserves an existing installation, and never starts a model evaluation or paid API. Once a Claude-ready prerelease is published and pinned, the local archive options can be removed from these commands.
+The default Claude Code destination is `~/.claude/skills/teach-me`. An explicit `--install-root` or `-InstallRoot` still overrides the default. The installer verifies the supplied package checksum, preserves an existing installation, and never starts a model evaluation or paid API. For published `v1.0.0-beta.2` installations, prefer the self-hosted marketplace or verified release archive. Use the development ZIP only for unpublished checkouts.
 
 ## What is the same, and what differs?
 

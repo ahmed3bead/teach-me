@@ -2,12 +2,19 @@
 
 ## Unreleased
 
+## 1.0.0-beta.2 - 2026-09-17
+
+- Publish the accumulated post-beta improvements as a second public beta for real-user testing and structured feedback.
+- Remediate the shared artifact-validation, grader-protocol, deterministic-guard, routing, and fixture defects identified by the immutable 90-case paid report without weakening the stable release gates.
+- Restore local Ollama evaluation compatibility and strict Codex subscription grader compatibility.
+- Record a targeted, non-representative diagnostic of the 14 previously model-only cases: 5 passed, 8 produced educational-quality failures, and 1 produced an exact-quote grader-protocol failure. No infrastructure or response-model protocol failures occurred, and no paid API requests were made for this diagnostic.
+- Keep stable `v1.0.0` deferred until the complete exact-candidate behavioral, simulation, human-review, and artifact-review gates pass.
 - Add a self-hosted Claude Code plugin marketplace and plugin manifest, with commit-based update detection and documented installation commands. Community-marketplace availability remains subject to Anthropic review.
 - Add Claude chat and Claude Code support through the existing Agent Skills release archive, with a Claude upload guide, acceptance checks, and host-aware cross-platform installer defaults.
 - Replace the stale managed-workspace-only ChatGPT Builder claim with capability-based guidance: owners who can access the web editor and **Create** control can use the setup checklist.
 - Add a maintainable private-beta ChatGPT Edition configuration generated from a shared cross-edition teaching policy, with owner, mobile/tablet, compatibility, and manual acceptance guidance.
-- Add checksum-pinned Linux, macOS, and Windows PowerShell installers with safe backup, disable, restore, version verification, and failure-recovery lifecycles tested only in isolated temporary directories.
-- Reframe the README around the ChatGPT and Codex editions without changing the published `v1.0.0-beta.1` release or advertising a public GPT.
+- Add Linux, macOS, and Windows PowerShell installers that verify release archives against published adjacent checksums, with safe backup, disable, restore, version verification, and failure-recovery lifecycles tested only in isolated temporary directories.
+- Reframe the README around the ChatGPT, Claude, Codex, and Claude Code editions while keeping the ChatGPT Edition private rather than advertising a public GPT.
 
 ## 1.0.0-beta.1 - 2026-09-14
 

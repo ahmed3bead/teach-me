@@ -6,18 +6,20 @@ param(
     [string]$Action = "install",
     [ValidateSet("codex", "claude-code")]
     [string]$TargetHost = "codex",
-    [string]$Version = "1.0.0-beta.1",
+    [string]$Version = "1.0.0-beta.2",
     [string]$InstallRoot,
     [string]$Archive,
-    [string]$Checksum = "e924647f3bcd11c8e090fe51a12ef4d2fbbfcd30001be76c9631e1733abde728"
+    [string]$Checksum
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-$PinnedVersion = "1.0.0-beta.1"
+$PinnedVersion = "1.0.0-beta.2"
 $ReleaseBase = "https://github.com/ahmed3bead/teach-me/releases/download"
 
+$ArchiveSupplied = $PSBoundParameters.ContainsKey("Archive")
+$ChecksumSupplied = $PSBoundParameters.ContainsKey("Checksum")
 function Stop-Setup([string]$Message) {
     throw "Teach Me setup failed: $Message"
 }
@@ -46,7 +48,7 @@ function Get-InstalledVersion([string]$Directory) {
 if ($Version -ne $PinnedVersion) {
     Stop-Setup "this installer supports only version $PinnedVersion"
 }
-if ($Checksum -notmatch '^[0-9a-f]{64}$') {
+if ($ChecksumSupplied -and $Checksum -cnotmatch '^[0-9a-f]{64}$') {
     Stop-Setup "checksum must be 64 lowercase hexadecimal characters"
 }
 if ([string]::IsNullOrWhiteSpace($InstallRoot)) {
@@ -115,30 +117,69 @@ if (Test-Path -LiteralPath $Backup) {
 if (Test-Path -LiteralPath $Failed) {
     Stop-Setup "failed-install quarantine already exists at $Failed; preserve or move it before replacing the installation"
 }
-if ([string]::IsNullOrWhiteSpace($Archive) -and $TargetHost -eq "claude-code") {
-    Stop-Setup "the published $PinnedVersion archive predates verified Claude support; pass a compatible -Archive and -Checksum or wait for the next prerelease"
-}
 
 New-Item -ItemType Directory -Force -Path $FullRoot | Out-Null
 $WorkDirectory = Join-Path ([System.IO.Path]::GetTempPath()) ("teach-me-install-" + [guid]::NewGuid().ToString("N"))
-$ArchivePath = Join-Path $WorkDirectory "teach-me-$PinnedVersion.zip"
+$ArchiveName = "teach-me-$PinnedVersion.zip"
+$ArchivePath = Join-Path $WorkDirectory $ArchiveName
+$ChecksumPath = "$ArchivePath.sha256"
 $ExtractRoot = Join-Path $WorkDirectory "extracted"
 New-Item -ItemType Directory -Path $WorkDirectory | Out-Null
 
-if ([string]::IsNullOrWhiteSpace($Archive)) {
-    $Archive = "$ReleaseBase/v$PinnedVersion/teach-me-$PinnedVersion.zip"
+function Copy-Source([string]$Source, [string]$Destination, [string]$Description) {
+    if ($Source -match '^https://') {
+        try {
+            Invoke-WebRequest -UseBasicParsing -Uri $Source -OutFile $Destination
+        } catch {
+            Stop-Setup "$Description download failed; the existing installation was not changed"
+        }
+    } elseif ($Source -match '^http://') {
+        Stop-Setup "refusing an unencrypted $Description URL"
+    } elseif ($Source -match '^file://') {
+        try {
+            Copy-Item -LiteralPath ([uri]$Source).LocalPath -Destination $Destination
+        } catch {
+            Stop-Setup "could not read local $Description"
+        }
+    } elseif ($Source -match '^[a-zA-Z][a-zA-Z0-9+.-]*://') {
+        Stop-Setup "unsupported $Description URL scheme"
+    } else {
+        try {
+            Copy-Item -LiteralPath $Source -Destination $Destination
+        } catch {
+            Stop-Setup "could not read local $Description"
+        }
+    }
 }
-if ($Archive -match '^https://') {
-    Invoke-WebRequest -UseBasicParsing -Uri $Archive -OutFile $ArchivePath
-} elseif ($Archive -match '^http://') {
-    Stop-Setup "refusing an unencrypted archive URL"
-} elseif ($Archive -match '^file://') {
-    Copy-Item -LiteralPath ([uri]$Archive).LocalPath -Destination $ArchivePath
-} elseif ($Archive -match '^[a-zA-Z][a-zA-Z0-9+.-]*://') {
-    Stop-Setup "unsupported archive URL scheme"
+
+if ($ArchiveSupplied) {
+    if (-not $ChecksumSupplied) {
+        Stop-Setup "a custom archive requires an explicit -Checksum"
+    }
 } else {
-    Copy-Item -LiteralPath $Archive -Destination $ArchivePath
+    if ($ChecksumSupplied) {
+        Stop-Setup "-Checksum may be used only with a custom -Archive"
+    }
+    $PublishedReleaseBase = $ReleaseBase
+    if ($env:TEACH_ME_TESTING -eq "1" -and -not [string]::IsNullOrWhiteSpace($env:TEACH_ME_TEST_RELEASE_BASE)) {
+        $PublishedReleaseBase = $env:TEACH_ME_TEST_RELEASE_BASE
+    }
+    $Archive = "$PublishedReleaseBase/v$PinnedVersion/$ArchiveName"
+    $ChecksumSource = "$Archive.sha256"
+    Copy-Source $ChecksumSource $ChecksumPath "checksum file"
+    $ChecksumText = [System.IO.File]::ReadAllText($ChecksumPath)
+    $ChecksumMatch = [regex]::Match(
+        $ChecksumText,
+        '\A([0-9a-f]{64})  ([^\r\n]+)(?:\r?\n)?\z',
+        [System.Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )
+    if (-not $ChecksumMatch.Success -or $ChecksumMatch.Groups[2].Value -cne $ArchiveName) {
+        Stop-Setup "published checksum file is malformed, missing, or ambiguous"
+    }
+    $Checksum = $ChecksumMatch.Groups[1].Value
 }
+
+Copy-Source $Archive $ArchivePath "archive"
 
 $ActualChecksum = (Get-FileHash -LiteralPath $ArchivePath -Algorithm SHA256).Hash.ToLowerInvariant()
 if ($ActualChecksum -ne $Checksum) {
@@ -193,6 +234,9 @@ try {
 }
 
 Remove-Item -LiteralPath $ArchivePath -Force
+if (Test-Path -LiteralPath $ChecksumPath -PathType Leaf) {
+    Remove-Item -LiteralPath $ChecksumPath -Force
+}
 Remove-Item -LiteralPath $ExtractRoot -Force
 Remove-Item -LiteralPath $WorkDirectory -Force
 

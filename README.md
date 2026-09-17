@@ -5,11 +5,11 @@
 [English](README.md) · [العربية](README.ar.md)
 
 [![CI](https://github.com/ahmed3bead/teach-me/actions/workflows/validate.yml/badge.svg)](https://github.com/ahmed3bead/teach-me/actions/workflows/validate.yml)
-[![Release](https://img.shields.io/github/v/release/ahmed3bead/teach-me?include_prereleases&label=release)](https://github.com/ahmed3bead/teach-me/releases/tag/v1.0.0-beta.1)
+[![Release](https://img.shields.io/github/v/release/ahmed3bead/teach-me?include_prereleases&label=release)](https://github.com/ahmed3bead/teach-me/releases/tag/v1.0.0-beta.2)
 [![License: MIT](https://img.shields.io/github/license/ahmed3bead/teach-me)](LICENSE)
 [![Languages: ar-MSA | en](https://img.shields.io/badge/languages-ar--MSA%20%7C%20en-0f766e)](README.ar.md)
 
-> **Beta:** the current public release is `v1.0.0-beta.1`. It is ready for testing, but the corrected 90-case evaluation and human review are still required before stable `v1.0.0`.
+> **Beta:** the current public release is `v1.0.0-beta.2`. It is ready for testing, but the corrected 90-case evaluation and human review are still required before stable `v1.0.0`.
 
 ## Why Teach Me?
 
@@ -50,13 +50,13 @@ For Claude Code:
 For Codex on Linux or macOS:
 
 ```bash
-sh installers/install.sh install --version 1.0.0-beta.1
+sh installers/install.sh install --version 1.0.0-beta.2
 ```
 
 Windows PowerShell:
 
 ```powershell
-.\installers\install.ps1 -Action install -Version "1.0.0-beta.1"
+.\installers\install.ps1 -Action install -Version "1.0.0-beta.2"
 ```
 
 See [Getting started](docs/getting-started.md) for the complete first-session walkthrough and update instructions.

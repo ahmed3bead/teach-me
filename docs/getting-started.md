@@ -24,14 +24,14 @@ Build and upload the verified Skill ZIP by following the [Claude setup guide](..
 From a trusted checkout, run:
 
 ```bash
-sh installers/install.sh install --version 1.0.0-beta.1
+sh installers/install.sh install --version 1.0.0-beta.2
 sh installers/install.sh version
 ```
 
 Windows PowerShell:
 
 ```powershell
-.\installers\install.ps1 -Action install -Version "1.0.0-beta.1"
+.\installers\install.ps1 -Action install -Version "1.0.0-beta.2"
 .\installers\install.ps1 -Action version
 ```
 
