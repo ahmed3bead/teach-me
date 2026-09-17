@@ -3,8 +3,7 @@
 
 set -eu
 
-PINNED_VERSION="1.0.0-beta.1"
-PINNED_SHA256="e924647f3bcd11c8e090fe51a12ef4d2fbbfcd30001be76c9631e1733abde728"
+PINNED_VERSION="1.0.0-beta.2"
 RELEASE_BASE="https://github.com/ahmed3bead/teach-me/releases/download"
 
 fail() {
@@ -35,7 +34,9 @@ requested_version="$PINNED_VERSION"
 target_host="codex"
 install_root=""
 archive_source=""
-expected_checksum="$PINNED_SHA256"
+expected_checksum=""
+archive_supplied=0
+checksum_supplied=0
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -48,8 +49,8 @@ while [ "$#" -gt 0 ]; do
                 --version) requested_version="$value" ;;
                 --target-host) target_host="$value" ;;
                 --install-root) install_root="$value" ;;
-                --archive) archive_source="$value" ;;
-                --checksum) expected_checksum="$value" ;;
+                --archive) archive_source="$value"; archive_supplied=1 ;;
+                --checksum) expected_checksum="$value"; checksum_supplied=1 ;;
             esac
             ;;
         -h|--help) usage; exit 0 ;;
@@ -69,10 +70,12 @@ case "$target_host" in
         ;;
     *) fail "target host must be codex or claude-code" ;;
 esac
-case "$expected_checksum" in
-    *[!0-9a-f]*|'') fail "checksum must be 64 lowercase hexadecimal characters" ;;
-esac
-[ "${#expected_checksum}" -eq 64 ] || fail "checksum must be 64 lowercase hexadecimal characters"
+if [ "$checksum_supplied" -eq 1 ]; then
+    case "$expected_checksum" in
+        *[!0-9a-f]*|'') fail "checksum must be 64 lowercase hexadecimal characters" ;;
+    esac
+    [ "${#expected_checksum}" -eq 64 ] || fail "checksum must be 64 lowercase hexadecimal characters"
+fi
 
 if [ -z "$install_root" ]; then
     [ -n "${HOME:-}" ] || fail "HOME is unavailable; pass --install-root"
@@ -152,27 +155,63 @@ if [ "$action" = "update" ]; then
 fi
 [ ! -e "$backup" ] || fail "backup already exists at $backup; preserve or move it before replacing the installation"
 [ ! -e "$failed" ] || fail "failed-install quarantine already exists at $failed; preserve or move it before replacing the installation"
-if [ -z "$archive_source" ] && [ "$target_host" = "claude-code" ]; then
-    fail "the published $PINNED_VERSION archive predates verified Claude support; pass a compatible --archive and --checksum or wait for the next prerelease"
-fi
 
 mkdir -p "$install_root"
 work_dir=$(mktemp -d "${TMPDIR:-/tmp}/teach-me-install.XXXXXX") || fail "could not create a temporary directory"
-archive="$work_dir/teach-me-$PINNED_VERSION.zip"
+archive_name="teach-me-$PINNED_VERSION.zip"
+archive="$work_dir/$archive_name"
+checksum_file="$archive.sha256"
 extract_root="$work_dir/extracted"
-archive_source=${archive_source:-"$RELEASE_BASE/v$PINNED_VERSION/teach-me-$PINNED_VERSION.zip"}
 
-case "$archive_source" in
+copy_source() {
+    source=$1
+    destination=$2
+    description=$3
+    case "$source" in
     https://*)
         command -v curl >/dev/null 2>&1 || fail "curl is required to download the pinned release"
-        curl --fail --location --silent --show-error --proto '=https' --tlsv1.2 "$archive_source" --output "$archive" \
-            || fail "download failed; the existing installation was not changed"
+        curl --fail --location --silent --show-error --proto '=https' --tlsv1.2 "$source" --output "$destination" \
+            || fail "$description download failed; the existing installation was not changed"
         ;;
-    http://*) fail "refusing an unencrypted archive URL" ;;
-    file://*) cp "${archive_source#file://}" "$archive" || fail "could not read local archive" ;;
-    *://*) fail "unsupported archive URL scheme" ;;
-    *) cp "$archive_source" "$archive" || fail "could not read local archive" ;;
-esac
+    http://*) fail "refusing an unencrypted $description URL" ;;
+    file://*) cp "${source#file://}" "$destination" || fail "could not read local $description" ;;
+    *://*) fail "unsupported $description URL scheme" ;;
+    *) cp "$source" "$destination" || fail "could not read local $description" ;;
+    esac
+}
+
+if [ "$archive_supplied" -eq 1 ]; then
+    [ "$checksum_supplied" -eq 1 ] || fail "a custom archive requires an explicit --checksum"
+else
+    [ "$checksum_supplied" -eq 0 ] || fail "--checksum may be used only with a custom --archive"
+    release_base="$RELEASE_BASE"
+    if [ "${TEACH_ME_TESTING:-}" = "1" ] && [ -n "${TEACH_ME_TEST_RELEASE_BASE:-}" ]; then
+        release_base=$TEACH_ME_TEST_RELEASE_BASE
+    fi
+    archive_source="$release_base/v$PINNED_VERSION/$archive_name"
+    checksum_source="$archive_source.sha256"
+    copy_source "$checksum_source" "$checksum_file" "checksum file"
+    expected_checksum=$(awk -v expected="$archive_name" '
+        {
+            sub(/\r$/, "")
+            digest = substr($0, 1, 64)
+            separator = substr($0, 65, 2)
+            filename = substr($0, 67)
+            if (length(digest) != 64 || digest ~ /[^0-9a-f]/ || separator != "  " || filename != expected) {
+                malformed = 1
+            } else {
+                records++
+                value = digest
+            }
+        }
+        END {
+            if (malformed || records != 1) exit 1
+            print value
+        }
+    ' "$checksum_file") || fail "published checksum file is malformed, missing, or ambiguous"
+fi
+
+copy_source "$archive_source" "$archive" "archive"
 
 if command -v sha256sum >/dev/null 2>&1; then
     actual_checksum=$(sha256sum "$archive" | awk '{print $1}')

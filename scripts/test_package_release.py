@@ -26,13 +26,28 @@ def main() -> int:
         actual = hashlib.sha256(first.read_bytes()).hexdigest()
         if expected != actual:
             raise AssertionError("release checksum does not match archive")
+
+        dist = Path(__file__).resolve().parents[1] / "dist"
+        dist.mkdir(exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix="sidecar-regression-", dir=dist) as in_repo:
+            same_output = Path(in_repo)
+            adjacent_archive, adjacent_checksum = build(same_output, version())
+            before_sidecar_regeneration = adjacent_archive.read_bytes()
+            adjacent_checksum.write_text(
+                f"{'0' * 64}  {adjacent_archive.name}\n",
+                encoding="utf-8",
+            )
+            regenerated_archive, _ = build(same_output, version())
+            if regenerated_archive.read_bytes() != before_sidecar_regeneration:
+                raise AssertionError("release archive changed when its adjacent checksum was regenerated")
+
         with zipfile.ZipFile(first) as bundle:
             names = set(bundle.namelist())
         if "teach-me/SKILL.md" not in names:
             raise AssertionError("archive does not install SKILL.md at the skill root")
         if "teach-me/teach-me/SKILL.md" in names:
             raise AssertionError("archive contains a nested duplicate skill")
-        if any("__pycache__" in name or name.startswith("teach-me/dist/") for name in names):
+        if any("__pycache__" in name or name.startswith("teach-me/dist/") or name.startswith("teach-me/.idea/") for name in names):
             raise AssertionError("archive includes local build artifacts")
         with zipfile.ZipFile(first) as bundle:
             skill_text = bundle.read("teach-me/SKILL.md").decode("utf-8")

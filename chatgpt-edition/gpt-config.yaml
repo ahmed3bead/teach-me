@@ -1,6 +1,6 @@
 product_name: "Teach Me for ChatGPT"
 draft_name: "Teach Me — Beta"
-version: "1.0.0-beta.1"
+version: "1.0.0-beta.2"
 status: "private-draft-configuration"
 compatibility:
   surfaces:

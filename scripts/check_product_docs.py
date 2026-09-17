@@ -98,7 +98,7 @@ def main() -> int:
         "-TargetHost claude-code",
         "~/.claude/skills/teach-me",
         "python3 scripts/package_claude_skill.py",
-        "teach-me-claude-1.0.0-beta.1-development.zip",
+        "teach-me-claude-1.0.0-beta.2-development.zip",
     ):
         if required not in claude_readme:
             failures.append(f"Claude setup guide is missing {required!r}")
@@ -160,8 +160,10 @@ def main() -> int:
         text = (ROOT / relative).read_text(encoding="utf-8")
         if f'PINNED_VERSION="{version}"' not in text and f'$PinnedVersion = "{version}"' not in text:
             failures.append(f"{relative} does not pin the repository version")
-        if "e924647f3bcd11c8e090fe51a12ef4d2fbbfcd30001be76c9631e1733abde728" not in text:
-            failures.append(f"{relative} does not pin the published archive checksum")
+        if ".sha256" not in text:
+            failures.append(f"{relative} does not verify the published adjacent checksum")
+        if re.search(r'^PINNED_SHA256=|^\s*\[string\]\$Checksum\s*=', text, flags=re.MULTILINE):
+            failures.append(f"{relative} embeds an archive checksum")
         if "claude-code" not in text:
             failures.append(f"{relative} does not expose the Claude Code target")
         if ".claude" not in text or "skills" not in text:

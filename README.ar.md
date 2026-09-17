@@ -5,10 +5,10 @@
 [English](README.md) · [العربية](README.ar.md)
 
 [![CI](https://github.com/ahmed3bead/teach-me/actions/workflows/validate.yml/badge.svg)](https://github.com/ahmed3bead/teach-me/actions/workflows/validate.yml)
-[![Release](https://img.shields.io/github/v/release/ahmed3bead/teach-me?include_prereleases&label=release)](https://github.com/ahmed3bead/teach-me/releases/tag/v1.0.0-beta.1)
+[![Release](https://img.shields.io/github/v/release/ahmed3bead/teach-me?include_prereleases&label=release)](https://github.com/ahmed3bead/teach-me/releases/tag/v1.0.0-beta.2)
 [![License: MIT](https://img.shields.io/github/license/ahmed3bead/teach-me)](LICENSE)
 
-> **نسخة تجريبية:** الإصدار العام الحالي هو `v1.0.0-beta.1`. يمكن تجربته الآن، لكن إصدار `v1.0.0` المستقر ما زال يحتاج إلى الاختبار المصحح المكوّن من 90 حالة والمراجعة البشرية.
+> **نسخة تجريبية:** الإصدار العام الحالي هو `v1.0.0-beta.2`. يمكن تجربته الآن، لكن إصدار `v1.0.0` المستقر ما زال يحتاج إلى الاختبار المصحح المكوّن من 90 حالة والمراجعة البشرية.
 
 ## لماذا Teach Me؟
 
@@ -49,13 +49,13 @@
 على Codex في Linux أو macOS:
 
 ```bash
-sh installers/install.sh install --version 1.0.0-beta.1
+sh installers/install.sh install --version 1.0.0-beta.2
 ```
 
 على Windows PowerShell:
 
 ```powershell
-.\installers\install.ps1 -Action install -Version "1.0.0-beta.1"
+.\installers\install.ps1 -Action install -Version "1.0.0-beta.2"
 ```
 
 راجع [دليل البداية](docs/getting-started.md) لمعرفة خطوات أول جلسة وطريقة التحديث.

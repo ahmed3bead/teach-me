@@ -4,7 +4,7 @@ description: Teach adaptively from learner goals or authorized sources, or help 
 license: MIT
 metadata:
   author: ahmed3bead
-  version: "1.0.0-beta.1"
+  version: "1.0.0-beta.2"
   compatibility: "Agent Skills host; optional capabilities are documented in docs/compatibility.md; validators require Python 3.10+."
 ---
 
