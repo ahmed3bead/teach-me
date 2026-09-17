@@ -47,9 +47,68 @@ def main() -> int:
     if config.get("required_knowledge_files") != ["KNOWLEDGE.md"]:
         failures.append("ChatGPT owner setup must require exactly the generated knowledge bundle")
 
+    chatgpt_plugin_root = ROOT / "plugins" / "teach-me"
+    chatgpt_plugin_manifest_path = chatgpt_plugin_root / ".codex-plugin" / "plugin.json"
+    chatgpt_marketplace_path = ROOT / ".agents" / "plugins" / "marketplace.json"
+    try:
+        chatgpt_plugin_manifest = json.loads(chatgpt_plugin_manifest_path.read_text(encoding="utf-8"))
+        chatgpt_marketplace = json.loads(chatgpt_marketplace_path.read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError) as exc:
+        failures.append(f"ChatGPT plugin metadata is missing or invalid JSON: {exc}")
+    else:
+        if chatgpt_plugin_manifest.get("name") != "teach-me":
+            failures.append("ChatGPT plugin name must remain teach-me")
+        plugin_version = chatgpt_plugin_manifest.get("version")
+        if not isinstance(plugin_version, str) or re.fullmatch(
+            r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z.-]+)?",
+            plugin_version,
+        ) is None:
+            failures.append("ChatGPT plugin version must use semantic versioning")
+        if chatgpt_plugin_manifest.get("skills") != "./skills/":
+            failures.append("ChatGPT plugin must expose its bundled skills directory")
+        if "apps" in chatgpt_plugin_manifest or "mcpServers" in chatgpt_plugin_manifest:
+            failures.append("consumer ChatGPT plugin must not require an app, MCP server, or external backend")
+        interface = chatgpt_plugin_manifest.get("interface", {})
+        if interface.get("developerName") != "Ahmed Ebead":
+            failures.append("ChatGPT plugin developer name is incorrect")
+        prompts = interface.get("defaultPrompt")
+        if not isinstance(prompts, list) or not 1 <= len(prompts) <= 3:
+            failures.append("ChatGPT plugin must provide one to three learner-facing starter prompts")
+        for field, suffix in (
+            ("privacyPolicyURL", "/docs/privacy-policy.md"),
+            ("termsOfServiceURL", "/docs/terms-of-use.md"),
+        ):
+            if not str(interface.get(field, "")).endswith(suffix):
+                failures.append(f"ChatGPT plugin {field} is missing or incorrect")
+        for field in ("composerIcon", "logo"):
+            raw_asset = interface.get(field)
+            if not isinstance(raw_asset, str) or not (chatgpt_plugin_root / raw_asset).is_file():
+                failures.append(f"ChatGPT plugin {field} does not point to a bundled asset")
+        marketplace_plugins = chatgpt_marketplace.get("plugins")
+        if not isinstance(marketplace_plugins, list) or len(marketplace_plugins) != 1:
+            failures.append("ChatGPT repository marketplace must list exactly one plugin")
+        else:
+            marketplace_entry = marketplace_plugins[0]
+            if marketplace_entry.get("name") != "teach-me":
+                failures.append("ChatGPT marketplace plugin name is incorrect")
+            if marketplace_entry.get("source") != {"source": "local", "path": "./plugins/teach-me"}:
+                failures.append("ChatGPT marketplace source does not point to the Teach Me plugin")
+
     for path, content in render().items():
         if not path.exists() or path.read_text(encoding="utf-8") != content:
             failures.append(f"generated file is stale: {path.relative_to(ROOT)}")
+
+    generated_plugin_skill = chatgpt_plugin_root / "skills" / "teach-me" / "SKILL.md"
+    if generated_plugin_skill.is_file():
+        plugin_skill_text = generated_plugin_skill.read_text(encoding="utf-8")
+        if not plugin_skill_text.startswith("---\n"):
+            failures.append("generated ChatGPT plugin skill must begin with YAML frontmatter")
+        else:
+            plugin_skill_frontmatter = yaml.safe_load(plugin_skill_text.split("---", 2)[1])
+            if plugin_skill_frontmatter.get("name") != "teach-me":
+                failures.append("generated ChatGPT plugin skill name is incorrect")
+            if len(plugin_skill_frontmatter.get("description", "")) > 200:
+                failures.append("generated ChatGPT plugin skill description exceeds 200 characters")
 
     sources = (ROOT / "chatgpt-edition" / "knowledge-sources.txt").read_text(encoding="utf-8")
     if re.search(r"(^|/)(evals|fixtures|schemas|scripts)(/|$)", sources, flags=re.MULTILINE):
@@ -81,6 +140,10 @@ def main() -> int:
         "docs/examples.md",
         "docs/limitations.md",
         "docs/development.md",
+        "docs/privacy-policy.md",
+        "docs/terms-of-use.md",
+        "docs/chatgpt-plugin-submission.md",
+        "plugins/teach-me/ACCEPTANCE_TESTS.md",
     ):
         if not (ROOT / relative).is_file():
             failures.append(f"focused documentation is missing: {relative}")

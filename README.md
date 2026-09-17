@@ -24,12 +24,13 @@
 
 | Edition | Best for | Setup |
 |---|---|---|
-| **ChatGPT** | Learning on the web, phone, or tablet | [ChatGPT setup](chatgpt-edition/README.md) |
+| **ChatGPT plugin** | The easiest path for ordinary learners on the web, phone, or tablet | Install from ChatGPT after marketplace approval; [plugin status](plugins/teach-me/README.md) |
+| **Custom GPT** | Private owner testing before the public plugin is listed | [Owner setup](chatgpt-edition/README.md) |
 | **Claude** | Learning in a normal Claude conversation | [Claude setup](claude-edition/README.md) |
 | **Codex** | Structured learning with local files, reports, and validation | [Codex setup](docs/codex-installation.md) |
 | **Claude Code** | The full workflow inside Claude Code | [Claude Code setup](claude-edition/README.md#claude-code-marketplace-setup) |
 
-Not sure? Start with ChatGPT or Claude. Choose Codex or Claude Code when you need local files, reproducible workflows, or technical artifacts.
+Not sure? Start with the ChatGPT plugin or Claude. Choose Codex or Claude Code only when you need local files, reproducible workflows, or technical artifacts.
 
 ## Quick start
 
@@ -38,6 +39,8 @@ Give Teach Me one practical outcome:
 ```text
 Teach me Docker from zero. I am a Laravel developer and want to run a real Laravel project locally with Docker.
 ```
+
+The public ChatGPT plugin package is ready for marketplace review. It uses only bundled teaching instructions: no separate account, API key, server, or terminal is required for learners. Repository availability does not mean the plugin has already been approved or listed.
 
 For Claude Code:
 
@@ -83,6 +86,7 @@ Read [How Teach Me works](docs/how-it-works.md) for learner, educator, and sourc
 | [Limitations](docs/limitations.md) | Current beta boundaries and host differences |
 | [Development](docs/development.md) | Local validation and contributor commands |
 | [Compatibility](docs/compatibility.md) | Detailed host capability matrix |
+| [ChatGPT plugin submission](docs/chatgpt-plugin-submission.md) | Public-review boundary and publisher checklist |
 | [Model evaluation](docs/model-evaluation.md) | Behavioral and simulation evidence protocol |
 | [Release checklist](docs/release-checklist.md) | Gates required for stable release |
 

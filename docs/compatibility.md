@@ -1,8 +1,8 @@
 # Compatibility and capability matrix
 
-Teach Me supports four product surfaces through two delivery styles. **ChatGPT** uses a configured GPT for ordinary conversations. **Claude** uploads a verified Teach Me ZIP as a custom skill. **Codex** and **Claude Code** install the same Agent Skill and add the repository's local tooling, controlled artifacts, and validation workflows. The hosts are not technically identical, and output can differ with model, tool, context, and execution environment.
+Teach Me supports four product surfaces through several delivery styles. **ChatGPT** prioritizes a skills-only plugin for ordinary learners, with a private configured GPT retained for owner testing until marketplace publication. **Claude** uploads a verified Teach Me ZIP as a custom skill. **Codex** and **Claude Code** install the Agent Skill and add the repository's local tooling, controlled artifacts, and validation workflows. The hosts are not technically identical, and output can differ with model, tool, context, and execution environment.
 
-The ChatGPT Edition package is a private beta configuration and is not a publicly published GPT. Builder access varies by account; when the signed-in web editor exposes **Create**, the owner can follow [`../chatgpt-edition/README.md`](../chatgpt-edition/README.md). Claude and Claude Code setup is documented in [`../claude-edition/README.md`](../claude-edition/README.md). A host must expose a capability before the skill may claim to have used it.
+The ChatGPT plugin package is ready for marketplace review but must not be described as listed until approval and publication finish. It has no MCP server, external app, sign-in flow, or developer-operated backend. The separate ChatGPT Edition package remains a private owner configuration; when the signed-in web editor exposes **Create**, the owner can follow [`../chatgpt-edition/README.md`](../chatgpt-edition/README.md). Claude and Claude Code setup is documented in [`../claude-edition/README.md`](../claude-edition/README.md). A host must expose a capability before the skill may claim to have used it.
 
 | Capability | Without it | With it |
 |---|---|---|

@@ -2,7 +2,7 @@
 
 Teach Me for ChatGPT is the easiest edition for ordinary learners. It runs in normal ChatGPT conversations on supported web, phone, and tablet surfaces. It preserves the core Teach Me method without requiring a terminal, GitHub, Ollama, or a local installation.
 
-This directory contains the maintainable **private beta configuration** shipped with `v1.0.0-beta.2`; it is not a publicly published GPT.
+This directory contains the maintainable **private beta configuration** shipped with `v1.0.0-beta.2`; it is not a publicly published GPT. The consumer-facing marketplace candidate now lives in [`plugins/teach-me/`](../plugins/teach-me/README.md). Keep this owner configuration as a fallback for acceptance testing until the plugin is approved and listed.
 
 Builder availability varies by account and current product controls. Creation and editing use the ChatGPT web Builder; mobile apps can use an existing GPT but do not provide the full Builder. If the GPT editor opens and the **Create** button is available, the owner can proceed with this checklist. See the [official OpenAI documentation](https://help.openai.com/en/articles/8554397-creating-and-editing-gpts-with-actions) and trust the controls actually shown on the signed-in account rather than a hard-coded plan assumption.
 

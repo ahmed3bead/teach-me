@@ -1,0 +1,42 @@
+{
+  "name": "teach-me",
+  "version": "0.1.0",
+  "description": "An adaptive teacher for ordinary learners in English and simplified Modern Standard Arabic.",
+  "author": {
+    "name": "Ahmed Ebead",
+    "url": "https://github.com/ahmed3bead"
+  },
+  "homepage": "https://github.com/ahmed3bead/teach-me",
+  "repository": "https://github.com/ahmed3bead/teach-me",
+  "license": "MIT",
+  "keywords": [
+    "education",
+    "learning",
+    "teaching",
+    "arabic",
+    "english"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Teach Me",
+    "shortDescription": "Learn any topic from your current level.",
+    "longDescription": "Teach Me explains step by step, adapts when you get stuck, and can teach from material you provide. It supports English and simplified Modern Standard Arabic and asks before starting routine assessments.",
+    "developerName": "Ahmed Ebead",
+    "category": "Education",
+    "capabilities": [
+      "Interactive",
+      "Read"
+    ],
+    "websiteURL": "https://github.com/ahmed3bead/teach-me",
+    "privacyPolicyURL": "https://github.com/ahmed3bead/teach-me/blob/main/docs/privacy-policy.md",
+    "termsOfServiceURL": "https://github.com/ahmed3bead/teach-me/blob/main/docs/terms-of-use.md",
+    "defaultPrompt": [
+      "Teach me a new topic from zero.",
+      "Help me understand where I am stuck.",
+      "Teach me from this file without inventing gaps."
+    ],
+    "brandColor": "#0F766E",
+    "composerIcon": "./assets/teach-me-icon.svg",
+    "logo": "./assets/teach-me-icon.svg"
+  }
+}
