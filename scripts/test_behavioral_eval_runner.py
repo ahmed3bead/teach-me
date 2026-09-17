@@ -20,7 +20,7 @@ import yaml
 import run_behavioral_evals as runner
 import validate as core_validator
 from behavioral_eval_contract import canonical_hash, load_fixture_registry, reference_paths, validate_case_contract, validate_registry_entry
-from codex_subscription_eval_adapter import materialize_artifacts, render_prompt, safe_environment
+from codex_subscription_eval_adapter import materialize_artifacts, output_schema, render_prompt, safe_environment
 
 ROOT = Path(__file__).resolve().parents[1]
 RUNNER = ROOT / "scripts" / "run_behavioral_evals.py"
@@ -211,6 +211,12 @@ def test_reference_routing_and_prompt_boundaries() -> None:
     assert "do not normalize whitespace, add or remove diacritics" in grader_prompt
     assert "never splice noncontiguous text" in grader_prompt
     assert "cite user text as response evidence" in grader_prompt
+    grader_schema = output_schema({"type": "grade", "criteria": ["observable behavior"]})
+    evidence_schema = grader_schema["properties"]["results"]["items"]["properties"]["evidence"]
+    assert evidence_schema["required"] == ["source", "turn", "artifact_path", "quote"]
+    assert evidence_schema["properties"]["turn"]["type"] == ["integer", "null"]
+    assert evidence_schema["properties"]["artifact_path"]["type"] == ["string", "null"]
+    assert "Set turn to null unless source is response" in grader_prompt
     tampered = copy.deepcopy(packet); tampered["instruction_sources"][0]["content"] += "tamper"
     try: render_prompt({"type":"generate", "locale":"ar-MSA", "prompt":"تعلم", "history":[], "prompt_packet":tampered}, "response")
     except ValueError: pass
@@ -364,6 +370,9 @@ def test_grader_evidence() -> None:
     transcript = [{"role":"user","turn":1,"content":"Teach."},{"role":"assistant","turn":1,"content":"First evidence."},{"role":"user","turn":2,"content":"Continue."},{"role":"assistant","turn":2,"content":"Exact safe procedure."}]
     valid = {"results":[{"verdict":"pass","evidence":{"source":"response","turn":2,"quote":"safe procedure"},"reason":"The exact span demonstrates it."}]}
     assert runner.validate_grade(valid, ["criterion"], transcript)[0]["passed"]
+    strict_valid = copy.deepcopy(valid)
+    strict_valid["results"][0]["evidence"]["artifact_path"] = None
+    assert runner.validate_grade(strict_valid, ["criterion"], transcript)[0]["passed"]
     wrong = copy.deepcopy(valid); wrong["results"][0]["evidence"]["turn"] = 1
     try: runner.validate_grade(wrong, ["criterion"], transcript)
     except RuntimeError: pass
@@ -443,6 +452,9 @@ def test_grader_evidence() -> None:
     else: raise AssertionError("normalized response evidence passed without an exact quote")
     absent = {"results":[{"verdict":"fail","evidence":{"source":"absent","quote":"ABSENT: criterion"},"reason":"No evidence."}]}
     assert not runner.validate_grade(absent, ["criterion"], transcript)[0]["passed"]
+    strict_absent = copy.deepcopy(absent)
+    strict_absent["results"][0]["evidence"].update(turn=None, artifact_path=None)
+    assert not runner.validate_grade(strict_absent, ["criterion"], transcript)[0]["passed"]
 
 
 def test_release_git_binding() -> None:
