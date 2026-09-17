@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Teach Me</title>
+  <desc id="desc">An open book with a rising learning path.</desc>
+  <rect width="512" height="512" rx="112" fill="#0F766E"/>
+  <path d="M96 142c62-18 118-5 160 36v230c-42-41-98-54-160-36V142Z" fill="#FFFFFF"/>
+  <path d="M416 142c-62-18-118-5-160 36v230c42-41 98-54 160-36V142Z" fill="#CCFBF1"/>
+  <path d="M256 178v230" stroke="#115E59" stroke-width="18" stroke-linecap="round"/>
+  <path d="m305 282 38-38 33 33" fill="none" stroke="#0F766E" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M343 244v78" fill="none" stroke="#0F766E" stroke-width="18" stroke-linecap="round"/>
+</svg>

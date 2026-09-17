@@ -6,14 +6,16 @@ This guide helps you choose an edition, complete setup, and begin a useful first
 
 | You want to… | Choose |
 |---|---|
-| Learn in a normal browser, phone, or tablet conversation | ChatGPT or Claude |
+| Learn in a normal browser, phone, or tablet conversation | ChatGPT plugin or Claude |
 | Work with local files, reports, validation, or repeatable technical workflows | Codex or Claude Code |
 
 All editions follow the same essential teaching contract. Results can still differ because each host provides different models, tools, context limits, and file access.
 
 ## ChatGPT
 
-Use the ready-to-configure private beta package in [`chatgpt-edition/`](../chatgpt-edition/README.md). Learners need no terminal or local installation after the GPT owner completes the setup.
+The consumer-first path is the skills-only [Teach Me plugin](../plugins/teach-me/README.md). After marketplace approval, learners install it from ChatGPT and start a normal conversation. They need no terminal, GitHub checkout, API key, separate account, or developer-operated server.
+
+Until marketplace review and publication finish, owners can use the ready-to-configure private beta package in [`chatgpt-edition/`](../chatgpt-edition/README.md). That is a development and acceptance-testing fallback, not a claim that the public plugin is already listed.
 
 ## Claude
 

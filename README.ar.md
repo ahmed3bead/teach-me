@@ -23,12 +23,13 @@
 
 | النسخة | الأنسب لها | الإعداد |
 |---|---|---|
-| **ChatGPT** | التعلم من المتصفح أو الهاتف أو الجهاز اللوحي | [إعداد ChatGPT](chatgpt-edition/README.md) |
+| **إضافة ChatGPT** | أسهل مسار للمستخدم العادي من المتصفح أو الهاتف أو الجهاز اللوحي | التثبيت من ChatGPT بعد قبولها في المتجر؛ [حالة الإضافة](plugins/teach-me/README.md) |
+| **GPT مخصص** | اختبار خاص بواسطة المالك قبل إتاحة الإضافة العامة | [إعداد المالك](chatgpt-edition/README.md) |
 | **Claude** | التعلم داخل محادثة Claude عادية | [إعداد Claude](claude-edition/README.md) |
 | **Codex** | التعلم المنظم مع الملفات المحلية والتقارير والتحقق | [إعداد Codex](docs/codex-installation.md) |
 | **Claude Code** | تشغيل المسار الكامل داخل Claude Code | [إعداد Claude Code](claude-edition/README.md#claude-code-marketplace-setup) |
 
-إذا كنت غير متأكد، ابدأ بـChatGPT أو Claude. استخدم Codex أو Claude Code عندما تحتاج إلى ملفات محلية أو خطوات قابلة للتكرار أو مخرجات تقنية.
+إذا كنت غير متأكد، ابدأ بإضافة ChatGPT أو Claude. استخدم Codex أو Claude Code فقط عندما تحتاج إلى ملفات محلية أو خطوات قابلة للتكرار أو مخرجات تقنية.
 
 ## بداية سريعة
 
@@ -37,6 +38,8 @@
 ```text
 علّمني Docker من الصفر. أنا مطور Laravel وأريد تشغيل مشروع Laravel حقيقي محليًا باستخدام Docker.
 ```
+
+حزمة إضافة ChatGPT العامة جاهزة للمراجعة في المتجر. تعتمد على تعليمات مرفقة فقط، ولذلك لا يحتاج المتعلم إلى حساب إضافي أو مفتاح API أو خادم أو أوامر Terminal. وجود الحزمة في المستودع لا يعني أنها قُبلت أو أُدرجت في المتجر بعد.
 
 على Claude Code:
 
@@ -82,6 +85,7 @@ sh installers/install.sh install --version 1.0.0-beta.2
 | [القيود الحالية](docs/limitations.md) | حدود النسخة التجريبية واختلاف المنصات |
 | [التطوير](docs/development.md) | اختبارات المشروع وأوامر المساهمة |
 | [التوافق](docs/compatibility.md) | مقارنة تفصيلية لإمكانات المنصات |
+| [تقديم إضافة ChatGPT](docs/chatgpt-plugin-submission.md) | حدود المراجعة العامة وخطوات حساب الناشر |
 | [تقييم النماذج](docs/model-evaluation.md) | بروتوكول الاختبارات السلوكية والمحاكاة |
 | [قائمة الإصدار](docs/release-checklist.md) | شروط الانتقال إلى الإصدار المستقر |
 

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Add a review-ready, skills-only ChatGPT plugin for ordinary web, phone, and tablet learners, with no MCP server, external backend, API key, or separate sign-in requirement.
+- Generate the plugin skill and bundled knowledge from the same reviewed ChatGPT teaching sources, and validate its metadata, starter prompts, policy links, assets, and repository marketplace entry.
+- Add consumer acceptance tests plus public privacy, terms, and marketplace-submission guidance while keeping the private Custom GPT configuration as an owner-testing fallback.
+
 ## 1.0.0-beta.2 - 2026-09-17
 
 - Publish the accumulated post-beta improvements as a second public beta for real-user testing and structured feedback.
