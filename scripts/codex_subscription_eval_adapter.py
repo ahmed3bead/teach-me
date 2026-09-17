@@ -18,7 +18,7 @@ from typing import Any
 
 
 DEFAULT_MODEL = "gpt-5.6-sol"
-ADAPTER_VERSION = "2.1.0"
+ADAPTER_VERSION = "2.1.1"
 ENV_ALLOWLIST = frozenset({"PATH", "HOME", "CODEX_HOME", "LANG", "LC_ALL", "LC_CTYPE", "TMPDIR", "TEMP", "TMP"})
 
 
@@ -36,8 +36,8 @@ def output_schema(payload: dict[str, Any]) -> dict[str, Any]:
     if payload.get("type") == "grade":
         count = len(payload.get("criteria", []))
         evidence = object_schema(
-            {"source": {"enum": ["response", "artifact", "absent"]}, "turn": {"type": "integer", "minimum": 1}, "artifact_path": {"type": "string"}, "quote": {"type": "string", "minLength": 1, "maxLength": 800}},
-            ["source", "quote"],
+            {"source": {"enum": ["response", "artifact", "absent"]}, "turn": {"type": ["integer", "null"], "minimum": 1}, "artifact_path": {"type": ["string", "null"]}, "quote": {"type": "string", "minLength": 1, "maxLength": 800}},
+            ["source", "turn", "artifact_path", "quote"],
         )
         item = object_schema({"verdict": {"enum": ["pass", "fail"]}, "evidence": evidence, "reason": {"type": "string", "minLength": 1, "maxLength": 800}}, ["verdict", "evidence", "reason"])
         return object_schema({"results": {"type": "array", "minItems": count, "maxItems": count, "items": item}}, ["results"])
@@ -162,6 +162,7 @@ def render_prompt(payload: dict[str, Any], role: str, model: str = DEFAULT_MODEL
             "Act as an independent strict grader. Return one verdict per criterion in order. PASS requires an exact quote and the correct response turn or artifact path. "
             "For response and non-HTML evidence, copy each quote verbatim from the identified source: do not normalize whitespace, add or remove diacritics, translate, paraphrase, or cite user text as response evidence. "
             "For HTML artifacts, quote one contiguous learner-visible text span in reading order; omit markup but no visible words, and never splice noncontiguous text. "
+            "Set turn to null unless source is response, and set artifact_path to null unless source is artifact. "
             "FAIL may use source absent with an ABSENT: explanation. Never pass absent, implicit, deferred, or unperformed required behavior. "
             "A criterion that explicitly requires the absence, stopping, or internal-only handling of a prohibited behavior may pass when the evidence and reason show that prohibition is satisfied. "
             "Before returning PASS, verify that the reason positively explains how the quoted evidence satisfies the criterion; if the reason says behavior required by the criterion is absent, missing, implicit, deferred, or unperformed, return FAIL with absent evidence instead."

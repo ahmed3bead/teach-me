@@ -574,6 +574,7 @@ def validate_grade(grade: dict[str, Any], expected: list[str], transcript: list[
         reason = item.get("reason")
         if not isinstance(evidence, dict) or set(evidence) - {"source", "turn", "artifact_path", "quote"} or not isinstance(reason, str) or not reason.strip():
             raise RuntimeError("each grader result needs exact evidence and concise reasoning")
+        evidence = {key: value for key, value in evidence.items() if value is not None}
         passed = item["verdict"] == "pass"
         source, quote = evidence.get("source"), evidence.get("quote")
         expected_keys = {"response": {"source", "turn", "quote"}, "artifact": {"source", "artifact_path", "quote"}, "absent": {"source", "quote"}}
