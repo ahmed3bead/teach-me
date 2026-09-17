@@ -275,7 +275,7 @@ if [ "$value" != "$PINNED_VERSION" ]; then
     fail "installed version verification failed; failed files were quarantined at $failed and the previous installation was restored when available"
 fi
 
-rm -f "$archive"
+rm -f "$archive" "$checksum_file"
 rmdir "$extract_root" 2>/dev/null || true
 rmdir "$work_dir" 2>/dev/null || true
 

@@ -234,6 +234,9 @@ try {
 }
 
 Remove-Item -LiteralPath $ArchivePath -Force
+if (Test-Path -LiteralPath $ChecksumPath -PathType Leaf) {
+    Remove-Item -LiteralPath $ChecksumPath -Force
+}
 Remove-Item -LiteralPath $ExtractRoot -Force
 Remove-Item -LiteralPath $WorkDirectory -Force
 

@@ -35,7 +35,7 @@ installer=$(mktemp /tmp/teach-me-installer.XXXXXX)
 curl --fail --location --silent --show-error --proto '=https' --tlsv1.2 \
   https://raw.githubusercontent.com/ahmed3bead/teach-me/main/installers/install.sh \
   --output "$installer"
-printf '%s  %s\n' '9936e077b462c9892738f656bb2bad60fbdfd08d877ad37b8ad2e49b5371ee30' "$installer" | sha256sum --check -
+printf '%s  %s\n' 'db5fad42350050d8949e9f7ac81fe406fde37d04168b066be3c8201ef884358e' "$installer" | sha256sum --check -
 sh "$installer" install --version 1.0.0-beta.2
 rm -f "$installer"
 ```
@@ -47,7 +47,7 @@ installer=$(mktemp /tmp/teach-me-installer.XXXXXX)
 curl --fail --location --silent --show-error --proto '=https' --tlsv1.2 \
   https://raw.githubusercontent.com/ahmed3bead/teach-me/main/installers/install.sh \
   --output "$installer"
-printf '%s  %s\n' '9936e077b462c9892738f656bb2bad60fbdfd08d877ad37b8ad2e49b5371ee30' "$installer" | shasum -a 256 --check
+printf '%s  %s\n' 'db5fad42350050d8949e9f7ac81fe406fde37d04168b066be3c8201ef884358e' "$installer" | shasum -a 256 --check
 sh "$installer" install --version 1.0.0-beta.2
 rm -f "$installer"
 ```
@@ -59,7 +59,7 @@ $installer = Join-Path ([System.IO.Path]::GetTempPath()) "teach-me-install.ps1"
 Invoke-WebRequest -UseBasicParsing `
   -Uri "https://raw.githubusercontent.com/ahmed3bead/teach-me/main/installers/install.ps1" `
   -OutFile $installer
-$expected = "ec250fab9d38d796d1a06eb91422cc11228e71f51a406234913fe6cdb7b8ab4f"
+$expected = "ffda6d842150b2016603634ecba24c28e74faa2a04def89780fcb047f9990070"
 if ((Get-FileHash -LiteralPath $installer -Algorithm SHA256).Hash.ToLowerInvariant() -ne $expected) {
     throw "Teach Me installer checksum mismatch; nothing was executed."
 }
