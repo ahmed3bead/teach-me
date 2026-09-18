@@ -54,6 +54,7 @@ def validate() -> None:
         [sys.executable, "scripts/test_behavioral_eval_runner.py"],
         [sys.executable, "scripts/test_agent_simulations.py"],
         [sys.executable, "scripts/test_feedback_pipeline.py"],
+        [sys.executable, "scripts/test_validate_mcp_assets.py"],
         [sys.executable, "scripts/test_validate_bidi_html.py"],
         [sys.executable, "scripts/test_render_learning_pack.py"],
         [sys.executable, "scripts/test_inspect_source.py"],

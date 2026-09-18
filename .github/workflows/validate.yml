@@ -40,6 +40,7 @@ jobs:
       - run: python3 scripts/test_ollama_eval_adapter.py
       - run: python3 scripts/test_package_release.py
       - run: python3 scripts/test_feedback_pipeline.py
+      - run: python3 scripts/test_validate_mcp_assets.py
       - run: python3 scripts/test_validate_bidi_html.py
       - run: python3 scripts/test_validate_session.py
       - run: python3 scripts/test_validate_resume.py
@@ -83,6 +84,7 @@ jobs:
       - run: python scripts/test_installers.py
       - run: python scripts/test_openai_api_eval_adapter.py
       - run: python scripts/test_evaluation_cost.py
+      - run: python scripts/test_validate_mcp_assets.py
       - run: python scripts/test_validate_session.py
       - run: python scripts/test_validate_resume.py
       - run: python scripts/test_session_manager.py

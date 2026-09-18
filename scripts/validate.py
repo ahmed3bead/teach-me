@@ -8,6 +8,7 @@ import re
 import sys
 from pathlib import Path
 
+from validate_mcp_assets import validate_manifest as validate_mcp_asset_manifest
 from validate_resume import validate as validate_resume_code
 
 
@@ -47,6 +48,12 @@ def check_skill() -> None:
     for match in re.findall(r"\]\(([^)]+)\)", text):
         if "://" not in match and not (ROOT / match).exists():
             fail(f"SKILL.md: broken local reference {match}")
+
+
+def check_mcp_assets() -> None:
+    errors = validate_mcp_asset_manifest()
+    if errors:
+        fail("MCP asset boundary failed: " + "; ".join(errors))
 
 
 def check_evals() -> None:
@@ -225,6 +232,7 @@ def check_conversational_teaching() -> None:
 def main() -> int:
     check_json()
     check_skill()
+    check_mcp_assets()
     check_evals()
     check_templates()
     check_integration()

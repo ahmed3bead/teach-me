@@ -1,0 +1,175 @@
+{
+  "schema_version": "1.0.0",
+  "manifest_version": "1.0.0",
+  "teach_me_version": "1.0.0-beta.2",
+  "selection_model": "explicit-allowlist",
+  "ordering": {
+    "key": "order",
+    "direction": "ascending",
+    "require_contiguous": true
+  },
+  "module_categories": [
+    {"id": "topic-led-conversational", "status": "active"},
+    {"id": "educator-guidance", "status": "reserved"},
+    {"id": "source-grounded", "status": "reserved"},
+    {"id": "domain-packs", "status": "reserved"},
+    {"id": "accessibility", "status": "reserved"},
+    {"id": "safety", "status": "reserved"},
+    {"id": "artifact-guidance", "status": "reserved"}
+  ],
+  "asset_classifications": [
+    "entrypoint",
+    "policy",
+    "engine",
+    "continuity",
+    "locale"
+  ],
+  "canonical_roots": [
+    {"path": "SKILL.md", "kind": "file"},
+    {"path": "references", "kind": "directory"},
+    {"path": "domain-packs", "kind": "directory"},
+    {"path": "templates", "kind": "directory"},
+    {"path": "schemas", "kind": "directory"}
+  ],
+  "allowed_suffixes": [".md", ".json", ".yaml", ".html"],
+  "prohibited": {
+    "path_prefixes": [
+      ".git",
+      ".agents",
+      ".claude-plugin",
+      ".github",
+      ".venv",
+      "agents",
+      "chatgpt-edition",
+      "claude-edition",
+      "dist",
+      "docs",
+      "evals",
+      "fixtures",
+      "installers",
+      "mcp",
+      "node_modules",
+      "plugins",
+      "reports",
+      "scripts",
+      "skills",
+      "venv"
+    ],
+    "path_segments": [
+      ".git",
+      ".venv",
+      "__pycache__",
+      "node_modules",
+      "reports"
+    ],
+    "basenames": [
+      ".env",
+      ".env.local",
+      ".env.production",
+      ".env.test"
+    ],
+    "suffixes": [
+      ".bak",
+      ".log",
+      ".pyc",
+      ".pyo",
+      ".swp",
+      ".tmp"
+    ]
+  },
+  "limits": {
+    "max_asset_count": 64,
+    "max_individual_asset_bytes": 131072,
+    "max_total_asset_bytes": 524288
+  },
+  "assets": [
+    {
+      "order": 1,
+      "id": "teach-me-skill",
+      "path": "SKILL.md",
+      "classification": "entrypoint",
+      "required": true,
+      "module_categories": ["topic-led-conversational"]
+    },
+    {
+      "order": 2,
+      "id": "core-teaching-policy",
+      "path": "references/core-teaching-policy.md",
+      "classification": "policy",
+      "required": true,
+      "module_categories": ["topic-led-conversational"]
+    },
+    {
+      "order": 3,
+      "id": "teaching-contract",
+      "path": "references/teaching-contract.md",
+      "classification": "policy",
+      "required": true,
+      "module_categories": ["topic-led-conversational"]
+    },
+    {
+      "order": 4,
+      "id": "diagnostic-engine",
+      "path": "references/diagnostic-engine.md",
+      "classification": "engine",
+      "required": true,
+      "module_categories": ["topic-led-conversational"]
+    },
+    {
+      "order": 5,
+      "id": "teaching-engine",
+      "path": "references/teaching-engine.md",
+      "classification": "engine",
+      "required": true,
+      "module_categories": ["topic-led-conversational"]
+    },
+    {
+      "order": 6,
+      "id": "conversational-teaching",
+      "path": "references/conversational-teaching.md",
+      "classification": "engine",
+      "required": true,
+      "module_categories": ["topic-led-conversational"]
+    },
+    {
+      "order": 7,
+      "id": "assessment-feedback-engine",
+      "path": "references/assessment-feedback-engine.md",
+      "classification": "engine",
+      "required": true,
+      "module_categories": ["topic-led-conversational"]
+    },
+    {
+      "order": 8,
+      "id": "integration-core",
+      "path": "references/integration-core.md",
+      "classification": "continuity",
+      "required": true,
+      "module_categories": ["topic-led-conversational"]
+    },
+    {
+      "order": 9,
+      "id": "learner-model",
+      "path": "references/learner-model.md",
+      "classification": "continuity",
+      "required": true,
+      "module_categories": ["topic-led-conversational"]
+    },
+    {
+      "order": 10,
+      "id": "retention-adaptation",
+      "path": "references/retention-adaptation.md",
+      "classification": "continuity",
+      "required": true,
+      "module_categories": ["topic-led-conversational"]
+    },
+    {
+      "order": 11,
+      "id": "arabic-teaching-style",
+      "path": "references/arabic-teaching-style.md",
+      "classification": "locale",
+      "required": true,
+      "module_categories": ["topic-led-conversational"]
+    }
+  ]
+}

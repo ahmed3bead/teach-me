@@ -52,6 +52,7 @@ python3 scripts/test_agent_simulations.py
 python3 scripts/test_ollama_eval_adapter.py
 python3 scripts/test_package_release.py
 python3 scripts/test_feedback_pipeline.py
+python3 scripts/test_validate_mcp_assets.py
 python3 scripts/test_validate_bidi_html.py
 python3 scripts/test_validate_session.py
 python3 scripts/test_validate_resume.py

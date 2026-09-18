@@ -47,6 +47,24 @@ The future build layer will own:
 
 The build layer may transform or package canonical content, but it must not rewrite the teaching contract or become a second source of truth.
 
+The concrete remote asset boundary is the machine-readable manifest at `mcp/teach-me-assets.json`. It uses an explicit allowlist: canonical roots identify where a reviewed asset may come from, but only an asset individually listed in the manifest is remotely selectable. Reserved module categories describe extension points without selecting their files.
+
+```text
+canonical repository assets
+        ↓
+explicit manifest allowlist
+        ↓
+validated remote asset boundary
+        ↓
+future deterministic bundle
+        ↓
+future MCP adapter
+```
+
+`scripts/validate_mcp_assets.py` enforces the boundary, path safety, deterministic order, identity uniqueness, prohibited locations, and conservative count and byte ceilings. The manifest remains the sole machine-readable deployment-selection source. This task defines and validates selection only; it does not generate a runtime bundle.
+
+The initial ceilings are 64 assets, 128 KiB for one asset, and 512 KiB total. The selected topic-led graph is currently about 50 KiB, so these limits leave substantial reviewed growth for later modules while preventing an accidental directory inclusion or large content file from approaching infrastructure limits unnoticed. Raising a ceiling requires an explicit manifest change and remains bounded by stricter validator-policy maxima.
+
 ### MCP adapter
 
 The future adapter will own:
@@ -243,4 +261,3 @@ The disabled run is a control, not a deliberately degraded product. A capable ge
 ### Attribution rule
 
 Claim only that the enabled journey executed the versioned Teach Me contract when both the MCP trace and observable behavior pass. Do not claim that MCP caused a quality improvement from a single pair. Comparative quality claims require repeated runs, predefined sampling, and aggregated results.
-
