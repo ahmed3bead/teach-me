@@ -58,7 +58,11 @@ validated remote asset boundary
         ↓
 deterministic runtime bundle
         ↓
-future MCP adapter
+pure `load_teach_me` adapter
+        ↓
+future MCP transport
+        ↓
+future Cloudflare Worker
 ```
 
 `scripts/validate_mcp_assets.py` enforces the boundary, path safety, deterministic order, identity uniqueness, prohibited locations, and conservative count and byte ceilings. The manifest remains the sole machine-readable deployment-selection source.
@@ -76,17 +80,22 @@ Source CRLF and lone-CR newlines normalize to LF. JSON keys are sorted, assets r
 
 The initial ceilings are 64 assets, 128 KiB for one asset, and 512 KiB total. The selected topic-led graph is currently about 50 KiB, so these limits leave substantial reviewed growth for later modules while preventing an accidental directory inclusion or large content file from approaching infrastructure limits unnoticed. Raising a ceiling requires an explicit manifest change and remains bounded by stricter validator-policy maxima.
 
-### MCP adapter
+### Pure runtime adapter
 
-The future adapter will own:
+The pure adapter in `mcp/src/adapter.ts` owns:
 
-- the stable MCP-facing contract;
-- input validation and bounded canonical-module selection;
+- strict input validation and bounded canonical-module selection;
 - version, digest, provenance, and capability metadata in results;
-- accurate read-only, non-destructive, and closed-world annotations; and
-- client-neutral errors for unsupported modes or unavailable capabilities.
+- a transport-neutral `load_teach_me` result; and
+- structured client-neutral errors for unsupported inputs.
 
 It will not explain a topic, grade a learner, decide mastery, generate a curriculum, fetch arbitrary sources, call an LLM, or retain learner state.
+
+`load_teach_me({})` defaults to the `learner` audience, `topic-led` input mode, the `topic-led-conversational` logical guidance module, and a host-inferred locale. Explicit `en` and `ar-MSA` locales are supported; legacy `ar-EG` normalizes to `ar-MSA`. The adapter rejects unknown fields, unsupported enum values, malformed or empty module arrays, duplicates, and excessive module requests.
+
+Successful results include the normalized request, selected canonical modules, Teach Me and bundle versions, bundle and module digests, repository-relative provenance, supported capabilities, and the host contract. Failures use `{ ok: false, error: { code, message, field? } }`, with no stack or machine details. The adapter imports the generated JSON statically and has no filesystem, process, network, persistence, or LLM runtime dependency. The connected host model remains the teacher.
+
+The only public guidance module in v1 is `topic-led-conversational`; it is a logical identifier rather than a filename. Explicit English omits the Arabic-only style asset. Arabic and host-inferred requests include it so the host can preserve the canonical language behavior. Selection remains deterministic and is limited to assets tagged for the requested active module.
 
 ### Cloudflare Worker
 
@@ -118,7 +127,7 @@ ChatGPT or Claude remains the teacher. The host model owns:
 
 This foundation does not:
 
-- implement an MCP server, adapter, or Cloudflare Worker;
+- implement an MCP transport, server, or Cloudflare Worker;
 - replace the existing platform editions;
 - put the teaching loop behind remote procedure calls;
 - call an LLM from the server;

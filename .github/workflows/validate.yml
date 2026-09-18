@@ -19,6 +19,8 @@ jobs:
           cache-dependency-path: requirements-dev.txt
       - run: python3 -m pip install -r requirements-dev.txt
       - run: python3 -m pip check
+      - run: npm --prefix ./mcp ci
+      - run: npm --prefix ./mcp run check
       - run: python3 scripts/check_dependency_pins.py
       - run: python3 scripts/check_context_budget.py
       - run: python3 scripts/build_chatgpt_edition.py --check
@@ -76,6 +78,8 @@ jobs:
           cache-dependency-path: requirements-dev.txt
       - run: python -m pip install -r requirements-dev.txt
       - run: python -m pip check
+      - run: npm --prefix ./mcp ci
+      - run: npm --prefix ./mcp run check
       - run: python scripts/validate.py
       - run: python scripts/validate_schemas.py
       - run: python scripts/validate_evals.py

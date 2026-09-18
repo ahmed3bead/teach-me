@@ -5,6 +5,7 @@ This page is for contributors and release maintainers. Learners do not need thes
 ## Requirements
 
 - Python 3.10 or newer.
+- Node.js 18 or newer with npm (only for the zero-runtime-dependency MCP adapter build and tests).
 - Exact development packages from `requirements-dev.txt`.
 - A clean checkout for release evidence.
 
@@ -15,6 +16,8 @@ Installer tests use isolated temporary roots and fixture archives. Deterministic
 ```bash
 python3 -m pip install -r requirements-dev.txt
 python3 -m pip check
+npm --prefix ./mcp ci
+npm --prefix ./mcp run check
 ```
 
 ## Fast documentation check

@@ -49,7 +49,7 @@ def main() -> int:
             raise AssertionError("archive is missing the generated MCP runtime bundle")
         if "teach-me/teach-me/SKILL.md" in names:
             raise AssertionError("archive contains a nested duplicate skill")
-        if any("__pycache__" in name or name.startswith("teach-me/dist/") or name.startswith("teach-me/.idea/") for name in names):
+        if any("__pycache__" in name or "/node_modules/" in name or name.startswith("teach-me/dist/") or name.startswith("teach-me/.idea/") for name in names):
             raise AssertionError("archive includes local build artifacts")
         with zipfile.ZipFile(first) as bundle:
             skill_text = bundle.read("teach-me/SKILL.md").decode("utf-8")

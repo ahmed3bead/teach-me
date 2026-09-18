@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import json
 import re
 import sys
 from pathlib import Path
@@ -23,6 +24,12 @@ def main() -> int:
         for action, ref in ACTION.findall(text):
             if not re.fullmatch(r"[a-f0-9]{40}", ref):
                 failures.append(f"{workflow.relative_to(ROOT)}: {action}@{ref} is not an immutable commit SHA")
+    package = json.loads((ROOT / "mcp" / "package.json").read_text(encoding="utf-8"))
+    if package.get("dependencies"):
+        failures.append("mcp/package.json: runtime dependencies are not permitted for the pure adapter")
+    for name, version in package.get("devDependencies", {}).items():
+        if re.fullmatch(r"\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?", str(version)) is None:
+            failures.append(f"mcp/package.json: development dependency {name} is not exactly pinned")
     if failures:
         print("Dependency pin check failed:", file=sys.stderr)
         for failure in failures:

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import shutil
 import subprocess
 import sys
 import zipfile
@@ -20,7 +21,7 @@ except ImportError as exc:
 
 
 ROOT = Path(__file__).resolve().parents[1]
-EXCLUDED_PARTS = {".git", ".venv", "__pycache__", "dist", "reports", ".idea"}
+EXCLUDED_PARTS = {".git", ".venv", "__pycache__", "dist", "reports", ".idea", "node_modules"}
 EXCLUDED_SUFFIXES = {".pyc", ".pyo"}
 
 
@@ -35,7 +36,12 @@ def version() -> str:
 
 
 def validate() -> None:
+    npm = shutil.which("npm")
+    if npm is None:
+        raise RuntimeError("Node.js and npm are required to validate the MCP adapter")
     commands = [
+        [npm, "--prefix", str(ROOT / "mcp"), "ci"],
+        [npm, "--prefix", str(ROOT / "mcp"), "run", "check"],
         [sys.executable, "scripts/validate.py"],
         [sys.executable, "scripts/validate_schemas.py"],
         [sys.executable, "scripts/validate_evals.py"],
