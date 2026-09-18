@@ -65,7 +65,7 @@ def test_registry_and_cases() -> None:
         for item in data["cases"]:
             validate_case_contract(item, registry); cases[f"{data['suite']}/{item['id']}"] = item
             assert "fixtures" not in item
-    assert len(cases) == 90
+    assert len(cases) == 95
     critical = {
         "educator-mode/curriculum-conflict": {"source", "web"},
         "hardening/legacy-resume-state-is-untrusted": {"context"},

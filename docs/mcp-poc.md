@@ -36,7 +36,7 @@ Canonical assets do not import MCP, Cloudflare, transport, authentication, or st
 
 ### Build layer
 
-The future build layer will own:
+The build layer owns:
 
 - an explicit runtime-asset allowlist;
 - deterministic reading and normalization of canonical inputs;
@@ -56,12 +56,23 @@ explicit manifest allowlist
         ↓
 validated remote asset boundary
         ↓
-future deterministic bundle
+deterministic runtime bundle
         ↓
 future MCP adapter
 ```
 
-`scripts/validate_mcp_assets.py` enforces the boundary, path safety, deterministic order, identity uniqueness, prohibited locations, and conservative count and byte ceilings. The manifest remains the sole machine-readable deployment-selection source. This task defines and validates selection only; it does not generate a runtime bundle.
+`scripts/validate_mcp_assets.py` enforces the boundary, path safety, deterministic order, identity uniqueness, prohibited locations, and conservative count and byte ceilings. The manifest remains the sole machine-readable deployment-selection source.
+
+`scripts/build_mcp_bundle.py` validates that boundary and writes `mcp/generated/teach-me-runtime.json`. The generated JSON contains the ordered selected assets, canonical repository provenance, normalized UTF-8 content, versions, classifications, categories, required status, and per-asset SHA-256 digests. It contains no learner state, evaluation data, timestamps, Git identity, or machine paths.
+
+Rebuild and check the committed artifact with:
+
+```bash
+python3 scripts/build_mcp_bundle.py
+python3 scripts/build_mcp_bundle.py --check
+```
+
+Source CRLF and lone-CR newlines normalize to LF. JSON keys are sorted, assets retain validated manifest order, Unicode is emitted directly as UTF-8, output uses two-space indentation, and the file ends with one LF. The overall `bundle_digest` is SHA-256 of compact, sorted-key, UTF-8 JSON for every top-level field except `bundle_digest`; attaching the digest afterward avoids self-reference. The source-manifest digest uses the same canonical JSON encoding, so formatting-only manifest edits do not change content identity.
 
 The initial ceilings are 64 assets, 128 KiB for one asset, and 512 KiB total. The selected topic-led graph is currently about 50 KiB, so these limits leave substantial reviewed growth for later modules while preventing an accidental directory inclusion or large content file from approaching infrastructure limits unnoticed. Raising a ceiling requires an explicit manifest change and remains bounded by stricter validator-policy maxima.
 
@@ -107,7 +118,7 @@ ChatGPT or Claude remains the teacher. The host model owns:
 
 This foundation does not:
 
-- implement an MCP server, adapter, Cloudflare Worker, or runtime bundle generator;
+- implement an MCP server, adapter, or Cloudflare Worker;
 - replace the existing platform editions;
 - put the teaching loop behind remote procedure calls;
 - call an LLM from the server;

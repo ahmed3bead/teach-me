@@ -45,6 +45,8 @@ def main() -> int:
             names = set(bundle.namelist())
         if "teach-me/SKILL.md" not in names:
             raise AssertionError("archive does not install SKILL.md at the skill root")
+        if "teach-me/mcp/generated/teach-me-runtime.json" not in names:
+            raise AssertionError("archive is missing the generated MCP runtime bundle")
         if "teach-me/teach-me/SKILL.md" in names:
             raise AssertionError("archive contains a nested duplicate skill")
         if any("__pycache__" in name or name.startswith("teach-me/dist/") or name.startswith("teach-me/.idea/") for name in names):

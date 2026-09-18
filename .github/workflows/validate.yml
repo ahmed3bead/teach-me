@@ -22,6 +22,7 @@ jobs:
       - run: python3 scripts/check_dependency_pins.py
       - run: python3 scripts/check_context_budget.py
       - run: python3 scripts/build_chatgpt_edition.py --check
+      - run: python3 scripts/build_mcp_bundle.py --check
       - run: python3 scripts/check_product_docs.py
       - run: python3 scripts/check_markdown_links.py
       - run: python3 scripts/test_installers.py
@@ -40,6 +41,7 @@ jobs:
       - run: python3 scripts/test_ollama_eval_adapter.py
       - run: python3 scripts/test_package_release.py
       - run: python3 scripts/test_feedback_pipeline.py
+      - run: python3 scripts/test_build_mcp_bundle.py
       - run: python3 scripts/test_validate_mcp_assets.py
       - run: python3 scripts/test_validate_bidi_html.py
       - run: python3 scripts/test_validate_session.py
@@ -79,11 +81,13 @@ jobs:
       - run: python scripts/validate_evals.py
       - run: python scripts/validate_simulations.py
       - run: python scripts/build_chatgpt_edition.py --check
+      - run: python scripts/build_mcp_bundle.py --check
       - run: python scripts/check_product_docs.py
       - run: python scripts/check_markdown_links.py
       - run: python scripts/test_installers.py
       - run: python scripts/test_openai_api_eval_adapter.py
       - run: python scripts/test_evaluation_cost.py
+      - run: python scripts/test_build_mcp_bundle.py
       - run: python scripts/test_validate_mcp_assets.py
       - run: python scripts/test_validate_session.py
       - run: python scripts/test_validate_resume.py

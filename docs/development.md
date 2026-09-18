@@ -21,6 +21,7 @@ python3 -m pip check
 
 ```bash
 python3 scripts/build_chatgpt_edition.py --check
+python3 scripts/build_mcp_bundle.py --check
 python3 scripts/check_product_docs.py
 python3 scripts/check_markdown_links.py
 python3 scripts/test_installers.py
@@ -35,6 +36,7 @@ python3 -m pip check
 python3 scripts/check_dependency_pins.py
 python3 scripts/check_context_budget.py
 python3 scripts/build_chatgpt_edition.py --check
+python3 scripts/build_mcp_bundle.py --check
 python3 scripts/check_product_docs.py
 python3 scripts/check_markdown_links.py
 python3 scripts/test_installers.py
@@ -52,6 +54,7 @@ python3 scripts/test_agent_simulations.py
 python3 scripts/test_ollama_eval_adapter.py
 python3 scripts/test_package_release.py
 python3 scripts/test_feedback_pipeline.py
+python3 scripts/test_build_mcp_bundle.py
 python3 scripts/test_validate_mcp_assets.py
 python3 scripts/test_validate_bidi_html.py
 python3 scripts/test_validate_session.py
