@@ -60,9 +60,9 @@ deterministic runtime bundle
         ↓
 pure `load_teach_me` adapter
         ↓
-future MCP transport
+MCP Streamable HTTP server (`mcp/src/server.ts`)
         ↓
-future Cloudflare Worker
+Cloudflare Worker (`mcp/src/worker.ts`)
 ```
 
 `scripts/validate_mcp_assets.py` enforces the boundary, path safety, deterministic order, identity uniqueness, prohibited locations, and conservative count and byte ceilings. The manifest remains the sole machine-readable deployment-selection source.
@@ -99,7 +99,7 @@ The only public guidance module in v1 is `topic-led-conversational`; it is a log
 
 ### Cloudflare Worker
 
-The future Worker will own:
+The Worker in `mcp/src/worker.ts` owns:
 
 - the public HTTPS and Streamable HTTP boundary;
 - protocol dispatch to the adapter;
@@ -107,7 +107,7 @@ The future Worker will own:
 - deployment configuration, operational limits, and security telemetry that excludes learner content; and
 - serving one immutable runtime asset version per deployment.
 
-It will not use a runtime filesystem, execute repository Python scripts, keep correctness-relevant in-memory state, or add KV, D1, R2, Durable Objects, Queues, authentication, or outbound APIs without a demonstrated requirement.
+It does not use a runtime filesystem, execute repository Python scripts, keep correctness-relevant in-memory state, or add KV, D1, R2, Durable Objects, Queues, authentication, or outbound APIs without a demonstrated requirement.
 
 ### Host model
 
@@ -127,7 +127,6 @@ ChatGPT or Claude remains the teacher. The host model owns:
 
 This foundation does not:
 
-- implement an MCP transport, server, or Cloudflare Worker;
 - replace the existing platform editions;
 - put the teaching loop behind remote procedure calls;
 - call an LLM from the server;
@@ -173,6 +172,91 @@ The initial trust boundary contains public, read-only Teach Me product content o
 - Logs contain operational metadata only. Learner prompts, model answers, and returned policy bodies are not intentionally logged.
 - The initial anonymous endpoint exposes no private or user-specific data and performs no write action. Authentication must be added before either condition changes.
 - Public release still requires abuse controls, dependency review, rate-limit policy, privacy disclosure, and separate compatibility testing for each host.
+
+## Remote MCP Worker (public beta)
+
+The first remote slice is a Cloudflare Worker named `teach-me-mcp` that exposes one read-only tool over MCP Streamable HTTP.
+
+| Item | Value |
+|---|---|
+| MCP endpoint | `https://teach-me-mcp.ahmedm3bead.workers.dev/mcp` |
+| Status endpoint | `GET https://teach-me-mcp.ahmedm3bead.workers.dev/` |
+| Transport | Streamable HTTP, stateless, JSON responses (no SSE stream, no `Mcp-Session-Id`) |
+| Tool | `load_teach_me` (`readOnlyHint: true`, `destructiveHint: false`, `idempotentHint: true`, `openWorldHint: false`) |
+| Authentication | None (public, read-only guidance only) |
+| Bindings | None: no KV, D1, R2, Durable Objects, Queues, AI, secrets, or variables |
+| Logging | Workers observability disabled; the Worker writes no logs |
+
+### Protocol and HTTP behavior
+
+- `POST /mcp` handles JSON-RPC requests. Each request builds a fresh SDK `Server` and `WebStandardStreamableHTTPServerTransport`, so correctness never depends on isolate state.
+- `GET /mcp` and `DELETE /mcp` return `405` with `Allow: POST, OPTIONS`. The specification permits `405` instead of a standalone SSE stream, and there are no sessions to terminate.
+- `OPTIONS /mcp` answers CORS preflight for the allowed origins below.
+- `GET /` returns service name, public-beta status, endpoint, Teach Me version, bundle digest, and the privacy statement. Other routes return `404`; other methods return `405` with `Allow`.
+- Request bodies are capped at 64 KiB, checked against `Content-Length` and again while streaming, before JSON parsing.
+- `Content-Type` must be `application/json` (`415` otherwise). `Accept` must list `application/json` and `text/event-stream` (`406`), and `MCP-Protocol-Version`, when sent after initialization, must be supported (`400`).
+- Malformed JSON returns JSON-RPC `-32700`; valid JSON that is not a JSON-RPC 2.0 message returns `-32600`. Unknown tools return `-32602` without echoing the requested name. Error bodies never include stacks, paths, or input values.
+- Requests carrying an `Origin` header are accepted only from `https://chatgpt.com`, `https://chat.openai.com`, `https://claude.ai`, or loopback development origins; others receive `403`. Server-to-server requests without `Origin` are accepted.
+- Every response sets `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`, a deny-all `Permissions-Policy`, `Content-Security-Policy: default-src 'none'`, `X-Frame-Options: DENY`, and `Cache-Control: no-store`. No response sets cookies.
+
+The initialization instructions tell the host to call `load_teach_me` before teaching and follow the returned canonical guidance, and fit within 512 characters. They do not restate teaching policy; all guidance comes from the generated bundle through the pure adapter.
+
+### Tool contract
+
+`load_teach_me` accepts the optional selectors `audience` (`learner`), `input_mode` (`topic-led`), `locale` (`en`, `ar-MSA`, or legacy `ar-EG`), and `guidance_modules` (`["topic-led-conversational"]`). The advertised input schema rejects additional properties. The Worker passes arguments unchanged to the pure adapter, which owns all validation, normalization, and selection.
+
+A success returns the adapter result as `structuredContent` and a text block containing the version, bundle digest, host responsibilities, and every selected canonical module in order. A rejection returns `isError: true` with `structuredContent` `{ ok: false, error: { code, message, field? } }`. The output schema is one flat object with required `ok`, which both result shapes satisfy, for compatibility with ChatGPT and Claude.
+
+### Local development and MCP Inspector
+
+```bash
+npm --prefix ./mcp ci
+npm --prefix ./mcp run check          # typecheck, build, adapter and protocol tests
+npm --prefix ./mcp run dev            # wrangler dev on http://127.0.0.1:8787
+```
+
+With the dev server running, test with the MCP Inspector CLI:
+
+```bash
+npx @modelcontextprotocol/inspector --cli http://127.0.0.1:8787/mcp --transport http --method tools/list
+npx @modelcontextprotocol/inspector --cli http://127.0.0.1:8787/mcp --transport http \
+  --method tools/call --tool-name load_teach_me --tool-arg locale=ar-MSA
+```
+
+Or run `npx @modelcontextprotocol/inspector`, choose **Streamable HTTP**, and connect to `http://127.0.0.1:8787/mcp` (or the production URL).
+
+### Deployment
+
+Build the production bundle without deploying:
+
+```bash
+npm --prefix ./mcp run build:production   # wrangler deploy --dry-run --outdir dist/production
+```
+
+Deploy from a clean, validated checkout with Cloudflare credentials for the owning account:
+
+```bash
+npm --prefix ./mcp run deploy             # wrangler deploy
+```
+
+After deploying, confirm that `GET /` reports the expected `teach_me_version` and `bundle_digest` and that `tools/list` works through MCP Inspector against the production URL.
+
+### Connecting hosts
+
+- ChatGPT (developer mode or plugin connection): `https://teach-me-mcp.ahmedm3bead.workers.dev/mcp`, authentication **None**.
+- Claude custom connector: `https://teach-me-mcp.ahmedm3bead.workers.dev/mcp`, no OAuth client ID or secret.
+
+Repository readiness means the Worker is implemented and tested. It does not mean the connector is listed in, reviewed by, or approved for the ChatGPT app directory, the Claude connector directory, or any other marketplace; those reviews are separate.
+
+### Why there is no authentication, and when OAuth becomes mandatory
+
+The endpoint serves only public, versioned, read-only guidance, stores nothing, and performs no user-specific reads or writes, so authentication would protect nothing. OAuth (MCP authorization with protected-resource metadata) becomes mandatory before the service:
+
+- reads or writes any user-specific data, such as profiles, progress, memory, or history;
+- accepts learner content, files, or source material for server-side processing;
+- performs any write, side effect, or paid operation on a user's behalf;
+- exposes non-public, licensed, or tenant-specific content; or
+- needs per-user quotas or abuse controls that cannot be keyed anonymously.
 
 ## First supported vertical slice
 

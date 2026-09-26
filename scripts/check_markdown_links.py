@@ -17,7 +17,7 @@ GENERATED_OUTPUT_LINKS = {("templates/start-here.md", "CURRICULUM.md")}
 def main() -> int:
     failures: list[str] = []
     for document in sorted(ROOT.rglob("*.md")):
-        if any(part in {".git", ".venv", "dist", "reports"} for part in document.relative_to(ROOT).parts):
+        if any(part in {".git", ".venv", ".wrangler", "dist", "node_modules", "reports"} for part in document.relative_to(ROOT).parts):
             continue
         for raw in LINK.findall(document.read_text(encoding="utf-8")):
             destination = raw.strip().strip("<>").split(maxsplit=1)[0]

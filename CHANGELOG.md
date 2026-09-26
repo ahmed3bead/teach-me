@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Add the public-beta Teach Me remote MCP Worker (`teach-me-mcp`): a stateless, read-only Streamable HTTP endpoint at `/mcp` with one `load_teach_me` tool that delegates to the pure runtime adapter, plus a `/` status route. It stores no learner data, calls no model, performs no outbound fetch, and requires no authentication.
+- Add protocol-level Worker tests (initialize, tool listing and calls in English and Arabic, legacy `ar-EG`, invalid input, unknown tool, malformed JSON-RPC, body-size limit, determinism, security headers, and no persistence or outbound fetch), a `wrangler` dry-run production build in CI, and exact-pin and lockfile checks for the reviewed Worker runtime dependencies.
+- Document local development, MCP Inspector testing, deployment, ChatGPT and Claude connection URLs, and when OAuth becomes mandatory.
+- Pin Node.js 22 in CI for the Wrangler toolchain, permit the approved hosts' intentional cross-origin MCP responses, and update the privacy policy to distinguish the skills-only editions from the optional stateless remote connector.
+- Treat a stale cost-sensitive source inventory as a valid fail-closed rejection in the paid-evaluation cost test, and run accounting tests over the last authorized suite inventory. The committed pricing policy remains stale and paid evaluation remains blocked.
 - Add a review-ready, skills-only ChatGPT plugin for ordinary web, phone, and tablet learners, with no MCP server, external backend, API key, or separate sign-in requirement.
 - Generate the plugin skill and bundled knowledge from the same reviewed ChatGPT teaching sources, and validate its metadata, starter prompts, policy links, assets, and repository marketplace entry.
 - Add consumer acceptance tests plus public privacy, terms, and marketplace-submission guidance while keeping the private Custom GPT configuration as an owner-testing fallback.

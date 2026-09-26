@@ -2,11 +2,13 @@
 
 Effective date: 2026-09-17
 
-Teach Me is a skills-only teaching plugin maintained by Ahmed Ebead. It does not operate a separate server, account system, analytics service, advertising service, or payment system, and it does not ask for an API key.
+Teach Me is an open-source teaching plugin maintained by Ahmed Ebead. Its skills-only editions run entirely inside the selected host. An optional public remote MCP connector serves the same versioned teaching guidance from a Cloudflare Worker. Teach Me has no account system, advertising service, payment system, or learner API key.
 
 ## Data handling
 
-Teach Me processes the messages and files that a learner chooses to provide through the host conversation. The plugin package itself does not transmit that content to Ahmed Ebead or to a developer-operated service. The host platform may process and retain conversations according to its own terms, privacy policy, account settings, and product controls.
+Teach Me processes the messages and files that a learner chooses to provide through the host conversation. The skills-only package does not transmit that content to Ahmed Ebead or to a developer-operated service. The optional remote MCP connector accepts only bounded routing selectors such as language and teaching mode; it does not require or accept learner transcripts, files, credentials, or personal data. It returns public teaching instructions, stores no learner state, uses no analytics or cookies, and has application-level Worker observability disabled. Cloudflare may still process ordinary network metadata needed to deliver and protect the service under its own terms. The host platform may process and retain conversations according to its own terms, privacy policy, account settings, and product controls.
+
+The current MCP endpoint is `https://teach-me-mcp.ahmedm3bead.workers.dev/mcp`. Do not send learner content to it. If a future version accepts user-specific data or performs actions, this policy and the connector's authentication and consent flow must be updated before that version is enabled.
 
 Do not submit passwords, API keys, financial credentials, unnecessary personal information, private learner transcripts, or material you are not authorized to use. When age affects safety or teaching, Teach Me should ask for an age band rather than a birth date.
 

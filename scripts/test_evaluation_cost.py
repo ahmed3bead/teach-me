@@ -42,12 +42,16 @@ GRADER_COMMAND = (
 
 
 def accounting_test_plan() -> dict:
-    """Build an accounting-only plan; this does not make the stale committed policy releasable."""
-    paths = sorted((ROOT / "evals").glob("*.yaml")) + sorted(
-        (ROOT / "domain-packs").glob("*/evals.yaml")
-    )
-    suites = runner.load_suites(paths, None)
+    """Build an accounting-only plan over the last authorized suite inventory; this does not make the stale committed policy releasable."""
     raw = json.loads(POLICY.read_text(encoding="utf-8"))
+    baseline = set(raw["cost_sensitive_source_sha256"])
+    paths = [
+        path
+        for path in sorted((ROOT / "evals").glob("*.yaml"))
+        + sorted((ROOT / "domain-packs").glob("*/evals.yaml"))
+        if path.relative_to(ROOT).as_posix() in baseline
+    ]
+    suites = runner.load_suites(paths, None)
     raw["cost_sensitive_source_sha256"] = {
         path.relative_to(ROOT).as_posix(): hashlib.sha256(
             path.read_text(encoding="utf-8").replace("\r\n", "\n").encode("utf-8")
@@ -69,7 +73,11 @@ def test_committed_policy_is_fail_closed_after_request_shape_changes() -> None:
     try:
         load_cost_policy(POLICY, ROOT)
     except ValueError as exc:
-        assert "cost-sensitive source changed" in str(exc)
+        message = str(exc)
+        assert (
+            "cost-sensitive source changed" in message
+            or "cost-sensitive source inventory is stale" in message
+        ), message
     else:
         raise AssertionError("stale paid-evaluation pricing policy remained usable")
 

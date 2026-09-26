@@ -5,7 +5,7 @@ This page is for contributors and release maintainers. Learners do not need thes
 ## Requirements
 
 - Python 3.10 or newer.
-- Node.js 18 or newer with npm (only for the zero-runtime-dependency MCP adapter build and tests).
+- Node.js 22 or newer with npm (required by the pinned Wrangler toolchain used for the MCP adapter and remote MCP Worker build and tests).
 - Exact development packages from `requirements-dev.txt`.
 - A clean checkout for release evidence.
 
@@ -19,6 +19,18 @@ python3 -m pip check
 npm --prefix ./mcp ci
 npm --prefix ./mcp run check
 ```
+
+`npm --prefix ./mcp run check` typechecks, builds the pure adapter and the Cloudflare Worker, and runs the adapter and MCP protocol tests without network access.
+
+## Remote MCP Worker
+
+```bash
+npm --prefix ./mcp run dev               # local Worker at http://127.0.0.1:8787 (/ and /mcp)
+npm --prefix ./mcp run build:production  # wrangler dry-run bundle in mcp/dist/production; does not deploy
+npm --prefix ./mcp run deploy            # production deploy; maintainers only
+```
+
+See [MCP foundation and behavior contract](mcp-poc.md#remote-mcp-worker-public-beta) for MCP Inspector testing, host connection URLs, and the authentication policy.
 
 ## Fast documentation check
 
@@ -36,6 +48,9 @@ The Linux `validate` job in [`.github/workflows/validate.yml`](../.github/workfl
 
 ```bash
 python3 -m pip check
+npm --prefix ./mcp ci
+npm --prefix ./mcp run check
+npm --prefix ./mcp run build:production
 python3 scripts/check_dependency_pins.py
 python3 scripts/check_context_budget.py
 python3 scripts/build_chatgpt_edition.py --check
@@ -53,6 +68,7 @@ python3 scripts/run_behavioral_evals.py --validate-only
 python3 scripts/run_agent_simulations.py --validate-only
 python3 scripts/test_behavioral_eval_runner.py
 python3 scripts/test_openai_api_eval_adapter.py
+python3 scripts/test_evaluation_cost.py
 python3 scripts/test_agent_simulations.py
 python3 scripts/test_ollama_eval_adapter.py
 python3 scripts/test_package_release.py
