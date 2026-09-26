@@ -187,6 +187,8 @@ The first remote slice is a Cloudflare Worker named `teach-me-mcp` that exposes 
 | Bindings | None: no KV, D1, R2, Durable Objects, Queues, AI, secrets, or variables |
 | Logging | Workers observability disabled; the Worker writes no logs |
 
+The Worker also reserves `GET /.well-known/openai-apps-challenge` for OpenAI directory domain verification. It returns `404` until the publisher configures the exact portal-issued token in the `OPENAI_APPS_CHALLENGE` Worker secret, then returns that token as plain text with no newline. It is not an MCP route and exposes no learner data.
+
 ### Protocol and HTTP behavior
 
 - `POST /mcp` handles JSON-RPC requests. Each request builds a fresh SDK `Server` and `WebStandardStreamableHTTPServerTransport`, so correctness never depends on isolate state.
@@ -240,6 +242,14 @@ npm --prefix ./mcp run deploy             # wrangler deploy
 ```
 
 After deploying, confirm that `GET /` reports the expected `teach_me_version` and `bundle_digest` and that `tools/list` works through MCP Inspector against the production URL.
+
+When the OpenAI submission portal issues a domain-verification token, configure it without committing the value:
+
+```bash
+npx wrangler secret put OPENAI_APPS_CHALLENGE --config mcp/wrangler.jsonc
+```
+
+Then verify that `https://teach-me-mcp.ahmedm3bead.workers.dev/.well-known/openai-apps-challenge` returns exactly the issued token before selecting **Verify Domain** in the portal.
 
 ### Connecting hosts
 

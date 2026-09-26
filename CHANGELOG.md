@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Prepared the public remote MCP submission path with a disabled-by-default OpenAI domain-verification endpoint backed by an uncommitted Worker secret.
+
 - Add the public-beta Teach Me remote MCP Worker (`teach-me-mcp`): a stateless, read-only Streamable HTTP endpoint at `/mcp` with one `load_teach_me` tool that delegates to the pure runtime adapter, plus a `/` status route. It stores no learner data, calls no model, performs no outbound fetch, and requires no authentication.
 - Add protocol-level Worker tests (initialize, tool listing and calls in English and Arabic, legacy `ar-EG`, invalid input, unknown tool, malformed JSON-RPC, body-size limit, determinism, security headers, and no persistence or outbound fetch), a `wrangler` dry-run production build in CI, and exact-pin and lockfile checks for the reviewed Worker runtime dependencies.
 - Document local development, MCP Inspector testing, deployment, ChatGPT and Claude connection URLs, and when OAuth becomes mandatory.

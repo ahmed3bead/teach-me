@@ -28,6 +28,10 @@ function call(request) {
   return worker.fetch(request, env, { waitUntil() {}, passThroughOnException() {} });
 }
 
+function callWithEnv(request, bindings) {
+  return worker.fetch(request, bindings, { waitUntil() {}, passThroughOnException() {} });
+}
+
 function mcpHeaders(extra = {}) {
   return {
     "Content-Type": "application/json",
@@ -107,6 +111,28 @@ test("GET / returns public status without learner data", async () => {
     bundle_digest: runtimeBundle.bundle_digest,
     privacy: "No learner data is stored. The server is read-only, stateless, and never calls a model.",
   });
+});
+
+test("OpenAI domain challenge is disabled by default and serves only the configured token", async () => {
+  const url = `${BASE}/.well-known/openai-apps-challenge`;
+  const missing = await callWithEnv(new Request(url), {});
+  assert.equal(missing.status, 404);
+  assertSecurityHeaders(missing);
+
+  const token = "openai-domain-verification-example";
+  const response = await callWithEnv(new Request(url), { OPENAI_APPS_CHALLENGE: token });
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("Content-Type"), "text/plain; charset=utf-8");
+  assertSecurityHeaders(response);
+  assert.equal(await response.text(), token);
+
+  const head = await callWithEnv(new Request(url, { method: "HEAD" }), { OPENAI_APPS_CHALLENGE: token });
+  assert.equal(head.status, 200);
+  assert.equal(await head.text(), "");
+
+  const post = await callWithEnv(new Request(url, { method: "POST" }), { OPENAI_APPS_CHALLENGE: token });
+  assert.equal(post.status, 405);
+  assert.equal(post.headers.get("Allow"), "GET, HEAD");
 });
 
 test("unknown routes return 404 and unsupported methods return 405 with Allow", async () => {

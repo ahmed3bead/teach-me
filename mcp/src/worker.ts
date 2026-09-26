@@ -8,6 +8,10 @@ import { createTeachMeServer, SERVER_NAME } from "./server.js";
 
 const bundle = runtimeBundleJson as unknown as { teach_me_version: string; bundle_digest: string };
 
+interface Env {
+  OPENAI_APPS_CHALLENGE?: string;
+}
+
 const allowedOrigins = new Set(["https://chatgpt.com", "https://chat.openai.com", "https://claude.ai"]);
 const loopbackOrigin = /^http:\/\/(?:localhost|127\.0\.0\.1|\[::1\])(?::\d{1,5})?$/;
 
@@ -166,11 +170,25 @@ async function handleMcpPost(request: Request): Promise<Response> {
   }
 }
 
-async function route(request: Request): Promise<Response> {
+async function route(request: Request, env: Env): Promise<Response> {
   const { pathname } = new URL(request.url);
   const origin = request.headers.get("Origin");
   if (origin !== null && !isAllowedOrigin(origin)) {
     return json({ error: "forbidden_origin" }, 403);
+  }
+
+  if (pathname === "/.well-known/openai-apps-challenge") {
+    if (request.method !== "GET" && request.method !== "HEAD") {
+      return json({ error: "method_not_allowed" }, 405, { Allow: "GET, HEAD" });
+    }
+    const token = env.OPENAI_APPS_CHALLENGE;
+    if (typeof token !== "string" || token.length === 0 || token.length > 512) {
+      return json({ error: "not_found" }, 404);
+    }
+    return new Response(request.method === "HEAD" ? null : token, {
+      status: 200,
+      headers: { "Content-Type": "text/plain; charset=utf-8" },
+    });
   }
 
   if (pathname === "/") {
@@ -205,13 +223,13 @@ async function route(request: Request): Promise<Response> {
 }
 
 export default {
-  async fetch(request: Request): Promise<Response> {
+  async fetch(request: Request, env: Env): Promise<Response> {
     let response: Response;
     try {
-      response = await route(request);
+      response = await route(request, env);
     } catch {
       response = jsonRpcError(500, -32000, "Internal error");
     }
     return withHeaders(response, request);
   },
-} satisfies ExportedHandler;
+} satisfies ExportedHandler<Env>;
