@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import shutil
 import subprocess
 import sys
 import zipfile
@@ -20,7 +21,7 @@ except ImportError as exc:
 
 
 ROOT = Path(__file__).resolve().parents[1]
-EXCLUDED_PARTS = {".git", ".venv", "__pycache__", "dist", "reports", ".idea"}
+EXCLUDED_PARTS = {".git", ".venv", "__pycache__", "dist", "reports", ".idea", "node_modules"}
 EXCLUDED_SUFFIXES = {".pyc", ".pyo"}
 
 
@@ -35,7 +36,12 @@ def version() -> str:
 
 
 def validate() -> None:
+    npm = shutil.which("npm")
+    if npm is None:
+        raise RuntimeError("Node.js and npm are required to validate the MCP adapter")
     commands = [
+        [npm, "--prefix", str(ROOT / "mcp"), "ci"],
+        [npm, "--prefix", str(ROOT / "mcp"), "run", "check"],
         [sys.executable, "scripts/validate.py"],
         [sys.executable, "scripts/validate_schemas.py"],
         [sys.executable, "scripts/validate_evals.py"],
@@ -44,6 +50,7 @@ def validate() -> None:
         [sys.executable, "scripts/check_dependency_pins.py"],
         [sys.executable, "scripts/check_context_budget.py"],
         [sys.executable, "scripts/build_chatgpt_edition.py", "--check"],
+        [sys.executable, "scripts/build_mcp_bundle.py", "--check"],
         [sys.executable, "scripts/check_product_docs.py"],
         [sys.executable, "scripts/check_markdown_links.py"],
         [sys.executable, "scripts/test_installers.py"],
@@ -54,6 +61,8 @@ def validate() -> None:
         [sys.executable, "scripts/test_behavioral_eval_runner.py"],
         [sys.executable, "scripts/test_agent_simulations.py"],
         [sys.executable, "scripts/test_feedback_pipeline.py"],
+        [sys.executable, "scripts/test_build_mcp_bundle.py"],
+        [sys.executable, "scripts/test_validate_mcp_assets.py"],
         [sys.executable, "scripts/test_validate_bidi_html.py"],
         [sys.executable, "scripts/test_render_learning_pack.py"],
         [sys.executable, "scripts/test_inspect_source.py"],

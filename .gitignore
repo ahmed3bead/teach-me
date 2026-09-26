@@ -3,3 +3,6 @@ __pycache__/
 .venv/
 dist/
 reports/
+node_modules/
+.wrangler/
+.dev.vars*

@@ -1,0 +1,200 @@
+suite: mcp-poc
+version: 1.0.0
+cases:
+- id: english-beginner-topic-led-journey
+  critical: true
+  locale: en
+  turns:
+  - role: user
+    content: Teach me how percentages work from zero. I want to understand discounts when I shop, and I have never studied percentages before.
+    assessment_intent: none
+    assessment_boundary: continue
+  - role: user
+    content: The discount example makes sense. Continue the lesson without turning every step into a quiz.
+    assessment_intent: none
+    assessment_boundary: continue
+  expected:
+  - the explicit beginner starting point and practical shopping goal are accepted without a subject-matter placement test
+  - no more than three high-value questions are asked and useful teaching begins without unnecessary onboarding
+  - one manageable objective is explained progressively with a relevant worked discount example before any routine assessment
+  - the explanation remains coherent rather than becoming a chain of micro-quizzes
+  - no mastery, transfer, or retention claim is made from reading or acknowledgement alone
+  - each response ends with one clear current action that need not demand an answer
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: multi-turn
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: substantial
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+- id: arabic-beginner-topic-led-journey
+  critical: true
+  locale: ar-MSA
+  turns:
+  - role: user
+    content: أنا معرفش أي حاجة عن API وعاوز أفهمه من الصفر عشان أقدر أتعامل مع خدمات بسيطة.
+    assessment_intent: none
+    assessment_boundary: continue
+  - role: user
+    content: المثال واضح، كمل الشرح بهدوء ومن غير سؤال بعد كل معلومة.
+    assessment_intent: none
+    assessment_boundary: continue
+  expected:
+  - the explicit beginner starting point and practical goal are accepted without a subject-matter placement test
+  - the teaching uses natural simplified Modern Standard Arabic and preserves API in its original script
+  - API is defined progressively through one manageable objective and a relevant worked example before routine assessment
+  - the explanation remains connected and does not append a quiz or diagnostic question to each part
+  - no mastery, transfer, or retention claim is made from acknowledgement alone
+  - each response ends with one clear current action that need not demand an answer
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: multi-turn
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: substantial
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+- id: confusion-recovery-changes-strategy
+  critical: true
+  locale: en
+  turns:
+  - role: user
+    content: Teach me what a programming variable is. I am completely new to programming.
+    assessment_intent: none
+    assessment_boundary: continue
+  - role: user
+    content: I still do not understand. Repeating that a variable stores a value is not helping me.
+    assessment_intent: none
+    assessment_boundary: continue
+  expected:
+  - the initial response teaches a beginner-safe foundation and example before testing
+  - the confusion is acknowledged without shame, pressure, or an inference about intelligence
+  - the follow-up diagnoses a likely terminology, prerequisite, example, or representation barrier
+  - the follow-up changes representation or prerequisite intervention materially instead of paraphrasing the same definition
+  - no routine assessment question is introduced while repairing the failed explanation
+  - the follow-up ends with one smaller purposeful current action
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: multi-turn
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: substantial
+    assessment_state: none
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+- id: completed-unit-assessment-consent
+  critical: true
+  locale: en
+  turns:
+  - role: user
+    content: Teach me the basic idea of fractions from zero with one practical example.
+    assessment_intent: none
+    assessment_boundary: continue
+  - role: user
+    content: We have now finished that complete introductory unit on fractions.
+    assessment_intent: none
+    assessment_boundary: complete
+  - role: user
+    content: Yes, I want the short understanding check now.
+    assessment_intent: accept
+    assessment_boundary: continue
+  expected:
+  - the complete unit is taught and briefly recapped before an optional understanding check is offered
+  - no assessment question appears before the completed-unit boundary or in the same response as the offer
+  - the explicit acceptance is treated as consent and the check begins without requesting confirmation again
+  - the accepted check uses a purposeful explanation, prediction, or application item rather than a score-focused trivia sequence
+  - the result is used as evidence for the next teaching step without manufacturing mastery or retention
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: multi-turn
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: substantial
+    assessment_state: accepted
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
+- id: learner-declines-assessment
+  critical: true
+  locale: en
+  turns:
+  - role: user
+    content: Teach me the basic difference between weather and climate from zero.
+    assessment_intent: none
+    assessment_boundary: continue
+  - role: user
+    content: We have finished that complete introductory unit.
+    assessment_intent: none
+    assessment_boundary: complete
+  - role: user
+    content: No, I do not want the optional questions right now. Please keep teaching.
+    assessment_intent: decline
+    assessment_boundary: continue
+  expected:
+  - the completed unit is recapped and the assessment is offered as an optional learner choice
+  - the decline is accepted without pressure, guilt, penalty language, repeated requests, or a negative progress inference
+  - no assessment question is asked after the learner declines
+  - the next teaching step does not silently assume unverified mastery of a dependent objective
+  - teaching continues with a safe non-dependent objective or an equivalent low-pressure path
+  - the response ends with one clear current action
+  routing:
+    audience: learner
+    mode: topic-led
+    source_type: none
+    artifact_type: chat
+    session_state: multi-turn
+    domain_pack: none
+    accessibility: standard
+    safety_level: standard
+    instructional_scope: substantial
+    assessment_state: declined
+  capabilities:
+    source: not_required
+    web: not_required
+    file: not_required
+    rendering: not_required
+    sandbox: not_required
+    video: not_required
+    external_catalog: not_required
