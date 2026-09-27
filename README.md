@@ -1,115 +1,137 @@
-# Teach Me
+# Teach Me | علّمني
 
-**Adaptive teaching that starts from your goal, explains step by step, and changes approach when you get stuck.**
+**Learn anything step by step — or prepare a simple lesson for someone else.**
 
-[English](README.md) · [العربية](README.ar.md)
+[English](README.md) · [العربية](README.ar.md) · [Simple usage guide](https://teach-me-guide.pages.dev/)
 
 [![CI](https://github.com/ahmed3bead/teach-me/actions/workflows/validate.yml/badge.svg)](https://github.com/ahmed3bead/teach-me/actions/workflows/validate.yml)
 [![Release](https://img.shields.io/github/v/release/ahmed3bead/teach-me?include_prereleases&label=release)](https://github.com/ahmed3bead/teach-me/releases/tag/v1.0.0-beta.2)
 [![License: MIT](https://img.shields.io/github/license/ahmed3bead/teach-me)](LICENSE)
-[![Languages: ar-MSA | en](https://img.shields.io/badge/languages-ar--MSA%20%7C%20en-0f766e)](README.ar.md)
 
-> **Beta:** the current public release is `v1.0.0-beta.2`. It is ready for testing, but the corrected 90-case evaluation and human review are still required before stable `v1.0.0`.
+> **Availability:** the ChatGPT plugin is currently under OpenAI review. It is not yet listed publicly in the Plugins Directory.
 
 ## Why Teach Me?
 
-- Starts from what the learner wants to achieve and already knows.
-- Breaks difficult topics into manageable steps.
-- Changes the explanation instead of repeating it when confusion continues.
-- Supports English and simplified Modern Standard Arabic.
-- Can teach from authorized files and clearly separates sources from added explanation.
-- Never claims mastery without evidence or starts routine assessment without consent.
+ChatGPT can answer a question, but a long answer is not always a good lesson. Teach Me helps ChatGPT explain ideas like a patient teacher:
 
-## Choose your edition
+- it starts from your current level;
+- explains one useful step at a time;
+- uses practical examples;
+- tries a different explanation when something is unclear;
+- asks before giving you a quiz;
+- works in English and Arabic.
 
-| Edition | Best for | Setup |
-|---|---|---|
-| **ChatGPT plugin** | The easiest path for ordinary learners on the web, phone, or tablet | Install from ChatGPT after marketplace approval; [plugin status](plugins/teach-me/README.md) |
-| **Custom GPT** | Private owner testing before the public plugin is listed | [Owner setup](chatgpt-edition/README.md) |
-| **Claude** | Learning in a normal Claude conversation | [Claude setup](claude-edition/README.md) |
-| **Codex** | Structured learning with local files, reports, and validation | [Codex setup](docs/codex-installation.md) |
-| **Claude Code** | The full workflow inside Claude Code | [Claude Code setup](claude-edition/README.md#claude-code-marketplace-setup) |
+You can use the same plugin in three simple ways:
 
-Not sure? Start with the ChatGPT plugin or Claude. Choose Codex or Claude Code only when you need local files, reproducible workflows, or technical artifacts.
+### Learn something yourself
+
+Ask about any topic, say what you already know, and explain why you need it.
+
+~~~text
+Teach me Excel from zero for my work. Start with one practical example.
+~~~
+
+### Prepare a lesson
+
+If you are a teacher, trainer, or parent, Teach Me can prepare a short teaching plan with timing, examples, activities, common mistakes, and an answer key.
+
+~~~text
+Prepare a simple 20-minute lesson about photosynthesis for 12-year-old learners.
+Separate my teacher notes from the words I can say to the class.
+~~~
+
+### Explain something to your child
+
+Include the child's age and Teach Me will simplify the vocabulary, examples, and activity.
+
+~~~text
+Explain the water cycle so I can teach it to my 10-year-old child.
+Use one simple activity.
+~~~
+
+Teach Me can also work from an authorized file, PDF, book, webpage, video, YouTube playlist, course, or curriculum. It tells you what it could actually inspect instead of pretending it watched or read something unavailable.
+
+Read the [complete feature guide](docs/features.md) or [Arabic feature guide](docs/features.ar.md) for every supported workflow.
 
 ## Quick start
 
-Give Teach Me one practical outcome:
+After the plugin is publicly approved:
 
-```text
-Teach me Docker from zero. I am a Laravel developer and want to run a real Laravel project locally with Docker.
-```
+1. Open the ChatGPT Plugins Directory.
+2. Add **Teach Me | علّمني**.
+3. Start a normal chat and write what you need.
 
-The public ChatGPT plugin package is ready for marketplace review. It uses only bundled teaching instructions: no separate account, API key, server, or terminal is required for learners. Repository availability does not mean the plugin has already been approved or listed.
+There is no special command to remember. `/learn`, `/teacher`, and `/kids` are optional words inside a prompt, not ChatGPT menu commands.
 
-For Claude Code:
+Try one of these:
 
-```text
-/plugin marketplace add ahmed3bead/teach-me
-/plugin install teach-me@teach-me
-/teach-me:teach-me
-```
+~~~text
+Teach me compound interest from zero using an everyday example.
+~~~
 
-For Codex on Linux or macOS:
+~~~text
+Prepare a 30-minute fractions lesson for fourth-grade learners.
+~~~
 
-```bash
+~~~text
+Teach me only from this uploaded file. Tell me what you could inspect.
+~~~
+
+You do not need a Teach Me account, API key, server, or terminal.
+
+## Choose your edition
+
+For most people, the **ChatGPT plugin** is the right choice.
+
+| Edition | Who is it for? | Setup |
+|---|---|---|
+| **ChatGPT plugin** | Learners, teachers, trainers, and parents | Install after public approval; see [plugin status](plugins/teach-me/README.md) |
+| **Claude** | People who prefer learning inside Claude | [Claude setup](claude-edition/README.md) |
+| **Custom GPT** | Private testing by the project owner | [Owner setup](chatgpt-edition/README.md) |
+| **Codex / Claude Code** | Developers who need local files and repeatable workflows | [Developer setup](docs/getting-started.md) |
+
+### For developers
+
+Codex on Linux or macOS:
+
+~~~bash
 sh installers/install.sh install --version 1.0.0-beta.2
-```
+~~~
 
 Windows PowerShell:
 
-```powershell
+~~~powershell
 .\installers\install.ps1 -Action install -Version "1.0.0-beta.2"
-```
+~~~
 
-See [Getting started](docs/getting-started.md) for the complete first-session walkthrough and update instructions.
+Claude Code:
 
-## How it teaches
-
-Teach Me follows a simple loop:
-
-1. Understand the goal and starting point.
-2. Choose the smallest useful next objective.
-3. Explain with an example.
-4. Change strategy when the learner is stuck.
-5. Offer a short check only after a meaningful unit and with consent.
-
-Read [How Teach Me works](docs/how-it-works.md) for learner, educator, and source-grounded workflows.
+~~~text
+/plugin marketplace add ahmed3bead/teach-me
+/plugin install teach-me@teach-me
+/teach-me:teach-me
+~~~
 
 ## Documentation
 
-| Guide | What it covers |
+| Guide | What you will find |
 |---|---|
-| [Getting started](docs/getting-started.md) | Edition choice, setup, updates, and first session |
-| [How it works](docs/how-it-works.md) | Teaching method and supported workflows |
-| [Example prompts](docs/examples.md) | Ready-to-use English and Arabic prompts |
-| [Limitations](docs/limitations.md) | Current beta boundaries and host differences |
-| [Development](docs/development.md) | Local validation and contributor commands |
-| [Compatibility](docs/compatibility.md) | Detailed host capability matrix |
-| [ChatGPT plugin submission](docs/chatgpt-plugin-submission.md) | Public-review boundary and publisher checklist |
-| [Model evaluation](docs/model-evaluation.md) | Behavioral and simulation evidence protocol |
-| [Release checklist](docs/release-checklist.md) | Gates required for stable release |
-
-Platform-specific guides:
-
-- [ChatGPT Edition](chatgpt-edition/README.md)
-- [Claude and Claude Code](claude-edition/README.md)
-- [Codex installation](docs/codex-installation.md)
+| [Simple usage guide](https://teach-me-guide.pages.dev/) | A visual guide for ordinary users |
+| [Complete feature guide](docs/features.md) | Everything the plugin can do |
+| [دليل المزايا بالعربية](docs/features.ar.md) | All features explained in Arabic |
+| [Examples](docs/examples.md) | Prompts you can copy and use |
+| [How it works](docs/how-it-works.md) | Learning, teacher, age, and source workflows |
+| [Getting started](docs/getting-started.md) | Setup for every edition |
+| [Privacy policy](docs/privacy-policy.md) | What the service does and does not receive |
+| [Development](docs/development.md) | Tests and contribution commands |
 
 ## Status and limitations
 
-Teach Me does not guarantee perfect accuracy, mastery, retention, or a particular learning outcome. Available models, tools, files, and context differ between hosts. Important current or high-stakes claims need suitable authoritative evidence.
+- The ChatGPT plugin is under review and is not publicly available yet.
+- Teach Me helps organize learning, but its answers are still generated by AI and can contain mistakes.
+- Access to files, websites, audio, video, and images depends on the ChatGPT account and tools available.
+- Important, current, medical, legal, or financial information should be checked against suitable trusted sources.
 
-See [Limitations](docs/limitations.md) and [release notes](RELEASE_NOTES.md) before production or high-stakes use.
+See [Limitations](docs/limitations.md), [Compatibility](docs/compatibility.md), and [release notes](RELEASE_NOTES.md).
 
-## Contributing
-
-Contributions are welcome. Start with [CONTRIBUTING.md](CONTRIBUTING.md) and do not include personal data, credentials, private transcripts, protected curricula, generated reports, or model outputs.
-
-## Security
-
-Report vulnerabilities through [GitHub Private Vulnerability Reporting](https://github.com/ahmed3bead/teach-me/security/advisories/new). See [SECURITY.md](SECURITY.md).
-
-## License
-
-Released under the [MIT License](LICENSE).
+Developers can contribute through [CONTRIBUTING.md](CONTRIBUTING.md). Released under the [MIT License](LICENSE).
