@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Allow Teach Me pages to be discovered and cited in ChatGPT search.
+User-agent: OAI-SearchBot
+Allow: /
+
+Sitemap: https://teach-me-guide.pages.dev/sitemap.xml
