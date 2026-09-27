@@ -5,8 +5,8 @@ This report records observed behavior from the isolated personal beta connection
 ## Automated baseline
 
 - MCP TypeScript typecheck and build passed.
-- MCP adapter and Worker tests passed: 29/29.
-- The runtime bundle contains four compact ChatGPT-specific assets.
+- MCP adapter and Worker tests passed: 33/33.
+- The runtime bundle contains six compact ChatGPT-specific assets.
 - Topic-led adapter output is approximately 6.2 KB before MCP presentation.
 - A test prevents model-visible tool output from exceeding 16 KB across topic, document, video, book, and playlist selectors.
 - Module content appears once in model-visible output. Bundle provenance and module digests are returned in hidden MCP `_meta`.
@@ -45,3 +45,5 @@ Release copy must not say that Teach Me automatically watches videos, reads ever
 ## Release decision
 
 The tested source types cover every runtime routing group: core only; core plus source; source plus video; source plus curriculum; and mixed-source curriculum. Course and curriculum share the tested long-source module; recording shares the tested video module. Repeat a small smoke test after any change to tool schemas, module routing, source privacy boundaries, or the compact runtime assets.
+
+On 2026-09-27, a live beta smoke test confirmed that `tools/list` advertises the complete age-band, educator, source-mode, and source-type schema. Direct `tools/call` tests also confirmed the expected selective modules for Arabic educator guidance, younger-primary learner guidance, and source-grounded video guidance.

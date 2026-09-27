@@ -9,4 +9,3 @@ output/
 node_modules/
 .wrangler/
 .dev.vars*
-/chatgpt-app-submission.json
