@@ -8,7 +8,7 @@
 [![Release](https://img.shields.io/github/v/release/ahmed3bead/teach-me?include_prereleases&label=release)](https://github.com/ahmed3bead/teach-me/releases/tag/v1.0.0-beta.2)
 [![License: MIT](https://img.shields.io/github/license/ahmed3bead/teach-me)](LICENSE)
 
-> **Availability:** the ChatGPT plugin is currently under OpenAI review. It is not yet listed publicly in the Plugins Directory.
+> **Availability:** the ChatGPT plugin is currently under OpenAI review. It is not yet listed publicly in the Plugins Directory. The code on `main` is newer than the submitted version; see the [current release status](docs/release-status.md) before deploying or resubmitting.
 
 ## Why Teach Me?
 

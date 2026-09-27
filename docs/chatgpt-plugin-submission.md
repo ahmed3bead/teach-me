@@ -1,5 +1,7 @@
 # ChatGPT public plugin submission kit
 
+> **Release guard:** the plugin currently under OpenAI review uses the previously submitted production deployment. The `main` branch contains the next version and must not be deployed to production or resubmitted until the current review finishes. See [Current release status](release-status.md).
+
 This is the source-of-truth checklist for publishing Teach Me to ordinary ChatGPT users through the universal Plugins Directory. The submission type is **With MCP**, using the public, anonymous, read-only server below. Developer mode is only for private testing and is not the distribution path.
 
 ## Production candidate
