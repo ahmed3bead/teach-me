@@ -1,14 +1,37 @@
-export type Audience = "learner";
-export type InputMode = "topic-led";
+export type Audience = "learner" | "educator";
+export type AgeBand =
+  | "early-childhood"
+  | "primary-younger"
+  | "primary-older"
+  | "teen"
+  | "adult"
+  | "unspecified";
+export type InputMode = "topic-led" | "source-grounded";
 export type RequestedLocale = "en" | "ar-MSA";
 export type InputLocale = RequestedLocale | "ar-EG";
-export type GuidanceModule = "topic-led-conversational";
+export type GuidanceModule =
+  | "topic-led-conversational"
+  | "educator-guidance"
+  | "child-guidance"
+  | "source-grounded";
+export type SourceType =
+  | "document"
+  | "book"
+  | "webpage"
+  | "video"
+  | "playlist"
+  | "course"
+  | "recording"
+  | "curriculum"
+  | "mixed";
 
 export interface LoadTeachMeInput {
+  age_band?: AgeBand;
   audience?: Audience;
   input_mode?: InputMode;
   locale?: InputLocale;
   guidance_modules?: GuidanceModule[];
+  source_type?: SourceType;
 }
 
 export type AdapterErrorCode =
@@ -16,8 +39,12 @@ export type AdapterErrorCode =
   | "unknown_field"
   | "invalid_field_type"
   | "unsupported_audience"
+  | "unsupported_age_band"
   | "unsupported_input_mode"
   | "unsupported_locale"
+  | "unsupported_source_type"
+  | "source_type_requires_source_grounded"
+  | "incompatible_guidance_modules"
   | "unsupported_guidance_module"
   | "empty_guidance_modules"
   | "duplicate_guidance_module"
@@ -30,11 +57,19 @@ export interface AdapterError {
 }
 
 export interface NormalizedRequest {
+  age_band: AgeBand;
   audience: Audience;
   guidance_modules: GuidanceModule[];
   input_mode: InputMode;
   locale_strategy: "host-inferred" | "explicit";
   requested_locale: RequestedLocale | null;
+  source_type: SourceType | null;
+}
+
+export interface EducatorFormatContract {
+  timed_flow: "numbered-time-blocks";
+  arabic_markdown_tables: false;
+  arrow_dependent_diagrams: false;
 }
 
 export interface SelectedModule {
@@ -73,18 +108,21 @@ export interface LoadTeachMeSuccess {
   bundle_digest: string;
   bundle_schema_version: string;
   normalized_request: NormalizedRequest;
+  educator_format_contract: EducatorFormatContract | null;
   capabilities: {
+    age_bands: AgeBand[];
     audiences: Audience[];
     guidance_modules: GuidanceModule[];
     input_modes: InputMode[];
     locales: RequestedLocale[];
+    source_types: SourceType[];
   };
   host_contract: {
     teacher: "connected-host-model";
     server_calls_llm: false;
     server_side_learner_persistence: false;
     learner_transcript_required: false;
-    source_access: "host-provided";
+    source_access: "host-provided-or-host-retrieved";
   };
   provenance: RuntimeBundle["source_manifest"];
   selected_modules: SelectedModule[];

@@ -87,7 +87,7 @@ def load_skill_context(skill_root: Path) -> str:
     files = [skill_file, *sorted((skill_root / "references").glob("*.md"))]
     chunks = []
     for path in files:
-        relative = path.relative_to(skill_root)
+        relative = path.relative_to(skill_root).as_posix()
         chunks.append(f"\n--- {relative} ---\n{path.read_text(encoding='utf-8')}")
     return "".join(chunks)
 

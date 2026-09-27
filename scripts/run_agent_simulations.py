@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import shlex
 import subprocess
@@ -48,9 +49,17 @@ ROLE_OUTPUT_ARTIFACT = re.compile(
 )
 
 
+def command_arguments(command: str) -> list[str]:
+    """Parse a configured adapter command without corrupting Windows paths."""
+    tokens = shlex.split(command, posix=os.name != "nt")
+    if os.name == "nt":
+        return [token[1:-1] if len(token) >= 2 and token[0] == token[-1] == '"' else token for token in tokens]
+    return tokens
+
+
 def invoke(command: str, payload: dict[str, Any], timeout: int) -> dict[str, Any]:
     completed = subprocess.run(
-        shlex.split(command),
+        command_arguments(command),
         input=json.dumps(payload, ensure_ascii=False),
         text=True,
         capture_output=True,

@@ -1,7 +1,7 @@
 {
   "name": "teach-me",
-  "version": "0.1.0",
-  "description": "An adaptive teacher for ordinary learners in English and simplified Modern Standard Arabic.",
+  "version": "1.0.0-beta.2",
+  "description": "One adaptive education plugin for direct learning, teacher preparation, and age-appropriate teaching in English and simplified Modern Standard Arabic.",
   "author": {
     "name": "Ahmed Ebead",
     "url": "https://github.com/ahmed3bead"
@@ -18,9 +18,9 @@
   ],
   "skills": "./skills/",
   "interface": {
-    "displayName": "Teach Me",
-    "shortDescription": "Learn any topic from your current level.",
-    "longDescription": "Teach Me explains step by step, adapts when you get stuck, and can teach from material you provide. It supports English and simplified Modern Standard Arabic and asks before starting routine assessments.",
+    "displayName": "Teach Me | علّمني",
+    "shortDescription": "Learn, prepare a lesson, or teach a child.",
+    "longDescription": "One Teach Me plugin for direct adaptive learning, compact teacher briefs, and safe age-appropriate explanations with meaningful visuals when useful. It supports English and simplified Modern Standard Arabic and can work from authorized sources.",
     "developerName": "Ahmed Ebead",
     "category": "Education",
     "capabilities": [
@@ -32,8 +32,8 @@
     "termsOfServiceURL": "https://github.com/ahmed3bead/teach-me/blob/main/docs/terms-of-use.md",
     "defaultPrompt": [
       "Teach me a new topic from zero.",
-      "Help me understand where I am stuck.",
-      "Teach me from this file without inventing gaps."
+      "/teacher Prepare a one-page lesson brief for this topic.",
+      "/kids Explain this topic simply to a child with one useful visual."
     ],
     "brandColor": "#0F766E",
     "composerIcon": "./assets/teach-me-icon.svg",

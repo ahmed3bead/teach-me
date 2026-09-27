@@ -17,9 +17,10 @@ Teach Me is designed around what the learner can eventually do, not around the a
 |---|---|---|
 | Learner | Learning, practice, review, or getting unstuck | Teaches progressively and adapts to demonstrated needs |
 | Educator | Preparing an authorized lesson, workshop, activity, or assessment | Preserves traceability and separates teacher-only details |
+| Young learner | Teaching a child or teenager directly, or adapting learner-facing material | Uses a broad age band, concrete explanations, safe short activities, and meaningful accessible visuals |
 | Source-grounded | Learning from a book, document, accessible video, course, website, or curriculum | Records actual access, verifies important claims, and never presents inaccessible material as inspected |
 
-The audience and input are independent. A learner can study a source, and an educator can prepare a lesson from one.
+These are internal modes of the same Teach Me plugin. The audience, age band, and input are independent: a learner can study a source, an educator can prepare a lesson from one, and an educator can prepare child-facing material. `/learn`, `/teacher`, and `/kids` are optional prompt aliases rather than native ChatGPT commands.
 
 ## Language
 

@@ -17,30 +17,41 @@ export const SERVER_NAME = "teach-me-mcp";
 export const TOOL_NAME = "load_teach_me";
 
 export const SERVER_INSTRUCTIONS = [
-  "Teach Me provides versioned, reviewed teaching guidance; you, the connected model, are the teacher.",
-  "Before teaching any topic, call load_teach_me once (pass locale when the learner's language is known)",
-  "and follow the returned canonical guidance for the rest of the conversation.",
-  "Never send learner transcripts, files, credentials, or personal data to this server; it needs none.",
-  "The server is read-only, stateless, and does not call any model.",
+  "You are the teacher; call load_teach_me once before teaching or lesson preparation and follow the returned canonical guidance.",
+  "Use audience educator for teacher preparation, age_band for young learners, and source-grounded when a chosen source governs the work.",
+  "Aliases are prompt text, not native commands; /kids without an age uses teen.",
+  "Keep sources, transcripts, credentials, and personal data in the host; send selectors only.",
+  "Teach Me is read-only, stateless, and does not call a model.",
 ].join(" ");
 
 const inputSchema = z
   .strictObject({
-    audience: z.enum(["learner"]).optional().describe("Who is being taught. Only `learner` is supported."),
-    input_mode: z
-      .enum(["topic-led"])
+    age_band: z
+      .enum(["early-childhood", "primary-younger", "primary-older", "teen", "adult", "unspecified"])
       .optional()
-      .describe("How the learning is driven. Only `topic-led` (the learner names a topic) is supported."),
+      .describe("Broad learner band: ages 3–5 early-childhood, 6–8 primary-younger, 9–12 primary-older, 13–17 teen. Keep exact age in the host; never send identifying data."),
+    audience: z
+      .enum(["learner", "educator"])
+      .optional()
+      .describe("Use `learner` for direct teaching and `educator` for lesson preparation or teacher notes."),
+    input_mode: z
+      .enum(["topic-led", "source-grounded"])
+      .optional()
+      .describe("Use `topic-led` for a named topic or `source-grounded` when a source governs the lesson."),
     locale: z
       .enum(["en", "ar-MSA", "ar-EG"])
       .optional()
       .describe("Learner language. Omit to let the host infer it. `ar-EG` is accepted and normalized to `ar-MSA`."),
     guidance_modules: z
-      .array(z.enum(["topic-led-conversational"]))
+      .array(z.enum(["topic-led-conversational", "educator-guidance", "child-guidance", "source-grounded"]))
       .min(1)
       .max(8)
       .optional()
-      .describe("Guidance modules to load. Defaults to `topic-led-conversational`."),
+      .describe("Optional exact module set. Omit to select the safe defaults for input_mode."),
+    source_type: z
+      .enum(["document", "book", "webpage", "video", "playlist", "course", "recording", "curriculum", "mixed"])
+      .optional()
+      .describe("Type of learner-chosen source. Use only with `source-grounded`; never include source content."),
   })
   .describe("Optional selectors for the Teach Me guidance. Do not include learner content.");
 
@@ -48,18 +59,6 @@ const errorSchema = z.object({
   code: z.string(),
   message: z.string(),
   field: z.string().optional(),
-});
-
-const selectedModuleSchema = z.object({
-  id: z.string(),
-  path: z.string(),
-  order: z.number().int(),
-  classification: z.string(),
-  module_categories: z.array(z.string()),
-  required: z.boolean(),
-  sha256: z.string(),
-  content_bytes: z.number().int(),
-  content: z.string(),
 });
 
 const outputSchema = z
@@ -70,19 +69,31 @@ const outputSchema = z
     bundle_schema_version: z.string().optional(),
     normalized_request: z
       .object({
+        age_band: z.string(),
         audience: z.string(),
         guidance_modules: z.array(z.string()),
         input_mode: z.string(),
         locale_strategy: z.enum(["host-inferred", "explicit"]),
         requested_locale: z.string().nullable(),
+        source_type: z.string().nullable(),
       })
+      .optional(),
+    educator_format_contract: z
+      .object({
+        timed_flow: z.literal("numbered-time-blocks"),
+        arabic_markdown_tables: z.literal(false),
+        arrow_dependent_diagrams: z.literal(false),
+      })
+      .nullable()
       .optional(),
     capabilities: z
       .object({
+        age_bands: z.array(z.string()),
         audiences: z.array(z.string()),
         guidance_modules: z.array(z.string()),
         input_modes: z.array(z.string()),
         locales: z.array(z.string()),
+        source_types: z.array(z.string()),
       })
       .optional(),
     host_contract: z
@@ -94,16 +105,7 @@ const outputSchema = z
         source_access: z.string(),
       })
       .optional(),
-    provenance: z
-      .object({
-        manifest_version: z.string(),
-        path: z.string(),
-        schema_version: z.string(),
-        selection_model: z.string(),
-        sha256: z.string(),
-      })
-      .optional(),
-    selected_modules: z.array(selectedModuleSchema).optional(),
+    loaded_module_ids: z.array(z.string()).optional(),
     error: errorSchema.optional().describe("Present only when ok is false"),
   })
   .describe("The Teach Me adapter result");
@@ -117,9 +119,9 @@ export const LOAD_TEACH_ME_TOOL: Tool = {
   name: TOOL_NAME,
   title: "Load Teach Me guidance",
   description:
-    "Load the versioned Teach Me guidance that you, the connected host model, should follow when teaching an ordinary learner a topic. " +
-    "Call it before teaching, then follow the returned canonical modules. Returns public, reviewed instructions only; " +
-    "send no learner transcripts, files, or personal data.",
+    "Load the versioned Teach Me guidance that you, the connected host model, should follow for direct teaching, teacher preparation, young learners, or an accessible user-chosen source. " +
+    "Call it before teaching, then follow the returned canonical modules and any explicit format contract. Arabic teacher briefs use numbered blocks, never Markdown tables or arrow-dependent diagrams. Returns public, reviewed instructions only; " +
+    "send no source content, learner transcripts, files, or personal data.",
   inputSchema: toToolJsonSchema(inputSchema, "input"),
   outputSchema: toToolJsonSchema(outputSchema, "output") as NonNullable<Tool["outputSchema"]>,
   annotations: {
@@ -135,17 +137,32 @@ const hostResponsibilities = [
   "You are the teacher: the Teach Me server never calls a model and never sees the conversation.",
   "Follow the modules below in order; they are the canonical, reviewed guidance for this version.",
   "Keep learner transcripts, files, and personal data in the host conversation; never send them to this server.",
-  "Any sources the learner provides stay under host control (source_access: host-provided).",
+  "Sources stay under host control. Inspect only components the host can actually access and state coverage limits.",
 ];
 
 function successText(result: LoadTeachMeSuccess): string {
   const header = [
     `# Teach Me guidance ${result.teach_me_version}`,
     "",
-    `- bundle_digest: ${result.bundle_digest}`,
     `- locale_strategy: ${result.normalized_request.locale_strategy}`,
+    `- audience: ${result.normalized_request.audience}`,
+    `- age_band: ${result.normalized_request.age_band}`,
     `- requested_locale: ${result.normalized_request.requested_locale ?? "host-inferred"}`,
     `- guidance_modules: ${result.normalized_request.guidance_modules.join(", ")}`,
+    `- source_type: ${result.normalized_request.source_type ?? "none"}`,
+  ];
+  const formatContract = result.educator_format_contract === null
+    ? []
+    : [
+        "",
+        "## Mandatory educator format contract",
+        "",
+        "- timed_flow: numbered-time-blocks",
+        "- arabic_markdown_tables: forbidden",
+        "- arrow_dependent_diagrams: forbidden",
+        "- Revise the response before sending if any rule is violated.",
+      ];
+  const responsibilities = [
     "",
     "## Host responsibilities",
     "",
@@ -156,12 +173,10 @@ function successText(result: LoadTeachMeSuccess): string {
       "",
       `## Module ${module.order}: ${module.id}`,
       "",
-      `<!-- path: ${module.path}; sha256: ${module.sha256} -->`,
-      "",
       module.content.trimEnd(),
     ].join("\n"),
   );
-  return [...header, ...modules].join("\n") + "\n";
+  return [...header, ...formatContract, ...responsibilities, ...modules].join("\n") + "\n";
 }
 
 function failureText(result: LoadTeachMeFailure): string {
@@ -170,10 +185,25 @@ function failureText(result: LoadTeachMeFailure): string {
 }
 
 export function toCallToolResult(result: LoadTeachMeResult): CallToolResult {
-  const structuredContent = result as unknown as Record<string, unknown>;
   if (result.ok) {
-    return { content: [{ type: "text", text: successText(result) }], structuredContent };
+    const structuredContent = {
+      ok: true,
+      teach_me_version: result.teach_me_version,
+      normalized_request: result.normalized_request,
+      educator_format_contract: result.educator_format_contract,
+      capabilities: result.capabilities,
+      host_contract: result.host_contract,
+      loaded_module_ids: result.selected_modules.map((module) => module.id),
+    };
+    const _meta = {
+      bundle_digest: result.bundle_digest,
+      bundle_schema_version: result.bundle_schema_version,
+      provenance: result.provenance,
+      selected_modules: result.selected_modules.map(({ content: _content, ...module }) => module),
+    };
+    return { content: [{ type: "text", text: successText(result) }], structuredContent, _meta };
   }
+  const structuredContent = result as unknown as Record<string, unknown>;
   return { content: [{ type: "text", text: failureText(result) }], structuredContent, isError: true };
 }
 

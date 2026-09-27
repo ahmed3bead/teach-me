@@ -205,9 +205,9 @@ The initialization instructions tell the host to call `load_teach_me` before tea
 
 ### Tool contract
 
-`load_teach_me` accepts the optional selectors `audience` (`learner`), `input_mode` (`topic-led`), `locale` (`en`, `ar-MSA`, or legacy `ar-EG`), and `guidance_modules` (`["topic-led-conversational"]`). The advertised input schema rejects additional properties. The Worker passes arguments unchanged to the pure adapter, which owns all validation, normalization, and selection.
+`load_teach_me` accepts bounded optional selectors: `audience` (`learner` or `educator`), `age_band` (`early-childhood`, `primary-younger`, `primary-older`, `teen`, `adult`, or `unspecified`), `input_mode` (`topic-led` or `source-grounded`), `source_type`, `locale` (`en`, `ar-MSA`, or legacy `ar-EG`), and an exact `guidance_modules` set when a host needs explicit validation. The adapter always includes the compact core, then composes educator, young-learner, source, video, and curriculum guidance only when the selectors require it. The advertised input schema rejects additional properties. The Worker passes arguments unchanged to the pure adapter, which owns all validation, normalization, and selection.
 
-A success returns the adapter result as `structuredContent` and a text block containing the version, bundle digest, host responsibilities, and every selected canonical module in order. A rejection returns `isError: true` with `structuredContent` `{ ok: false, error: { code, message, field? } }`. The output schema is one flat object with required `ok`, which both result shapes satisfy, for compatibility with ChatGPT and Claude.
+A success returns compact selectors and loaded module identifiers in `structuredContent`, plus one text block containing the model-readable guidance. It does not duplicate module content across both model-visible fields. Bundle digests, paths, classifications, sizes, and per-module hashes are returned in hidden MCP `_meta`. A rejection returns `isError: true` with `structuredContent` `{ ok: false, error: { code, message, field? } }`. The output schema is one flat object with required `ok`, which both result shapes satisfy, for compatibility with ChatGPT and Claude.
 
 ### Local development and MCP Inspector
 
@@ -268,9 +268,9 @@ The endpoint serves only public, versioned, read-only guidance, stores nothing, 
 - exposes non-public, licensed, or tenant-specific content; or
 - needs per-user quotas or abuse controls that cannot be keyed anonymously.
 
-## First supported vertical slice
+## Supported compact slices
 
-The first activated slice is learner-facing, topic-led, conversational teaching in English and simplified Modern Standard Arabic:
+The default slice remains learner-facing, topic-led, conversational teaching in English and simplified Modern Standard Arabic:
 
 ```text
 audience: learner
@@ -280,6 +280,15 @@ artifact type: chat
 server state: none
 teacher: connected ChatGPT or Claude model
 ```
+
+The same plugin and the same MCP tool also compose:
+
+- educator guidance when `audience: educator`;
+- child- or teen-friendly guidance when a young `age_band` is supplied;
+- both together for a teacher preparing child-facing material; and
+- source-grounded guidance alongside any of those modes.
+
+The prompt aliases `/learn`, `/teacher`, and `/kids` are convenience text interpreted by the host instructions. They are not native ChatGPT commands and do not create separate plugins or tools.
 
 The slice must preserve the canonical behavior rather than define a reduced teaching method:
 

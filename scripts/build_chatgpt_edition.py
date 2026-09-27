@@ -102,7 +102,7 @@ def render() -> dict[Path, str]:
     plugin_skill = (
         "---\n"
         + "name: teach-me\n"
-        + "description: Teach any topic adaptively in English or simplified Modern Standard Arabic. Use when someone wants to learn, practise, review, or understand a source.\n"
+        + "description: Teach adaptively, prepare teacher briefs, or explain safely to young learners in English or simplified Modern Standard Arabic. Use for learning, lesson planning, review, or sources.\n"
         + "---\n\n"
         + GENERATED_NOTICE
         + plugin_body
