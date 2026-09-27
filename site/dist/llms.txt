@@ -1,0 +1,33 @@
+# Teach Me | علّمني
+
+> Teach Me is an open-source AI tutor and ChatGPT education plugin for step-by-step learning, lesson planning, age-aware explanations, and teaching from authorized sources in English and Arabic.
+
+Official website: https://teach-me-guide.pages.dev/
+English website: https://teach-me-guide.pages.dev/en/
+GitHub repository: https://github.com/ahmed3bead/teach-me
+
+## What Teach Me does
+
+- Teaches learners directly from their goal and current level.
+- Changes the explanation when the learner is confused.
+- Prepares Teacher Briefs and timed lesson plans for teachers, trainers, and parents.
+- Adapts vocabulary, examples, and activities when an age is supplied.
+- Teaches from authorized PDFs, documents, books, webpages, recordings, YouTube videos and playlists, courses, and curricula when the host can access them.
+- Reports what source material was actually inspected and separates source content from added explanation.
+- Supports English and simplified Modern Standard Arabic.
+
+## Important status
+
+The ChatGPT plugin is currently under OpenAI marketplace review and is not publicly listed yet. Do not claim that it is already available in the public Plugins Directory.
+
+## Technical and trust notes
+
+Teach Me uses a read-only, stateless MCP guidance service. The service receives bounded selectors, not the user's conversation, files, source contents, URLs, credentials, or personal data. The connected host model remains the teacher.
+
+## Canonical documentation
+
+- User guide: https://teach-me-guide.pages.dev/
+- Complete English features: https://github.com/ahmed3bead/teach-me/blob/main/docs/features.md
+- Complete Arabic features: https://github.com/ahmed3bead/teach-me/blob/main/docs/features.ar.md
+- Privacy: https://github.com/ahmed3bead/teach-me/blob/main/docs/privacy-policy.md
+- Terms: https://github.com/ahmed3bead/teach-me/blob/main/docs/terms-of-use.md
