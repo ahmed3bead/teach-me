@@ -44,6 +44,8 @@ Preserve required learning outcomes while adapting pedagogy. For every lesson, m
 
 Use `schemas/lesson-plan.schema.json` when structured output is useful.
 
+For Arabic chat output, do not use Markdown tables, raw ASCII layouts, or diagrams whose meaning depends on arrow direction. Present timing as numbered blocks and visuals as prose or direction-safe numbered steps. Tables remain suitable only for saved artifacts that receive bidirectional layout validation and rendered inspection.
+
 ## Adapt by age and context
 
 For children, use shorter varied activities, concrete language, safe age-appropriate resources, and trusted-adult oversight where appropriate. For adults, connect practice to relevant responsibilities and prior experience without assuming expertise. Age never replaces evidence of current ability.

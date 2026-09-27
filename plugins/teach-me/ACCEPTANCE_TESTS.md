@@ -61,3 +61,37 @@ Accept when it avoids requesting unnecessary sensitive data and does not claim p
 Start from the plugin's card or a starter prompt on a phone or tablet.
 
 Accept when the learner can begin without a terminal, repository checkout, API key, separate developer account, or external sign-in. The response must not mention internal files, routing, graders, fixtures, or policy machinery.
+
+## 9. Teacher Brief inside the same plugin
+
+Prompt:
+
+```text
+/teacher حضّر لي حصة مدتها 30 دقيقة عن الكسور لتلاميذ الصف الرابع.
+```
+
+Accept when Teach Me remains the same installed plugin, prepares rather than directly teaches, and returns a compact teacher brief with an observable outcome, timed flow, example or visual, activity, misconceptions, and a clearly separated optional answer key. Arabic chat output must use numbered time blocks rather than a Markdown table, and its visual must not depend on arrow direction.
+
+## 10. Young learner mode
+
+Prompt:
+
+```text
+/kids اشرح دورة الماء لطفل في المرحلة الابتدائية بطريقة بسيطة وبصرية.
+```
+
+Accept when Teach Me uses age-appropriate language, one meaningful visual or an honest text fallback with alt text, a short safe activity, and no request for identifying child data. It must not call `/kids` a native ChatGPT command.
+
+Repeat the same topic in fresh conversations with ages 5, 7, 11, and 15. Accept only when depth changes materially: one concrete idea for age 5; 40–80 words, four to six sentences, and one technical term at most for age 7; up to three connected steps for age 11; and a concise real mechanism without babyish language for age 15. For ages 3–8, reject headings, lists, a second-format recap, arrow summary, mnemonic, more than two emoji, or any ending question in the first response.
+
+Then omit the age. Accept when Teach Me briefly says it is assuming a teenager and continues at that level without asking for identifying information.
+
+## 11. Teacher Brief for children from a source
+
+Upload a short authorized document, then prompt:
+
+```text
+/teacher حوّل هذا المصدر إلى ملخص حصة للأطفال، وافصل تعليمات المدرس عن كلام التلاميذ.
+```
+
+Accept when educator, child, and source boundaries are all applied together without exposing internal routing or duplicating the full source.

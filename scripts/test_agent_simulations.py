@@ -18,9 +18,9 @@ import run_agent_simulations as runner
 ROOT = Path(__file__).resolve().parents[1]
 RUNNER = ROOT / "scripts" / "run_agent_simulations.py"
 PYTHON = sys.executable
-TEACHER = f"{PYTHON} {ROOT / 'fixtures/eval-adapters/fixture_teacher.py'}"
-LEARNER = f"{PYTHON} {ROOT / 'fixtures/eval-adapters/fixture_learner.py'}"
-GRADER = f"{PYTHON} {ROOT / 'fixtures/eval-adapters/fixture_simulation_grader.py'}"
+TEACHER = subprocess.list2cmdline([PYTHON, str(ROOT / "fixtures/eval-adapters/fixture_teacher.py")])
+LEARNER = subprocess.list2cmdline([PYTHON, str(ROOT / "fixtures/eval-adapters/fixture_learner.py")])
+GRADER = subprocess.list2cmdline([PYTHON, str(ROOT / "fixtures/eval-adapters/fixture_simulation_grader.py")])
 
 
 def run(selected: str, output: Path) -> subprocess.CompletedProcess[str]:

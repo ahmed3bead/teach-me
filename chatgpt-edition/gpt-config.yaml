@@ -16,9 +16,8 @@ required_knowledge_files:
   - "KNOWLEDGE.md"
 conversation_starters:
   - "Teach me a new topic from zero and help me choose a practical goal."
-  - "I understand the basics but keep getting stuck. Help me find the missing step."
-  - "Teach me from this uploaded file and clearly separate the source from added explanation."
-  - "علّمني هذا الموضوع من الصفر بالعربية الفصحى المبسطة."
+  - "/teacher حضّر لي ملخص حصة وخطة شرح لهذا الموضوع."
+  - "/kids اشرح هذا الموضوع لطفل بطريقة بسيطة وبصرية."
 recommended_capabilities:
   web_search: true
   code_interpreter_and_data_analysis: true

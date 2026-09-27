@@ -186,10 +186,34 @@ test("SDK client connects and lists exactly one read-only tool with explicit sch
   assert.equal(tool.inputSchema.type, "object");
   assert.equal(tool.inputSchema.additionalProperties, false);
   assert.deepEqual(tool.inputSchema.required ?? [], []);
-  assert.deepEqual(tool.inputSchema.properties.audience.enum, ["learner"]);
-  assert.deepEqual(tool.inputSchema.properties.input_mode.enum, ["topic-led"]);
+  assert.deepEqual(tool.inputSchema.properties.audience.enum, ["learner", "educator"]);
+  assert.deepEqual(tool.inputSchema.properties.age_band.enum, [
+    "early-childhood",
+    "primary-younger",
+    "primary-older",
+    "teen",
+    "adult",
+    "unspecified",
+  ]);
+  assert.deepEqual(tool.inputSchema.properties.input_mode.enum, ["topic-led", "source-grounded"]);
   assert.deepEqual(tool.inputSchema.properties.locale.enum, ["en", "ar-MSA", "ar-EG"]);
-  assert.deepEqual(tool.inputSchema.properties.guidance_modules.items.enum, ["topic-led-conversational"]);
+  assert.deepEqual(tool.inputSchema.properties.guidance_modules.items.enum, [
+    "topic-led-conversational",
+    "educator-guidance",
+    "child-guidance",
+    "source-grounded",
+  ]);
+  assert.deepEqual(tool.inputSchema.properties.source_type.enum, [
+    "document",
+    "book",
+    "webpage",
+    "video",
+    "playlist",
+    "course",
+    "recording",
+    "curriculum",
+    "mixed",
+  ]);
   assert.equal(tool.outputSchema.type, "object");
   assert.deepEqual(tool.outputSchema.required, ["ok"]);
   assert.equal("$schema" in tool.inputSchema, false);
@@ -203,23 +227,24 @@ test("English tools/call returns adapter result and model-readable guidance", as
   const structured = result.structuredContent;
   assert.equal(structured.ok, true);
   assert.equal(structured.teach_me_version, runtimeBundle.teach_me_version);
-  assert.equal(structured.bundle_digest, runtimeBundle.bundle_digest);
   assert.equal(structured.normalized_request.requested_locale, "en");
   assert.equal(structured.host_contract.server_calls_llm, false);
   assert.equal(structured.host_contract.server_side_learner_persistence, false);
-  assert.equal(structured.selected_modules.some((module) => module.id === "arabic-teaching-style"), false);
+  assert.deepEqual(structured.loaded_module_ids, ["chatgpt-runtime-core"]);
 
   const [content] = result.content;
   assert.equal(content.type, "text");
   assert.ok(content.text.includes(runtimeBundle.teach_me_version));
-  assert.ok(content.text.includes(runtimeBundle.bundle_digest));
   assert.match(content.text, /## Host responsibilities/);
-  for (const module of structured.selected_modules) {
+  for (const moduleId of structured.loaded_module_ids) {
+    const module = runtimeBundle.assets.find((asset) => asset.id === moduleId);
+    assert.ok(module);
     const canonical = runtimeBundle.assets.find((asset) => asset.id === module.id);
-    assert.equal(module.content, canonical.content);
     assert.ok(content.text.includes(canonical.content.trimEnd()), `text includes ${module.id}`);
-    assert.ok(content.text.includes(canonical.sha256));
   }
+  assert.equal(JSON.stringify(structured).includes(runtimeBundle.assets[0].content), false);
+  assert.equal(result._meta.bundle_digest, runtimeBundle.bundle_digest);
+  assert.equal("content" in result._meta.selected_modules[0], false);
   await client.close();
 });
 
@@ -228,10 +253,33 @@ test("Arabic tools/call selects Arabic teaching guidance", async () => {
   const result = await client.callTool({ name: "load_teach_me", arguments: { locale: "ar-MSA" } });
   assert.equal(result.structuredContent.ok, true);
   assert.equal(result.structuredContent.normalized_request.requested_locale, "ar-MSA");
-  const arabic = result.structuredContent.selected_modules.find((module) => module.id === "arabic-teaching-style");
-  assert.ok(arabic);
-  assert.match(arabic.content, /[؀-ۿ]/);
-  assert.match(result.content[0].text, /[؀-ۿ]/);
+  assert.deepEqual(result.structuredContent.loaded_module_ids, ["chatgpt-runtime-core"]);
+  assert.match(result.content[0].text, /Modern Standard Arabic/);
+  await client.close();
+});
+
+test("source-grounded tools/call returns book and playlist guidance without source payloads", async () => {
+  const client = await connectedClient();
+  for (const source_type of ["book", "playlist"]) {
+    const result = await client.callTool({
+      name: "load_teach_me",
+      arguments: { input_mode: "source-grounded", source_type, locale: "en" },
+    });
+    assert.notEqual(result.isError, true);
+    assert.equal(result.structuredContent.normalized_request.input_mode, "source-grounded");
+    assert.equal(result.structuredContent.normalized_request.source_type, source_type);
+    assert.deepEqual(result.structuredContent.normalized_request.guidance_modules, [
+      "topic-led-conversational",
+      "source-grounded",
+    ]);
+    assert.equal(result.structuredContent.loaded_module_ids.includes("chatgpt-runtime-source"), true);
+    assert.equal(
+      result.structuredContent.loaded_module_ids.includes("chatgpt-runtime-video"),
+      source_type === "playlist",
+    );
+    assert.equal(result.structuredContent.loaded_module_ids.includes("chatgpt-runtime-curriculum"), true);
+    assert.match(result.content[0].text, new RegExp(`source_type: ${source_type}`));
+  }
   await client.close();
 });
 
@@ -241,7 +289,63 @@ test("legacy ar-EG locale normalizes to ar-MSA through the adapter", async () =>
   const modern = await client.callTool({ name: "load_teach_me", arguments: { locale: "ar-MSA" } });
   assert.equal(legacy.structuredContent.normalized_request.requested_locale, "ar-MSA");
   assert.equal(legacy.structuredContent.normalized_request.locale_strategy, "explicit");
-  assert.deepEqual(legacy.structuredContent.selected_modules, modern.structuredContent.selected_modules);
+  assert.deepEqual(legacy.structuredContent.loaded_module_ids, modern.structuredContent.loaded_module_ids);
+  await client.close();
+});
+
+test("one tool composes teacher and young-learner guidance inside the same plugin", async () => {
+  const client = await connectedClient();
+  const result = await client.callTool({
+    name: "load_teach_me",
+    arguments: { audience: "educator", age_band: "primary-younger", locale: "ar-MSA" },
+  });
+  assert.equal(result.structuredContent.normalized_request.audience, "educator");
+  assert.equal(result.structuredContent.normalized_request.age_band, "primary-younger");
+  assert.deepEqual(result.structuredContent.educator_format_contract, {
+    timed_flow: "numbered-time-blocks",
+    arabic_markdown_tables: false,
+    arrow_dependent_diagrams: false,
+  });
+  assert.deepEqual(result.structuredContent.loaded_module_ids, [
+    "chatgpt-runtime-core",
+    "chatgpt-runtime-educator",
+    "chatgpt-runtime-child",
+  ]);
+  assert.match(result.content[0].text, /Teacher Brief mode/);
+  assert.match(result.content[0].text, /Young learner mode/);
+  assert.match(result.content[0].text, /Mandatory educator format contract/);
+  await client.close();
+});
+
+test("model-visible tool results stay within the token-conscious byte budget", async () => {
+  const client = await connectedClient();
+  const cases = [
+    { locale: "en" },
+    { locale: "ar-MSA" },
+    { input_mode: "source-grounded", source_type: "document", locale: "en" },
+    { input_mode: "source-grounded", source_type: "video", locale: "en" },
+    { input_mode: "source-grounded", source_type: "book", locale: "ar-MSA" },
+    { input_mode: "source-grounded", source_type: "playlist", locale: "ar-MSA" },
+    { audience: "educator", age_band: "primary-younger", locale: "ar-MSA" },
+    {
+      audience: "educator",
+      age_band: "primary-older",
+      input_mode: "source-grounded",
+      source_type: "document",
+      locale: "en",
+    },
+  ];
+  for (const args of cases) {
+    const result = await client.callTool({ name: "load_teach_me", arguments: args });
+    const visibleBytes = Buffer.byteLength(
+      JSON.stringify({ content: result.content, structuredContent: result.structuredContent }),
+      "utf8",
+    );
+    assert.ok(visibleBytes < 16_000, `${JSON.stringify(args)} produced ${visibleBytes} visible bytes`);
+    for (const asset of runtimeBundle.assets) {
+      assert.equal(JSON.stringify(result.structuredContent).includes(asset.content), false, asset.id);
+    }
+  }
   await client.close();
 });
 
@@ -249,8 +353,11 @@ test("invalid tool input returns safe structured adapter errors", async () => {
   const client = await connectedClient();
   const cases = [
     [{ locale: "fr" }, "unsupported_locale"],
-    [{ audience: "educator" }, "unsupported_audience"],
-    [{ input_mode: "source-grounded" }, "unsupported_input_mode"],
+    [{ audience: "student" }, "unsupported_audience"],
+    [{ age_band: "8" }, "unsupported_age_band"],
+    [{ input_mode: "unsupported" }, "unsupported_input_mode"],
+    [{ source_type: "book" }, "source_type_requires_source_grounded"],
+    [{ input_mode: "source-grounded", source_type: "unknown" }, "unsupported_source_type"],
     [{ guidance_modules: [] }, "empty_guidance_modules"],
     [{ guidance_modules: "topic-led-conversational" }, "invalid_field_type"],
     [{ transcript: [{ role: "user", content: "private learner text" }] }, "unknown_field"],

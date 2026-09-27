@@ -7,4 +7,6 @@ references/evidence-policy.md
 references/safety-privacy.md
 references/arabic-teaching-style.md
 references/accessibility-engagement.md
+references/educator-mode.md
+references/children-mode.md
 docs/pedagogy-basis.md

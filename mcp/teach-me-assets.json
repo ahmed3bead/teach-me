@@ -10,8 +10,9 @@
   },
   "module_categories": [
     {"id": "topic-led-conversational", "status": "active"},
-    {"id": "educator-guidance", "status": "reserved"},
-    {"id": "source-grounded", "status": "reserved"},
+    {"id": "educator-guidance", "status": "active"},
+    {"id": "child-guidance", "status": "active"},
+    {"id": "source-grounded", "status": "active"},
     {"id": "domain-packs", "status": "reserved"},
     {"id": "accessibility", "status": "reserved"},
     {"id": "safety", "status": "reserved"},
@@ -85,91 +86,51 @@
   "assets": [
     {
       "order": 1,
-      "id": "teach-me-skill",
-      "path": "SKILL.md",
+      "id": "chatgpt-runtime-core",
+      "path": "references/chatgpt-runtime-core.md",
       "classification": "entrypoint",
       "required": true,
       "module_categories": ["topic-led-conversational"]
     },
     {
       "order": 2,
-      "id": "core-teaching-policy",
-      "path": "references/core-teaching-policy.md",
+      "id": "chatgpt-runtime-educator",
+      "path": "references/chatgpt-runtime-educator.md",
       "classification": "policy",
       "required": true,
-      "module_categories": ["topic-led-conversational"]
+      "module_categories": ["educator-guidance"]
     },
     {
       "order": 3,
-      "id": "teaching-contract",
-      "path": "references/teaching-contract.md",
+      "id": "chatgpt-runtime-child",
+      "path": "references/chatgpt-runtime-child.md",
       "classification": "policy",
       "required": true,
-      "module_categories": ["topic-led-conversational"]
+      "module_categories": ["child-guidance"]
     },
     {
       "order": 4,
-      "id": "diagnostic-engine",
-      "path": "references/diagnostic-engine.md",
-      "classification": "engine",
+      "id": "chatgpt-runtime-source",
+      "path": "references/chatgpt-runtime-source.md",
+      "classification": "policy",
       "required": true,
-      "module_categories": ["topic-led-conversational"]
+      "module_categories": ["source-grounded"]
     },
     {
       "order": 5,
-      "id": "teaching-engine",
-      "path": "references/teaching-engine.md",
+      "id": "chatgpt-runtime-video",
+      "path": "references/chatgpt-runtime-video.md",
       "classification": "engine",
       "required": true,
-      "module_categories": ["topic-led-conversational"]
+      "module_categories": ["source-grounded"]
     },
     {
       "order": 6,
-      "id": "conversational-teaching",
-      "path": "references/conversational-teaching.md",
+      "id": "chatgpt-runtime-curriculum",
+      "path": "references/chatgpt-runtime-curriculum.md",
       "classification": "engine",
       "required": true,
-      "module_categories": ["topic-led-conversational"]
-    },
-    {
-      "order": 7,
-      "id": "assessment-feedback-engine",
-      "path": "references/assessment-feedback-engine.md",
-      "classification": "engine",
-      "required": true,
-      "module_categories": ["topic-led-conversational"]
-    },
-    {
-      "order": 8,
-      "id": "integration-core",
-      "path": "references/integration-core.md",
-      "classification": "continuity",
-      "required": true,
-      "module_categories": ["topic-led-conversational"]
-    },
-    {
-      "order": 9,
-      "id": "learner-model",
-      "path": "references/learner-model.md",
-      "classification": "continuity",
-      "required": true,
-      "module_categories": ["topic-led-conversational"]
-    },
-    {
-      "order": 10,
-      "id": "retention-adaptation",
-      "path": "references/retention-adaptation.md",
-      "classification": "continuity",
-      "required": true,
-      "module_categories": ["topic-led-conversational"]
-    },
-    {
-      "order": 11,
-      "id": "arabic-teaching-style",
-      "path": "references/arabic-teaching-style.md",
-      "classification": "locale",
-      "required": true,
-      "module_categories": ["topic-led-conversational"]
+      "module_categories": ["source-grounded"]
     }
   ]
 }

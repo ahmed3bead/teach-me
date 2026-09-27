@@ -39,7 +39,7 @@ def run_case(directory: Path, item: dict, grader: Path = GRADER, extra: list[str
     suite.write_text(yaml.safe_dump({"suite": "test-suite", "version": "1.0.0", "cases": [item]}, sort_keys=False, allow_unicode=True))
     command = [sys.executable, str(RUNNER), str(suite), "--response-command", f"{sys.executable} {response}", "--grader-command", f"{sys.executable} {grader}", "--output", str(report), "--pass-threshold", "1", *(extra or [])]
     completed = subprocess.run(command, text=True, capture_output=True, check=False)
-    return completed, json.loads(report.read_text()) if report.exists() else {}
+    return completed, json.loads(report.read_text(encoding="utf-8")) if report.exists() else {}
 
 
 def run_cases(
@@ -53,7 +53,7 @@ def run_cases(
     suite.write_text(yaml.safe_dump({"suite": "test-suite", "version": "1.0.0", "cases": items}, sort_keys=False, allow_unicode=True))
     command = [sys.executable, str(RUNNER), str(suite), "--response-command", f"{sys.executable} {response}", "--grader-command", f"{sys.executable} {grader}", "--output", str(report), "--pass-threshold", "1", *(extra or [])]
     completed = subprocess.run(command, text=True, capture_output=True, check=False)
-    return completed, json.loads(report.read_text()) if report.exists() else {}
+    return completed, json.loads(report.read_text(encoding="utf-8")) if report.exists() else {}
 
 
 def test_registry_and_cases() -> None:
@@ -61,7 +61,7 @@ def test_registry_and_cases() -> None:
     registry = load_fixture_registry(); assert len(registry) == 82
     cases = {}
     for path in sorted((ROOT / "evals").glob("*.yaml")) + sorted((ROOT / "domain-packs").glob("*/evals.yaml")):
-        data = yaml.safe_load(path.read_text())
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
         for item in data["cases"]:
             validate_case_contract(item, registry); cases[f"{data['suite']}/{item['id']}"] = item
             assert "fixtures" not in item
@@ -106,7 +106,7 @@ def test_registry_and_cases() -> None:
     assert {item["objective_id"] for item in journey_source["outcomes"]} == {"OBJ-EVAP-01", "OBJ-COND-02"}
     assert {item["material_id"] for item in journey_source["materials"]} == {"MAT-CUP-01", "MAT-WATER-02", "MAT-PAPER-03"}
 
-    matrix = json.loads((ROOT / "fixtures" / "eval-regressions" / "paid-report-remediation-20260916.json").read_text())
+    matrix = json.loads((ROOT / "fixtures" / "eval-regressions" / "paid-report-remediation-20260916.json").read_text(encoding="utf-8"))
     allowed_categories = {
         "genuine Teach Me policy/teaching defect",
         "deterministic-guard false positive",
@@ -170,8 +170,8 @@ def test_semantic_fixture_leakage() -> None:
 def test_reference_routing_and_prompt_boundaries() -> None:
     simple = case("simple")
     assert {p.name for p in reference_paths(simple)} == {"SKILL.md", "core-teaching-policy.md", "teaching-contract.md", "diagnostic-engine.md", "teaching-engine.md"}
-    skill_policy = (ROOT / "SKILL.md").read_text()
-    conversation_policy = (ROOT / "references" / "conversational-teaching.md").read_text()
+    skill_policy = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+    conversation_policy = (ROOT / "references" / "conversational-teaching.md").read_text(encoding="utf-8")
     assert "without previewing or promising a routine check" in skill_policy
     assert "explicit request to verify or confirm understanding is itself opt-in" in skill_policy
     assert "without previewing, promising, or offering the routine check" in conversation_policy
@@ -179,7 +179,7 @@ def test_reference_routing_and_prompt_boundaries() -> None:
     assert "one integrated authentic application" in conversation_policy
     assert "must not announce when a future quiz" in conversation_policy
     assert "changed or unseen context" in conversation_policy
-    source_policy = (ROOT / "references" / "source-grounded-mode.md").read_text()
+    source_policy = (ROOT / "references" / "source-grounded-mode.md").read_text(encoding="utf-8")
     assert "execute this fallback immediately" in source_policy
     assert "not the same course, a reconstruction, a summary" in source_policy
     rich = case("rich", "Prepare an accessible video curriculum.", "ar-MSA")
@@ -239,16 +239,22 @@ def test_artifact_and_environment_safety() -> None:
             try: materialize_artifacts({"artifacts":[{"path":unsafe,"media_type":"text/plain","content":"x"}]}, root, dict(CAPS, file="executable_temp"))
             except ValueError: pass
             else: raise AssertionError(f"unsafe artifact path accepted: {unsafe}")
-        outside = root / "outside"; outside.mkdir(); (root / "linked").symlink_to(outside, target_is_directory=True)
-        try: materialize_artifacts({"artifacts":[{"path":"linked/escape.txt","media_type":"text/plain","content":"x"}]}, root, dict(CAPS, file="executable_temp"))
-        except ValueError: pass
-        else: raise AssertionError("symlink escape was accepted")
-        assert not (outside / "escape.txt").exists()
+        outside = root / "outside"; outside.mkdir()
+        try:
+            (root / "linked").symlink_to(outside, target_is_directory=True)
+        except OSError as exc:
+            if getattr(exc, "winerror", None) != 1314:
+                raise
+        else:
+            try: materialize_artifacts({"artifacts":[{"path":"linked/escape.txt","media_type":"text/plain","content":"x"}]}, root, dict(CAPS, file="executable_temp"))
+            except ValueError: pass
+            else: raise AssertionError("symlink escape was accepted")
+            assert not (outside / "escape.txt").exists()
         try: materialize_artifacts({"artifacts":[{"path":"lesson.md","media_type":"text/plain","content":"overwrite"}]}, root, dict(CAPS, file="executable_temp"))
         except FileExistsError: pass
         else: raise AssertionError("artifact overwrite was accepted")
     with tempfile.TemporaryDirectory() as directory:
-        root = Path(directory); html = (ROOT / "fixtures" / "bidi" / "printable.html").read_text()
+        root = Path(directory); html = (ROOT / "fixtures" / "bidi" / "printable.html").read_text(encoding="utf-8")
         rendered = materialize_artifacts({"artifacts":[{"path":"pack.html","media_type":"text/html","content":html}]}, root, dict(CAPS, file="executable_temp", rendering="executable_temp"))
         pdf = next(item for item in rendered if item["media_type"] == "application/pdf")
         assert pdf["sha256"] == hashlib.sha256((root / pdf["path"]).read_bytes()).hexdigest() and pdf["validation"]["pages"] >= 1
@@ -263,7 +269,7 @@ def test_artifact_and_environment_safety() -> None:
 
 
 def test_assessment_and_consent() -> None:
-    forensic = json.loads((ROOT / "fixtures" / "eval-regressions" / "behavioral-forensic.json").read_text())
+    forensic = json.loads((ROOT / "fixtures" / "eval-regressions" / "behavioral-forensic.json").read_text(encoding="utf-8"))
     for item in forensic["assessment_false_positives"]: assert runner.deterministic_assessment_check(item["text"], item["turns"])["passed"], item["case"]
     for item in forensic["assessment_negative_controls"]: assert not runner.deterministic_assessment_check(item["text"], item["turns"])["passed"], item["text"]
     none = [{"role":"user", "content":"Continue.", "assessment_intent":"none"}]
@@ -336,7 +342,7 @@ def test_assessment_and_consent() -> None:
 
 
 def test_terminology_structure_and_child_semantics() -> None:
-    forensic = json.loads((ROOT / "fixtures" / "eval-regressions" / "behavioral-forensic.json").read_text())
+    forensic = json.loads((ROOT / "fixtures" / "eval-regressions" / "behavioral-forensic.json").read_text(encoding="utf-8"))
     for item in forensic["terminology_false_positives"]: assert runner.deterministic_terminology_check(item["text"], item["prompt"])["passed"], item["case"]
     for item in forensic["terminology_negative_controls"]: assert not runner.deterministic_terminology_check(item["text"], item["prompt"])["passed"]
     for item in forensic["completeness_false_positives"]: assert runner.deterministic_completeness_check(item["text"])["passed"], item["case"]
@@ -584,7 +590,7 @@ def test_runner_retry_checkpoint_and_resume() -> None:
             else: os.environ["OPENAI_API_KEY"] = previous_key
         stale=temp/"report.json"; stale.write_text('{"old":true}')
         fresh,_=run_case(temp, case("fresh")); assert fresh.returncode == 0, fresh.stderr
-        assert '"old"' not in stale.read_text()
+        assert '"old"' not in stale.read_text(encoding="utf-8")
         blocker=temp/"blocker"; blocker.write_text("x")
         try: runner.write_report(blocker/"report.json", {"status":"running"})
         except OSError: pass
