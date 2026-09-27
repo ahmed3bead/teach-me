@@ -1,6 +1,6 @@
 # Teach Me | علّمني
 
-**Learn anything step by step — or prepare a simple lesson for someone else.**
+**Open-source AI tutor and ChatGPT education plugin for step-by-step learning, lesson planning, and teaching from PDFs, books, websites, and videos.**
 
 [English](README.md) · [العربية](README.ar.md) · [Simple usage guide](https://teach-me-guide.pages.dev/)
 
@@ -12,7 +12,7 @@
 
 ## Why Teach Me?
 
-ChatGPT can answer a question, but a long answer is not always a good lesson. Teach Me helps ChatGPT explain ideas like a patient teacher:
+Teach Me is an AI tutor and lesson plan generator for learners, teachers, trainers, and parents. ChatGPT can answer a question, but a long answer is not always a good lesson. Teach Me helps ChatGPT explain ideas like a patient teacher:
 
 - it starts from your current level;
 - explains one useful step at a time;
