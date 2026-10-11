@@ -34,7 +34,7 @@ See the full [English feature guide](../../docs/features.md) or [Arabic feature 
 
 ## Distribution status
 
-This directory is the review-ready public plugin package. Repository inclusion does not by itself mean the plugin is already listed in ChatGPT. Until marketplace review and publication finish, use it only in an authorized development or review environment.
+Teach Me has been approved by OpenAI and published in the ChatGPT Plugins Directory. [Install Teach Me | علّمني](https://chatgpt.com/plugins/plugin_asdk_app_6ab81f50a2b881918abe2865d47fb2a3). The public listing shows version **1.0.0**, verified on 2026-10-11. See the [current release status](../../docs/release-status.md) for the publication record and future update guidance.
 
 The plugin uses the Teach Me MCP endpoint to load reviewed teaching guidance. The endpoint receives only bounded selectors such as language, mode, and source type; source content, files, URLs, transcripts, credentials, and learner messages remain in ChatGPT. There is no Teach Me sign-in flow or learner account. See the [privacy policy](../../docs/privacy-policy.md) and [terms of use](../../docs/terms-of-use.md).
 
