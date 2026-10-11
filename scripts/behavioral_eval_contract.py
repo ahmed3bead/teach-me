@@ -204,6 +204,9 @@ def instruction_manifest(case: dict[str, Any]) -> list[dict[str, Any]]:
 
 def immutable_prompt_packet(suite: str, case: dict[str, Any]) -> dict[str, Any]:
     validate_case_contract(case)
-    packet = {"packet_version": "1.1.0", "suite": suite, "case_id": case["id"], "locale": case["locale"], "routing": case["routing"], "capabilities": case["capabilities"], "controlled_inputs": resolve_case_fixtures(case), "instruction_sources": instruction_manifest(case)}
+    # assessment_state describes where the whole scripted conversation ends (for example "accepted" at a
+    # later turn). Showing it to the response model leaks future learner consent, so it only routes references.
+    visible_routing = {key: value for key, value in case["routing"].items() if key != "assessment_state"}
+    packet = {"packet_version": "1.2.0", "suite": suite, "case_id": case["id"], "locale": case["locale"], "routing": visible_routing, "capabilities": case["capabilities"], "controlled_inputs": resolve_case_fixtures(case), "instruction_sources": instruction_manifest(case)}
     packet["sha256"] = canonical_hash(packet)
     return packet

@@ -198,6 +198,9 @@ def test_reference_routing_and_prompt_boundaries() -> None:
     packet = immutable_prompt_packet("test-suite", rich)
     hidden_changed=copy.deepcopy(rich); hidden_changed["expected"]=["entirely different hidden criterion"]
     assert immutable_prompt_packet("test-suite", hidden_changed) == packet
+    assert "assessment_state" not in packet["routing"], "future learner consent must not reach the response model"
+    consent_changed = copy.deepcopy(rich); consent_changed["routing"]["assessment_state"] = "accepted"
+    assert immutable_prompt_packet("test-suite", consent_changed)["routing"] == packet["routing"]
     prompt = render_prompt({"type":"generate", "locale":"ar-MSA", "prompt":"تعلم", "history":[], "prompt_packet":packet}, "response")
     assert all(source["content"] in prompt and len(source["sha256"]) == 64 for source in packet["instruction_sources"])
     assert "exactly one self-contained printable text/html artifact" in prompt
