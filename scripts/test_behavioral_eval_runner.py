@@ -306,6 +306,8 @@ def test_assessment_and_consent() -> None:
         "ما بلد الدراسة، وما جنسيتك، وهل ستقدّم من بلد إقامتك؟",
         "يمكننا إجراء تحقق قصير من الفهم. هل تريد أن نبدأ؟",
         "هل تريد اختبارًا قصيرًا؟ لن أبدأ الأسئلة قبل موافقتك.",
+        "إذا كان الصندوق أزرق:\n- هل وزنه أكبر من 4 كجم؟\n  - نعم ← H.\n  - لا ← N.",
+        "If the box is blue:\n- Is its weight above 4 kg?\n  - Yes -> H.\n  - No -> N.",
         "الإجراء الآن: أجب بنعم للاختبار أو لا للمتابعة دون اختبار.",
         "What would you like to learn next, and what are you hoping to use it for?",
         "What concept are you trying to understand, and which part feels unclear?",
