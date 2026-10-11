@@ -18,7 +18,7 @@ from typing import Any
 
 
 DEFAULT_MODEL = "gpt-5.6-sol"
-ADAPTER_VERSION = "2.2.0"
+ADAPTER_VERSION = "2.3.0"
 ENV_ALLOWLIST = frozenset({"PATH", "HOME", "CODEX_HOME", "LANG", "LC_ALL", "LC_CTYPE", "TMPDIR", "TEMP", "TMP", "SystemRoot", "SYSTEMROOT"})
 
 
@@ -161,6 +161,7 @@ def render_prompt(payload: dict[str, Any], role: str, model: str = DEFAULT_MODEL
         rules = (
             "Act as an independent strict grader. Return one verdict per criterion in order. PASS requires an exact quote and the correct response turn or artifact path. "
             "For response and non-HTML evidence, copy each quote verbatim from the identified source: do not normalize whitespace, add or remove diacritics, translate, paraphrase, or cite user text as response evidence. "
+            "Quote the shortest decisive span, normally one or two sentences and under 300 characters; long quotes are easy to miscopy and a miscopied quote fails the protocol. "
             "For HTML artifacts, quote one contiguous learner-visible text span in reading order; omit markup but no visible words, and never splice noncontiguous text. "
             "Set turn to null unless source is response, and set artifact_path to null unless source is artifact. "
             "FAIL may use source absent with an ABSENT: explanation. Never pass absent, implicit, deferred, or unperformed required behavior. "
