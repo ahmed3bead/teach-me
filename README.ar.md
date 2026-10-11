@@ -8,7 +8,7 @@
 [![Release](https://img.shields.io/github/v/release/ahmed3bead/teach-me?include_prereleases&label=release)](https://github.com/ahmed3bead/teach-me/releases/tag/v1.0.0-beta.2)
 [![License: MIT](https://img.shields.io/github/license/ahmed3bead/teach-me)](LICENSE)
 
-> **الإتاحة:** بلاجين ChatGPT قيد مراجعة OpenAI حاليًا، ولم تظهر بعد في دليل البلاجين للمستخدمين. الكود الموجود على `main` أحدث من النسخة المقدمة؛ راجع [حالة الإصدار الحالية](docs/release-status.md) قبل أي نشر أو إعادة تقديم.
+> **الإتاحة:** تمت الموافقة على Teach Me من OpenAI ونشرها في دليل بلاجين ChatGPT. [ثبّت Teach Me | علّمني](https://chatgpt.com/plugins/plugin_asdk_app_6ab81f50a2b881918abe2865d47fb2a3). النسخة المعروضة: **1.0.0**، وتم التحقق من الصفحة في 2026-10-11. راجع [حالة الإصدار الحالية](docs/release-status.md).
 
 ## لماذا Teach Me؟
 
@@ -55,7 +55,7 @@
 
 ## بداية سريعة
 
-بعد اعتماد البلاجين ونشرها رسميًا:
+ثبّت البلاجين المعتمدة من [صفحتها في ChatGPT](https://chatgpt.com/plugins/plugin_asdk_app_6ab81f50a2b881918abe2865d47fb2a3):
 
 1. افتح دليل Plugins داخل ChatGPT.
 2. أضف **Teach Me | علّمني**.
@@ -85,7 +85,7 @@
 
 | النسخة | مناسبة لمن؟ | الإعداد |
 |---|---|---|
-| **بلاجين ChatGPT** | المتعلمون والمدرسون والمدربون والآباء | التثبيت بعد الاعتماد العام؛ راجع [حالة البلاجين](plugins/teach-me/README.md) |
+| **بلاجين ChatGPT** | المتعلمون والمدرسون والمدربون والآباء | [التثبيت في ChatGPT](https://chatgpt.com/plugins/plugin_asdk_app_6ab81f50a2b881918abe2865d47fb2a3) |
 | **Claude** | من يفضل التعلّم داخل Claude | [إعداد Claude](claude-edition/README.md) |
 | **Custom GPT** | الاختبار الخاص بواسطة مالك المشروع | [إعداد المالك](chatgpt-edition/README.md) |
 | **Codex / Claude Code** | المطورون الذين يحتاجون ملفات محلية ومسارات قابلة للتكرار | [إعداد المطور](docs/getting-started.md) |
@@ -127,7 +127,7 @@ Claude Code:
 
 ## الحالة والحدود
 
-- بلاجين ChatGPT قيد المراجعة وغير متاحة للعامة حتى الآن.
+- بلاجين ChatGPT معتمدة ومنشورة للعامة؛ يتطلب التثبيت تسجيل الدخول إلى ChatGPT.
 - يساعد علّمني على تنظيم التعلّم، لكن الإجابات تظل مولدة بالذكاء الاصطناعي وقد تحتوي على أخطاء.
 - الوصول إلى الملفات والويب والصوت والفيديو والصور يعتمد على الأدوات المتاحة في حساب ChatGPT.
 - المعلومات المهمة أو الحديثة أو الطبية أو القانونية أو المالية يجب مراجعتها من مصادر موثوقة مناسبة.

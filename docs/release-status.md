@@ -1,37 +1,34 @@
 # Current release status | حالة الإصدار الحالية
 
-Last updated: 2026-09-27
+Last updated: 2026-10-11
 
-## Important distinction
+## Approved and published
 
-The `main` branch contains the newest Teach Me work, including the next plugin version with learner, educator, age-aware, and source-grounded workflows plus selective guidance loading for lower token usage.
+Teach Me | علّمني has been approved by OpenAI and published in the ChatGPT Plugins Directory.
 
-The ChatGPT plugin currently under OpenAI review is an earlier submitted version. Merging code into `main` does **not** update that submission, redeploy the production MCP server, or make the new capabilities live in the Plugins Directory.
+- Public listing: [Install Teach Me | علّمني](https://chatgpt.com/plugins/plugin_asdk_app_6ab81f50a2b881918abe2865d47fb2a3)
+- Public listing version: **1.0.0**.
+- Developer: Ahmed Ebead.
+- Verification date: **2026-10-11**. This is the date the public page was checked, not a claim about the original approval or publication date.
+- The listing was accessible without signing in and displayed **Install plugin**; installation requires signing in to ChatGPT. Installation from a separate learner account has not been verified in this check.
 
-## Release decision
+The published description includes learner, educator, parent, age-aware, and source-grounded workflows. The listing does not establish which Git commit or Worker build is deployed. Merging changes into `main` does not automatically update the published plugin or production MCP server.
 
-Decision recorded on 2026-09-27: prepare the complete next version, then cancel the current OpenAI review and resubmit the complete version before producing the public promotional video. Do not cancel the current review until the beta acceptance tests, submission metadata, and reviewer test cases are ready, so cancellation and resubmission can happen in one controlled session.
+## Future updates
 
-## Release guard
-
-Until the full-version resubmission kit is ready:
-
-1. Do not redeploy the production MCP endpoint from `main`.
-2. Do not cancel or replace the plugin version currently under review prematurely.
-3. Treat changes merged into `main` as the source for the **next** plugin update.
-4. Use the beta MCP deployment for manual testing of the next version.
+The 2026-09-27 plan to cancel the earlier review and resubmit is historical and no longer the current release instruction. For future changes, test the candidate on the beta endpoint, follow the submission checklist, and record the deployed version and any required review before updating production.
 
 Current endpoints:
 
-- Production submission: `https://teach-me-mcp.ahmedm3bead.workers.dev/mcp`
-- Next-version beta: `https://teach-me-mcp-next.ahmedm3bead.workers.dev/mcp`
-
-When the kit is ready, use this order: cancel the current review, deploy the tested beta build to the unchanged production origin, run **Scan Tools**, verify the imported metadata, update the reviewer cases, and submit the complete version. Update this status file in the same pull request as any production release change.
+- Production MCP: `https://teach-me-mcp.ahmedm3bead.workers.dev/mcp`
+- Beta MCP: `https://teach-me-mcp-next.ahmedm3bead.workers.dev/mcp`
 
 ## الملخص بالعربية
 
-فرع `main` يحتوي أحدث شغل وخصائص النسخة القادمة، لكن البلاجين الموجودة حاليًا عند OpenAI للمراجعة هي النسخة السابقة التي تم تقديمها بالفعل.
+تمت الموافقة على Teach Me | علّمني من OpenAI ونشرها في دليل بلاجين ChatGPT، والنسخة المعروضة هي **1.0.0**.
 
-وجود الكود الجديد على `main` لا يغيّر النسخة قيد المراجعة ولا ينشر MCP جديدًا تلقائيًا. حتى تنتهي المراجعة الحالية، لا نعيد نشر رابط الإنتاج ولا نعيد تقديم البلاجين. نختبر النسخة القادمة على رابط البيتا، ثم ننشرها كتحديث مستقل بعد اتخاذ قرار واضح.
+[رابط التثبيت في ChatGPT](https://chatgpt.com/plugins/plugin_asdk_app_6ab81f50a2b881918abe2865d47fb2a3)
 
-القرار الحالي هو تجهيز النسخة الكاملة أولًا، ثم إلغاء المراجعة القديمة وإعادة التقديم بالنسخة الكاملة قبل تصوير فيديو الدعاية. لا نلغي الطلب قبل اكتمال الاختبارات وبيانات التقديم حتى تتم عملية الإلغاء والنشر وإعادة التقديم في جلسة واحدة.
+تم التحقق من ظهور الصفحة العامة وزر التثبيت في **11 أكتوبر 2026**؛ هذا تاريخ التحقق وليس تاريخ الموافقة الأصلية. التثبيت يتطلب تسجيل الدخول، ولم يُختبر هنا من حساب متعلم مستقل.
+
+تعليمات انتظار المراجعة القديمة أو إلغائها لم تعد تمثل الحالة الحالية. أي تحديث قادم يُختبر على البيتا أولًا، ووجود تغييرات على `main` لا يعني نشرها تلقائيًا أو أن نفس نسخة الكود تعمل في الإنتاج.

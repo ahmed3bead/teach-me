@@ -1,10 +1,10 @@
 # ChatGPT public plugin submission kit
 
-> **Release guard:** the plugin currently under OpenAI review uses the previously submitted production deployment. The `main` branch contains the next version and must not be deployed to production or resubmitted until the current review finishes. See [Current release status](release-status.md).
+> **Publication status:** Teach Me has been approved by OpenAI and published in ChatGPT. [Public listing](https://chatgpt.com/plugins/plugin_asdk_app_6ab81f50a2b881918abe2865d47fb2a3) — version **1.0.0**, verified on 2026-10-11. This checklist remains maintainer guidance for future updates; see [Current release status](release-status.md).
 
 This is the source-of-truth checklist for publishing Teach Me to ordinary ChatGPT users through the universal Plugins Directory. The submission type is **With MCP**, using the public, anonymous, read-only server below. Developer mode is only for private testing and is not the distribution path.
 
-## Full-version resubmission candidate
+## Submission configuration
 
 | Field | Value |
 |---|---|
@@ -95,10 +95,11 @@ The server requires no authentication because it exposes no private or user-spec
 - [ ] Five positive and three negative cases are entered with their expected behavior.
 - [ ] The candidate is tested privately in ChatGPT with genuine traces and screenshots where the portal requests them.
 - [ ] The exact production version is submitted for review and left unchanged while review is pending.
-- [ ] After approval, the publisher selects **Publish** and verifies installation from a separate ordinary learner account.
+- [x] OpenAI approval and a public listing with **Install plugin** are confirmed as of 2026-10-11.
+- [ ] Verify installation from a separate ordinary learner account.
 
 ## Publication boundary
 
-A healthy public MCP endpoint is not by itself a public ChatGPT listing. Ordinary users can discover Teach Me only after OpenAI review, approval, and the publisher's explicit publication step. Until then, describe the MCP connector as a public beta ready for directory submission, not as generally available in ChatGPT.
+A healthy public MCP endpoint is not by itself a public ChatGPT listing. Ordinary users can discover Teach Me only after OpenAI review, approval, and the publisher's explicit publication step. Teach Me has completed approval and publication and is [publicly listed in ChatGPT](https://chatgpt.com/plugins/plugin_asdk_app_6ab81f50a2b881918abe2865d47fb2a3). Future candidate builds still require their own release validation.
 
 The existing skills-only package under `plugins/teach-me/` remains independently usable for compatible plugin hosts. It must not be represented as the reviewed remote MCP listing unless that exact combined package is what the portal imports and approves.
