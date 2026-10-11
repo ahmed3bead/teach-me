@@ -57,7 +57,9 @@
     {
       "description": "Teaching from an authorized PDF stays grounded in what ChatGPT can actually inspect.",
       "user_prompt": "Teach me from the PDF I attached. First tell me what text and page visuals you could inspect, then start with the first useful idea.",
-      "file_attachment_urls": null,
+      "file_attachment_urls": [
+        "https://raw.githubusercontent.com/ahmed3bead/teach-me/main/fixtures/submission/water-cycle.pdf"
+      ],
       "tools_triggered": "load_teach_me",
       "expected_output": "ChatGPT calls load_teach_me with source-grounded document guidance, reports inspected coverage, distinguishes source content from teaching additions, and does not claim access to unavailable pages or components.",
       "expected_output_url": null

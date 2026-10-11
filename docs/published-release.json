@@ -1,0 +1,49 @@
+{
+  "verified_on": "2026-10-11",
+  "listing_url": "https://chatgpt.com/plugins/plugin_asdk_app_6ab81f50a2b881918abe2865d47fb2a3",
+  "listing_version": "1.0.0",
+  "runtime_version": "1.0.0-beta.2",
+  "bundle_digest": "sha256:efbe6e8a20891fddcafbf9eb5a5ff9469779e8df12f2b3d3f23df2a9d367d2f4",
+  "observed_repository_commit": "b54b0a4f9f1ca0311508712a0d52b512f30b0a44",
+  "original_deployment_commit": null,
+  "approval_date": null,
+  "publication_date": null,
+  "starter_prompts": [
+    "Teach me how compound interest works from zero, using a practical example.",
+    "حضّر لي درسًا مدته 20 دقيقة عن التمثيل الضوئي لطلاب عمرهم 12 سنة، وافصل ملاحظات المدرس عن الكلام الذي أقوله للطلاب.",
+    "Teach me from the PDF I attach. First tell me what you can inspect, then start with the first useful idea."
+  ],
+  "production_endpoint": "https://teach-me-mcp.ahmedm3bead.workers.dev/mcp",
+  "beta_endpoint": "https://teach-me-mcp-next.ahmedm3bead.workers.dev/mcp",
+  "checked_routes": [
+    {},
+    {
+      "audience": "educator",
+      "locale": "ar-MSA"
+    },
+    {
+      "age_band": "primary-younger"
+    },
+    {
+      "input_mode": "source-grounded",
+      "source_type": "document"
+    },
+    {
+      "input_mode": "source-grounded",
+      "source_type": "video"
+    },
+    {
+      "input_mode": "source-grounded",
+      "source_type": "playlist"
+    },
+    {
+      "input_mode": "source-grounded",
+      "source_type": "mixed"
+    }
+  ],
+  "independent_account_installation_verified": false,
+  "pdf_fixture": {
+    "path": "fixtures/submission/water-cycle.pdf",
+    "sha256": "b7f779d15de0a64e6926918ffaaad4335ddfdbfc6ca2baa6deea55cddd0ac0ee"
+  }
+}

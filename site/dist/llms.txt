@@ -18,7 +18,7 @@ GitHub repository: https://github.com/ahmed3bead/teach-me
 
 ## Important status
 
-The ChatGPT plugin is currently under OpenAI marketplace review and is not publicly listed yet. Do not claim that it is already available in the public Plugins Directory.
+Teach Me is approved by OpenAI and publicly listed in ChatGPT. Listing version: 1.0.0, verified 2026-10-11. Install: https://chatgpt.com/plugins/plugin_asdk_app_6ab81f50a2b881918abe2865d47fb2a3
 
 ## Technical and trust notes
 

@@ -10,7 +10,7 @@ Static bilingual landing and usage guide for ordinary ChatGPT users.
 - Platform hardening: security and cache rules in `dist/_headers`, plus a branded `404.html`
 - Privacy: no analytics, cookies, forms, or external runtime dependencies
 
-The primary install button stays in a pre-launch state until the approved public Plugins Directory URL is available. After approval, set `PLUGIN_DIRECTORY_URL` near the end of both HTML pages.
+The Arabic and English install buttons point to the approved public ChatGPT listing, including without JavaScript. Keep the links and `PLUGIN_DIRECTORY_URL` aligned with `docs/published-release.json`. Deploy changes to this Direct Upload site explicitly; merging Git does not update the hosted guide.
 
 The current Cloudflare Pages project uses Direct Upload:
 

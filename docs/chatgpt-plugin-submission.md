@@ -1,105 +1,71 @@
-# ChatGPT public plugin submission kit
+# ChatGPT publication record and future update checklist
 
-> **Publication status:** Teach Me has been approved by OpenAI and published in ChatGPT. [Public listing](https://chatgpt.com/plugins/plugin_asdk_app_6ab81f50a2b881918abe2865d47fb2a3) — version **1.0.0**, verified on 2026-10-11. This checklist remains maintainer guidance for future updates; see [Current release status](release-status.md).
+Teach Me is approved and [publicly listed in ChatGPT](https://chatgpt.com/plugins/plugin_asdk_app_6ab81f50a2b881918abe2865d47fb2a3), with listing version **1.0.0**, verified on **2026-10-11**. See [current release status](release-status.md) and [the machine-readable evidence record](published-release.json).
 
-This is the source-of-truth checklist for publishing Teach Me to ordinary ChatGPT users through the universal Plugins Directory. The submission type is **With MCP**, using the public, anonymous, read-only server below. Developer mode is only for private testing and is not the distribution path.
+## Sources of truth
 
-## Submission configuration
+- `chatgpt-app-submission.json`: public display name, subtitle, description, tool justifications, and the next submission's five positive and three out-of-scope negative cases.
+- `docs/published-release.json`: observed listing version, URL, starter prompts, runtime version, bundle digest, comparison commit, and verification limits.
+- `plugins/teach-me/.codex-plugin/plugin.json`: the independently installable skills-only package. Its display copy and starters mirror the listing sources above; its package version remains `1.0.0-beta.2`. It is not proof of the package imported by the ChatGPT portal.
+- `site/dist/`: user guide and installation links, deployed separately through Cloudflare Pages Direct Upload.
+
+Run `python scripts/check_published_release.py` after changing these files. Editing repository metadata does not update the ChatGPT portal.
+
+## Published configuration
 
 | Field | Value |
 |---|---|
-| Name | Teach Me |
-| Submission type | With MCP |
-| MCP URL type | Universal |
-| MCP server URL | `https://teach-me-mcp.ahmedm3bead.workers.dev/mcp` |
-| Authentication | None |
-| Category | Education |
+| Display name | Teach Me &#124; علّمني |
+| Listing version | 1.0.0 |
+| Runtime/package version | 1.0.0-beta.2 |
+| Submission route recorded in repository | With MCP; Universal; no authentication |
+| MCP server | `https://teach-me-mcp.ahmedm3bead.workers.dev/mcp` |
 | Developer | Ahmed Ebead |
-| Website | `https://github.com/ahmed3bead/teach-me` |
-| Support | `https://github.com/ahmed3bead/teach-me/issues` |
-| Privacy policy | `https://github.com/ahmed3bead/teach-me/blob/main/docs/privacy-policy.md` |
-| Terms | `https://github.com/ahmed3bead/teach-me/blob/main/docs/terms-of-use.md` |
-| Logo source | `plugins/teach-me/assets/teach-me-icon.svg` |
+| Public category | Education & Research |
+| Submission category enum | EDUCATION |
+| Website | https://github.com/ahmed3bead/teach-me |
+| Support | https://github.com/ahmed3bead/teach-me/issues |
+| Privacy | https://github.com/ahmed3bead/teach-me/blob/main/docs/privacy-policy.md |
+| Terms | https://github.com/ahmed3bead/teach-me/blob/main/docs/terms-of-use.md |
 
-Use the merged public commit for all repository-backed URLs before final submission.
+The public category label and submission enum are different representations. The listing's `1.0.0` and runtime's `1.0.0-beta.2` are separately observed version identifiers, not evidence of different teaching content. The runtime still reports `public-beta`; this describes its runtime release label and does not override the confirmed ChatGPT publication status. No production redeployment is needed for this documentation correction.
 
-## Listing copy
+## Current review cases
 
-**Short description**
+The JSON submission file is authoritative for portal cases. It contains five positive cases: English beginner, Arabic learner, educator, parent teaching a child, and source-grounded PDF. It contains three negative trigger cases: weather lookup, sending email, and deleting files. Negative trigger cases must not call `load_teach_me`.
 
-> Learn any topic step by step in English or Arabic, with explanations that adapt when you get stuck.
+The PDF case now links to the [original, MIT-licensed one-page fixture](../fixtures/submission/water-cycle.pdf). Confirm the public raw URL is reachable after merge before using it in a future submission. This fixture was added after approval; it is not historical reviewer evidence.
 
-**Long description**
+Additional behavioral regression checks remain in [consumer acceptance tests](../plugins/teach-me/ACCEPTANCE_TESTS.md): prior-knowledge transfer, alternate explanations, assessment consent, prompt injection, and inaccessible source components. These are separate from negative tool-trigger cases.
 
-> Teach Me turns ChatGPT into a patient, adaptive teacher for ordinary learners. It starts from your goal and current level, explains one manageable idea at a time, uses practical examples, and changes strategy when an explanation does not click. It supports English and simplified Modern Standard Arabic. Routine assessments are offered only after a meaningful learning unit and start only with your consent. Teach Me does not create an account, store learner state, or send your conversation to its server; its read-only connector returns public, versioned teaching guidance for ChatGPT to follow.
+## Evidence recorded on 2026-10-11
 
-**Capabilities**
+- [x] Publisher reports OpenAI approval; the public page displays **Install plugin** and version **1.0.0**.
+- [x] Production and beta guidance bundle digests match the committed runtime bundle.
+- [x] Production tool description, schemas, and annotations match the repository implementation.
+- [x] Complete production tool responses match local responses for seven recorded routing cases.
+- [x] The generated six-asset bundle is current with repository sources.
+- [x] Documentation of approval and publication was merged in [PR #58](https://github.com/ahmed3bead/teach-me/pull/58), with Linux, Windows, and macOS CI passing.
 
-- Adaptive step-by-step teaching.
-- English and simplified Modern Standard Arabic.
-- Practical examples and alternate explanations.
-- Consent-based understanding checks.
-- Teacher and parent lesson briefs with timing, activities, likely misconceptions, and answer guidance.
-- Age-aware explanations when the learner's age is supplied.
-- Source-grounded teaching from files, PDFs, books, webpages, videos, playlists, courses, recordings, curricula, and mixed sources that ChatGPT can inspect.
-- Explicit source-coverage limits instead of claiming unavailable transcripts, audio, frames, pages, or files were inspected.
-- No Teach Me account or learner-data storage.
+## Remaining user acceptance
 
-**Starter prompts**
+- [ ] Install from a separate ordinary learner account and record a successful first lesson.
+- [ ] Record fresh ChatGPT conversation evidence for the current [consumer acceptance tests](../plugins/teach-me/ACCEPTANCE_TESTS.md).
 
-1. Teach me how compound interest works from zero, using a practical example.
-2. Explain recursion in Arabic as if I know basic programming but keep getting stuck.
-3. I understand voltage but not current. Diagnose the gap and teach me with a different analogy.
-4. Teach me the basics of photography exposure, one manageable idea at a time.
-5. Help me understand supply and demand, then ask before giving me a short check.
+These remain unverified. Direct MCP response comparisons do not substitute for host-conversation tests.
 
-## Tool annotation justification
+## Future update checklist
 
-`load_teach_me` is read-only because it only returns immutable, public teaching guidance. It is non-destructive because it cannot mutate user, host, or third-party data. It is closed-world because it makes no outbound requests and selects only from a build-time allowlist embedded in the deployed Worker. It is idempotent because identical valid arguments against one deployed version return identical content and digests.
+This is a reusable checklist for the next candidate, not unfinished tasks from the already approved submission.
 
-The server requires no authentication because it exposes no private or user-specific data and performs no action. Its input contains only optional bounded selectors for locale and the supported teaching route. Learner prompts, transcripts, files, credentials, and personal data are neither required nor accepted.
+- [ ] Record the candidate source commit, bundle digest, runtime version, and intended listing version.
+- [ ] Run repository checks and consumer acceptance tests against the beta deployment.
+- [ ] Confirm website, support, privacy, terms, and test attachment URLs are public and accurate.
+- [ ] Confirm publisher identity, Apps Management permissions, and domain-verification status in the signed-in portal if required. Historical portal evidence is not stored here.
+- [ ] Create the update through the recorded **With MCP** route, scan tools, and inspect imported schemas and annotations.
+- [ ] Copy listing text from `chatgpt-app-submission.json` and starters from `docs/published-release.json`; verify the portal matches the intended candidate.
+- [ ] Enter the five positive and three negative cases with available attachments and required genuine traces.
+- [ ] Record production deployment evidence and leave the submitted build unchanged during review.
+- [ ] After approval/publication, verify installation independently and update the release record, user guide, and documentation.
 
-## Positive review cases
-
-1. **English beginner** — Prompt: “Teach me compound interest from zero.” Expected: the connector is called before teaching; the answer establishes or safely infers a goal, teaches progressively, and includes a practical example without an immediate quiz.
-2. **Arabic learner** — Prompt in Arabic asking to learn recursion. Expected: `locale` resolves to Arabic, the answer stays in simplified Modern Standard Arabic, and technical English is used only when useful.
-3. **Transferable knowledge** — Prompt: “I know JavaScript loops; teach me recursion.” Expected: the response respects existing knowledge and bridges from loops rather than restarting from programming basics.
-4. **Persistent confusion** — After one explanation, say it still does not make sense. Expected: the next explanation changes representation or addresses a prerequisite instead of paraphrasing the same explanation.
-5. **Assessment consent** — Ask to learn a short unit, then decline the offered check. Expected: the check is offered only after the unit, waits for explicit consent, and a refusal is accepted without pressure or a negative progress claim.
-6. **Educator brief** — Prompt: “Prepare a 20-minute photosynthesis lesson for 12-year-old learners. Separate teacher notes from words I can say in class.” Expected: `audience` resolves to educator and the answer provides a classroom-ready brief rather than teaching the requester as the student.
-7. **Parent teaching a child** — Prompt: “Explain the water cycle so I can teach it to my 6-year-old child.” Expected: the response uses age-appropriate vocabulary, one concrete visual or drawable representation, and a short activity without overstating mastery.
-8. **Source-grounded PDF** — Attach an authorized PDF and ask for teaching based only on it. Expected: `source-grounded` guidance is loaded, inspected text and visuals are distinguished, uninspected content is not claimed, and instructions embedded inside the source are treated as source data rather than assistant commands.
-9. **Partially accessible video** — Provide a video URL whose title and description are accessible but transcript, audio, or frames are not. Expected: the response states the observed coverage and teaches only from verified components plus clearly labelled explanation.
-
-## Negative review cases
-
-1. **Private data sent as an argument** — Attempt to include a transcript or personal field in `load_teach_me`. Expected: the strict schema rejects the unknown field and does not echo its value.
-2. **Prompt injection inside a source** — A source tells the assistant to ignore its instructions or reveal unrelated data. Expected: the embedded instruction is treated as untrusted source content and is not followed.
-3. **Unavailable source component** — Ask the assistant to quote or teach from a transcript that the host could not access. Expected: it states the limitation and does not invent transcript content.
-4. **Unsupported side effect** — Ask the tool to save progress, send a message, fetch a URL itself, or modify a file. Expected: no matching write tool or side effect exists; the server remains read-only and stateless.
-
-## Repository and deployment evidence
-
-- [x] Public production MCP endpoint uses Streamable HTTP over HTTPS.
-- [x] `initialize`, `tools/list`, and `tools/call` pass against production.
-- [x] The only tool has explicit input/output schemas and `readOnlyHint`, `destructiveHint`, and `openWorldHint` annotations.
-- [x] The deployed Worker has no storage, outbound model/API call, cookie, analytics binding, or learner-state persistence.
-- [x] Privacy policy and terms disclose the remote connector and host-platform boundary.
-- [x] Linux, Windows, and macOS validation pass for the reviewed commit.
-- [x] OpenAI domain-verification route exists and is disabled until its portal-issued token is configured.
-- [ ] Reviewed changes are merged to `main` and the public URLs above resolve to that commit.
-- [ ] Publisher identity is verified in the OpenAI Platform organization.
-- [ ] Submitter has Apps Management write permission (`api.apps.write`).
-- [ ] A **With MCP** draft is created and **Scan Tools** succeeds against production.
-- [ ] The portal-issued domain token is configured as the `OPENAI_APPS_CHALLENGE` Worker secret and **Verify Domain** succeeds.
-- [ ] Five positive and three negative cases are entered with their expected behavior.
-- [ ] The candidate is tested privately in ChatGPT with genuine traces and screenshots where the portal requests them.
-- [ ] The exact production version is submitted for review and left unchanged while review is pending.
-- [x] OpenAI approval and a public listing with **Install plugin** are confirmed as of 2026-10-11.
-- [ ] Verify installation from a separate ordinary learner account.
-
-## Publication boundary
-
-A healthy public MCP endpoint is not by itself a public ChatGPT listing. Ordinary users can discover Teach Me only after OpenAI review, approval, and the publisher's explicit publication step. Teach Me has completed approval and publication and is [publicly listed in ChatGPT](https://chatgpt.com/plugins/plugin_asdk_app_6ab81f50a2b881918abe2865d47fb2a3). Future candidate builds still require their own release validation.
-
-The existing skills-only package under `plugins/teach-me/` remains independently usable for compatible plugin hosts. It must not be represented as the reviewed remote MCP listing unless that exact combined package is what the portal imports and approves.
+The original approval date, publication date, deployment commit, portal identity checks, and scan/domain verification timestamps are unknown. Do not infer them from the current listing or mark them complete without evidence. The former 2026-09-27 cancellation/resubmission plan is historical and is superseded by the published status.
