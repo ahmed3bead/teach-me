@@ -372,6 +372,14 @@ def test_terminology_structure_and_child_semantics() -> None:
     for text in ("A complete sentence with reversed delimiters )( is structurally invalid.", 'A complete sentence with an "unclosed quotation.', "A code block starts here: ```python\nprint('x')"):
         assert not runner.deterministic_completeness_check(text)["passed"]
     assert runner.deterministic_completeness_check("A complete teaching list follows for this lesson:\n- first detailed learning item\n- second detailed learning item")['passed']
+    for text in (
+        "أرسل في رد واحد: 1) بلد الدراسة، 2) جنسيتك، 3) مدة الدراسة ونوع البرنامج. هذه هي خطوتك الحالية.",
+        "اختر الإجابة الصحيحة: أ) النواة، ب) الغشاء الخلوي، ج) الميتوكوندريا. اكتب إجاباتك مرقّمة.",
+        "Choose one option for this lesson: a) recall the rule, b) apply it (see step 1), c) explain it.",
+    ):
+        assert runner.deterministic_completeness_check(text)["passed"], text
+    for text in ("هذه جملة كاملة تنتهي بقوس مغلق بلا افتتاح كلمة) وتبقى غير سليمة.", "Pick the answer (a) or b) and then explain it clearly (see notes."):
+        assert not runner.deterministic_completeness_check(text)["passed"], text
     child_prompt = "Explain fractions to a primary school child."
     assert runner.deterministic_child_onboarding_check("We start from zero with fractions. Imagine an apple cut into equal pieces for a clear concrete example.", child_prompt)["passed"]
     assert not runner.deterministic_child_onboarding_check("I have never seen an apple before. Here is a paper circle and a friendly explanation.", child_prompt)["passed"]
@@ -468,6 +476,15 @@ def test_grader_evidence() -> None:
         try: runner.validate_grade(hidden, ["criterion"], transcript, explicitly_hidden_artifact)
         except RuntimeError: pass
         else: raise AssertionError(f"explicitly hidden HTML text passed as learner-visible evidence: {hidden_text}")
+    spacing = copy.deepcopy(valid); spacing["results"][0]["evidence"]["quote"] = "safeprocedure"
+    assert runner.validate_grade(spacing, ["criterion"], transcript)[0]["passed"]
+    inline_html = [{"path":"plan.html","media_type":"text/html","content":"<li>المتطلب: <bdi dir='ltr'>L01</bdi>. الحالة: مخطط.</li>"}]
+    inline_grade = copy.deepcopy(html_grade); inline_grade["results"][0]["evidence"].update(artifact_path="plan.html", quote="المتطلب: L01. الحالة: مخطط.")
+    assert runner.validate_grade(inline_grade, ["criterion"], transcript, inline_html)[0]["passed"]
+    reordered = copy.deepcopy(valid); reordered["results"][0]["evidence"]["quote"] = "procedure safe"
+    try: runner.validate_grade(reordered, ["criterion"], transcript)
+    except RuntimeError: pass
+    else: raise AssertionError("reordered evidence passed as an exact span")
     diacritic = copy.deepcopy(valid); diacritic["results"][0]["evidence"]["quote"] = "safe procédurè"
     try: runner.validate_grade(diacritic, ["criterion"], transcript)
     except RuntimeError: pass

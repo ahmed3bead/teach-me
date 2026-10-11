@@ -14,6 +14,10 @@ Research claims that are recent, changing, specialized, disputed, consequential,
 
 Popularity is not evidence quality. Prefer the source that directly supports the exact claim.
 
+## Current facts
+
+When teaching a recent or changing rule from a lookup, name the authority and link the supporting page, distinguish its publication or effective date from the date you checked it, and state the verification date explicitly. Explain which jurisdiction or case the source covers and what it does not settle.
+
 ## Claim checks
 
 Before teaching a consequential claim, verify:

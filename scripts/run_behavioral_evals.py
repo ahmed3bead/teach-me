@@ -553,15 +553,23 @@ def visible_html_text(value: str) -> str:
     return " ".join(" ".join(parser.parts).split())
 
 
+def contains_exact_span(content: str, quote: str) -> bool:
+    """Require every quoted character in order; only whitespace placement may differ."""
+    if quote in content:
+        return True
+    compact_quote = "".join(quote.split())
+    return bool(compact_quote) and compact_quote in "".join(content.split())
+
+
 def artifact_contains_evidence(artifact: dict[str, Any], quote: str) -> bool:
     """Accept raw evidence for non-HTML or a contiguous learner-visible HTML span."""
     content = artifact.get("content", "")
     if not isinstance(content, str):
         return False
     if artifact.get("media_type") != "text/html":
-        return quote in content
+        return contains_exact_span(content, quote)
     visible_quote = visible_html_text(quote)
-    return bool(visible_quote) and visible_quote in visible_html_text(content)
+    return bool(visible_quote) and contains_exact_span(visible_html_text(content), visible_quote)
 
 
 def validate_grade(grade: dict[str, Any], expected: list[str], transcript: list[dict[str, Any]], artifacts: list[dict[str, Any]] | None = None, on_result: Any | None = None) -> list[dict[str, Any]]:
@@ -585,7 +593,7 @@ def validate_grade(grade: dict[str, Any], expected: list[str], transcript: list[
         if source == "response":
             turn = evidence.get("turn")
             messages = [m for m in transcript if m.get("role") == "assistant" and m.get("turn") == turn]
-            if len(messages) != 1 or quote not in messages[0].get("content", ""):
+            if len(messages) != 1 or not contains_exact_span(messages[0].get("content", ""), quote):
                 raise RuntimeError("evidence quote must occur in the identified assistant turn")
         elif source == "artifact":
             matches = [a for a in (artifacts or []) if a.get("path") == evidence.get("artifact_path")]
@@ -1124,9 +1132,13 @@ def deterministic_completeness_check(
     minimum_characters = 30 if short_assessment else 1
     fences_closed = stripped.count("```") % 2 == 0
     stack: list[str] = []; pairs = {")": "(", "]": "[", "}": "{"}; in_double = False
-    for character in stripped.replace("```", ""):
+    unfenced = stripped.replace("```", "")
+    # An unopened ")" after a short list label such as "1)", "b)", or "أ)" is an enumerator, not a broken pair.
+    enumerators = {match.end() - 1 for match in re.finditer(r"(?:^|(?<=[\s،,؛;:]))(?:\d{1,3}|[A-Za-z]|[ء-ي])\)", unfenced, re.M)}
+    for index, character in enumerate(unfenced):
         if character == '"': in_double = not in_double
         elif not in_double and character in "([{": stack.append(character)
+        elif not in_double and character == ")" and index in enumerators and "(" not in stack: continue
         elif not in_double and character in pairs:
             if not stack or stack.pop() != pairs[character]: stack.append("INVALID"); break
     pairs_closed = not stack and not in_double and stripped.count("«") == stripped.count("»") and stripped.count("“") == stripped.count("”")

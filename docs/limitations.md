@@ -1,6 +1,6 @@
 # Limitations
 
-Teach Me is currently a public beta. It is designed to make teaching more adaptive and evidence-aware, but it cannot guarantee a particular outcome.
+Teach Me `v1.0.0` is published as a version label, but its stable quality gates have not all passed; treat its quality evidence as beta-level. It is designed to make teaching more adaptive and evidence-aware, but it cannot guarantee a particular outcome.
 
 ## General limits
 
@@ -18,11 +18,12 @@ Teach Me is currently a public beta. It is designed to make teaching more adapti
 - Codex and Claude Code provide stronger local file and validation workflows, but their available tools and permissions still vary by environment.
 - Codex PDF output depends on the pinned Python packages and required platform libraries. Validated HTML remains the accessible source of truth when rendering is unavailable.
 
-## Beta evidence status
+## Quality evidence status
 
 - The programming and photography domain packs remain experimental until qualified review.
-- The corrected full 90-case exact-SHA behavioral run remains required for stable release.
+- A complete 95-case exact-SHA behavioral run at or above the 90% threshold, with no critical failures, has not yet passed.
+- The Arabic Luma closed-book simulation most recently failed a critical check.
 - Earlier invalid behavioral results are not release evidence.
-- Human review and the stable evidence receipt remain incomplete.
+- Human review is owner-attested (see `human-review-attestation-2026-10-11.md`); the learner-journey and artifact reviews and the stable evidence receipt remain incomplete.
 
 See [release notes](../RELEASE_NOTES.md), [model evaluation](model-evaluation.md), and the [release checklist](release-checklist.md) for the exact status.
