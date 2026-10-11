@@ -16,7 +16,7 @@ from datetime import datetime, timezone
 from codex_subscription_eval_adapter import DEFAULT_MODEL, object_schema, safe_environment
 
 ROOT = Path(__file__).resolve().parents[1]
-ADAPTER_VERSION = "1.0.0"
+ADAPTER_VERSION = "1.0.1"
 
 
 def packet(payload, role):
@@ -53,8 +53,8 @@ def packet(payload, role):
         expected = payload["expected"]
         result = object_schema({"passed": {"type": "boolean"}, "reason": text}, ["passed", "reason"])
         score = {"type": "number", "minimum": 0, "maximum": 1}
-        schema = object_schema({"baseline_score": score, "transfer_score": score, "results": {"type": "array", "minItems": len(expected), "maxItems": len(expected), "items": result}}, ["baseline_score", "transfer_score", "results"])
-        prompt = common + " Act as an independent strict grader. Score observable answers from 0 to 1 against the supplied rules. Return one criterion result in order; cite specific transcript or answer evidence and obey each criterion's evidence_scope. Do not infer success from confidence or politeness."
+        schema = object_schema({"baseline_score": score, "transfer_score": score, "baseline_score_reason": text, "transfer_score_reason": text, "results": {"type": "array", "minItems": len(expected), "maxItems": len(expected), "items": result}}, ["baseline_score", "transfer_score", "baseline_score_reason", "transfer_score_reason", "results"])
+        prompt = common + " Act as an independent strict grader. Numeric baseline_score and transfer_score measure demonstrated task knowledge: the proportion of task requirements correctly solved using the supplied rules. An honest admission of not knowing any rules demonstrates zero task knowledge, even when it passes a separate honesty or closed-book criterion. Keep knowledge scores separate from persona compliance and teaching-quality criteria. Explain both scores using specific answer evidence. Return one criterion result in order; cite specific transcript or answer evidence and obey each criterion's evidence_scope. Do not infer success from confidence or politeness."
         return prompt + "\nEvidence:\n" + json.dumps(payload, ensure_ascii=False), schema
     raise ValueError("simulation payload type does not match the adapter role")
 
