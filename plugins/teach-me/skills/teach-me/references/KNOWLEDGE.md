@@ -105,13 +105,13 @@ Use evidence levels:
 4. `transferred`: succeeded in a meaningfully different context;
 5. `retained`: retrieved or applied it after a delay.
 
-Do not advance a prerequisite based only on acknowledgement or recognition. If a learner declines an optional check, keep the evidence state unchanged. Continue to material that does not depend on the unverified capability; when the next objective does depend on it, explain that dependency and offer an equivalent low-pressure way to demonstrate it.
+Do not advance a prerequisite based only on acknowledgement or recognition. When a learner says they understand and asks to move on, do not choose and start the next topic yourself: briefly note that understanding has not yet been demonstrated, then ask what they want to learn next so you can tell whether it depends on the current topic. If a learner declines an optional check, keep the evidence state unchanged. Continue to material that does not depend on the unverified capability; when the next objective does depend on it, explain that dependency and offer an equivalent low-pressure way to demonstrate it.
 
 These evidence levels are primarily teacher-facing. Do not announce a classification after every learner message. Offer verification only after a complete lesson, topic, module objective, or practical skill, using the opt-in boundary in [conversational-teaching.md](https://github.com/ahmed3bead/teach-me/blob/main/references/conversational-teaching.md). Prefer one meaningful application over frequent micro-questions.
 
 ## Recover from failure
 
-When a learner struggles, form one testable diagnosis and try a materially different intervention. State the likely cause in one sentence—for example, an abstract definition without a concrete case, or a missing prerequisite—and begin the new representation in the same turn, even when you also ask which concept or example confused them. If two approaches fail, inspect prerequisites or narrow the goal. Explain the adjustment without making the learner feel evaluated as a person.
+When a learner struggles, form one testable diagnosis and try a materially different intervention. State the likely cause in one sentence—for example, an abstract definition without a concrete case, or a missing prerequisite—and begin the new representation in the same turn, even when you also ask which concept or example confused them. If two approaches fail, inspect prerequisites or narrow the goal: stop advancing, name the nearest prerequisite you suspect, and ask one short low-pressure question about it before explaining again. Explain the adjustment without making the learner feel evaluated as a person.
 
 ---
 
@@ -137,11 +137,11 @@ Do not narrate `introduced`, `practised-with-help`, `applied-independently`, sco
 The teaching arc may span several responses. Do not force Model, Guide, Release, Retrieve, and Close into every turn.
 
 - Complete a meaningful learning unit before offering routine assessment. A unit may be a complete lesson, topic, module, chapter objective, or practical skill with its explanation, distinctions, and representative example.
-- A page, paragraph, isolated fact, heading, arbitrary chat turn, or unfinished slice of a source is not a unit boundary. Before the boundary, continue the connected explanation without previewing, promising, or offering the routine check. A correct “not yet” response must not announce when a future quiz or check will occur.
-- At each completed-unit boundary, give a short recap and offer an optional understanding check. The invitation must not contain the first test question; wait for explicit acceptance before starting. If the learner explicitly asks to verify or confirm understanding, that request is acceptance: begin one suitable check without asking them to opt in again.
+- A page, paragraph, isolated fact, heading, arbitrary chat turn, or unfinished slice of a source is not a unit boundary. Before the boundary, continue the connected explanation without previewing, promising, or offering the routine check. A correct “not yet” response must not announce when a future quiz or check will occur. Say «لا، لم يكتمل الدرس بعد؛ لنكمل الشرح.» and continue teaching; do not add «وبعد اكتمال الدرس أعرض عليك فحصًا قصيرًا».
+- At each completed-unit boundary, give a short recap and offer an optional understanding check. Never state or imply that the learner already agreed unless their own message says so. The invitation must not contain the first test question; wait for explicit acceptance before starting. If the learner explicitly asks to verify or confirm understanding, that request is acceptance: begin one suitable check without asking them to opt in again.
 - Prefer one integrated authentic application when it can reveal several depths of understanding. Use several separate items when the learner requests multiple questions, the objective cannot be sampled authentically in one task, or formal exam practice requires them.
 - Vary participation: the learner may read, compare, annotate, ask, observe a worked case, attempt a task, or teach back. Not every turn requires a reply containing an answer.
-- Make formal quizzes, scores, and repeated drills optional unless the learner explicitly wants exam preparation or certification practice.
+- Make formal quizzes, scores, and repeated drills optional unless the learner explicitly wants exam preparation or certification practice. Even when the learner asks for many questions, ask them in short rounds of three to five, give feedback on each round, and use the answers to choose the next round; never send one long list of ten or more questions.
 - If the learner declines, continue without pressure, penalty language, or an implied negative judgment. Offer again only after another complete unit, not repeatedly within the same one.
 - Continue to protect prerequisite integrity internally; lower assessment frequency does not mean claiming unobserved mastery.
 

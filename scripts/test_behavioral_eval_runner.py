@@ -380,6 +380,21 @@ def test_terminology_structure_and_child_semantics() -> None:
         assert runner.deterministic_completeness_check(text)["passed"], text
     for text in ("هذه جملة كاملة تنتهي بقوس مغلق بلا افتتاح كلمة) وتبقى غير سليمة.", "Pick the answer (a) or b) and then explain it clearly (see notes."):
         assert not runner.deterministic_completeness_check(text)["passed"], text
+    syllabus = "### Lesson 1.2: Profile the source\n\nLearn:\n\n- Preserve the raw sheet unchanged.\n- Identify the record key, such as `Order_ID`.\n\nEvidence of completion: a short profile note."
+    assert runner.assessment_prompt_match(syllabus) is None
+    assert runner.assessment_prompt_match("**ستتعلم:**\n- حدّد عمود المفتاح في الجدول.\n- راجع القيم الفارغة.") is None
+    for text in (
+        "Practice:\n- Identify the record key in this sheet.",
+        "Learn:\n- Preserve the raw sheet.\n\nIdentify the record key in this sheet.",
+    ):
+        assert runner.assessment_prompt_match(text) is not None, text
+    assert not runner.deterministic_text_quality_check("مبنية على نواتج المنهج الم suppliedة: وصف التبخر.")["passed"]
+    for text in ("نستخدم الـAPI وبـPython في المثال.", "اكتب `xة` داخل الكود فقط.", "راجع https://example.test/aب للمزيد."):
+        assert runner.deterministic_text_quality_check(text)["passed"], text
+    assert runner.assessment_prompt_match("حلّلت المصدر المصرّح به فقط، ولم أُنشئ الحصة بعد.") is None
+    assert runner.assessment_prompt_match("حلّ المسألة الآتية الآن.") is not None
+    assert runner.deterministic_completeness_check("Current action: remember this one-line rule—**an API lets software communicate; replication keeps copies synchronized.**")["passed"]
+    assert not runner.deterministic_completeness_check("Current action: remember this one-line rule—**an API lets software communicate and**")["passed"]
     child_prompt = "Explain fractions to a primary school child."
     assert runner.deterministic_child_onboarding_check("We start from zero with fractions. Imagine an apple cut into equal pieces for a clear concrete example.", child_prompt)["passed"]
     assert not runner.deterministic_child_onboarding_check("I have never seen an apple before. Here is a paper circle and a friendly explanation.", child_prompt)["passed"]
@@ -481,6 +496,14 @@ def test_grader_evidence() -> None:
     inline_html = [{"path":"plan.html","media_type":"text/html","content":"<li>المتطلب: <bdi dir='ltr'>L01</bdi>. الحالة: مخطط.</li>"}]
     inline_grade = copy.deepcopy(html_grade); inline_grade["results"][0]["evidence"].update(artifact_path="plan.html", quote="المتطلب: L01. الحالة: مخطط.")
     assert runner.validate_grade(inline_grade, ["criterion"], transcript, inline_html)[0]["passed"]
+    revised = [{"path":"plan.html","media_type":"text/html","content":"<p>الإصدار الأول.</p>"},{"path":"plan.html","media_type":"text/html","content":"<p>الإصدار المعدّل بلا تكلفة.</p>"}]
+    for quote in ("الإصدار الأول.", "الإصدار المعدّل بلا تكلفة."):
+        revised_grade = copy.deepcopy(html_grade); revised_grade["results"][0]["evidence"].update(artifact_path="plan.html", quote=quote)
+        assert runner.validate_grade(revised_grade, ["criterion"], transcript, revised)[0]["passed"], quote
+    invented = copy.deepcopy(html_grade); invented["results"][0]["evidence"].update(artifact_path="plan.html", quote="نص غير موجود")
+    try: runner.validate_grade(invented, ["criterion"], transcript, revised)
+    except RuntimeError: pass
+    else: raise AssertionError("invented evidence passed against revised artifacts")
     reordered = copy.deepcopy(valid); reordered["results"][0]["evidence"]["quote"] = "procedure safe"
     try: runner.validate_grade(reordered, ["criterion"], transcript)
     except RuntimeError: pass

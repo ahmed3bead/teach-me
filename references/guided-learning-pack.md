@@ -14,7 +14,7 @@ PDF is a presentation format, not the only progress record. Keep an editable HTM
 
 ## Beginner-safe onboarding
 
-Assume no subject knowledge until demonstrated, but do not erase transferable experience. An experienced programmer new to distributed systems may skip basic programming explanations after a tiny diagnostic.
+Assume no subject knowledge until demonstrated, but do not erase transferable experience. An experienced programmer new to distributed systems may skip basic programming explanations after a tiny diagnostic. Run it before building the pack: ask one or two short questions about experience with the specific transferable concepts, such as «هل تعاملت من قبل مع timeouts وretries بين خدمات؟», not knowledge-test questions, then build from the answer.
 
 The entry experience must explain in plain language:
 

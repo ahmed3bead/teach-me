@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Fix four more evaluator false failures found in the 2026-10-11 run on `34b9ea2`: Arabic phrase boundaries now treat diacritics as part of a word (so «حلّلت» no longer matches the imperative «حلّ»); bullets under syllabus content labels such as "Learn:" are not treated as assessment prompts; a closing Markdown emphasis marker after final punctuation no longer counts as truncation; and grader evidence may cite any recorded version of a revised artifact path.
+- Ask graders for the shortest decisive quote (normally under 300 characters) after a long quote was miscopied at the 800-character limit.
+- Reject Latin text fused into an Arabic word (for example «suppliedة») in the deterministic text-quality guard.
+- Tighten teaching guidance for genuine findings: ask what comes next instead of choosing a topic after "I understand, move on"; do not mention a future check before a unit boundary; ask intensive exam practice in rounds of three to five with feedback; name the HTML source of a PDF; never imply consent the learner did not give; check the nearest prerequisite after a second failed explanation; run a tiny experience-based diagnostic for transferable expertise; and on a `TEACH-ME:` resume code, state the validated locator fields and use a short unscored prerequisite check for `v1` or partial codes.
+
 - Stop the deterministic completeness guard from treating list enumerators such as `1)`, `b)`, or `أ)` as unclosed delimiters. This false positive marked two complete Arabic responses as truncated in the 2026-10-11 behavioral run.
 - Accept grader evidence whose characters match the identified response or learner-visible artifact text exactly except for whitespace placement. Reordered, altered, hidden, or invented text is still rejected. This removes two grader-protocol false failures caused by a dropped space and by spacing around inline HTML elements.
 - Require learner-facing statements of the likely cause when an explanation fails, an explicit verification date and named authority for changing rules, and an honest report of which rendered PDF pages were reviewed.

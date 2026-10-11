@@ -69,6 +69,10 @@ ASSESSMENT_IMPERATIVE = re.compile(
     ),
     flags=re.IGNORECASE,
 )
+SYLLABUS_CONTENT_LABEL = re.compile(
+    r"(?:\*\*)?(?:learn|you will learn|topics|covers|content|ستتعلم|ستتعلّم|تتعلم|المحتوى|الموضوعات)(?:\*\*)?\s*[:：](?:\*\*)?",
+    flags=re.IGNORECASE,
+)
 ASSESSMENT_QUESTION = re.compile(
     r"^(?:هل|ماذا|ما|أي|من|متى|أين|كيف|لماذا|ليه|كم|كام|"
     r"what|which|who|when|where|why|how|can\s+you\s+explain|did\s+you\s+understand|do\s+you\s+understand|got\s+it)\b.*[؟?]$",
@@ -596,8 +600,9 @@ def validate_grade(grade: dict[str, Any], expected: list[str], transcript: list[
             if len(messages) != 1 or not contains_exact_span(messages[0].get("content", ""), quote):
                 raise RuntimeError("evidence quote must occur in the identified assistant turn")
         elif source == "artifact":
+            # A revised artifact keeps its path, so evidence may come from any recorded version.
             matches = [a for a in (artifacts or []) if a.get("path") == evidence.get("artifact_path")]
-            if len(matches) != 1 or not artifact_contains_evidence(matches[0], quote):
+            if not matches or not any(artifact_contains_evidence(match, quote) for match in matches):
                 raise RuntimeError("evidence quote must occur in the identified artifact")
         elif passed or not quote.startswith("ABSENT:"):
             raise RuntimeError("only FAIL may use ABSENT: evidence")
@@ -1000,6 +1005,7 @@ def assessment_prompt_match(text: str) -> AssessmentMatch | None:
         if {"yes", "no"}.issubset(supplied_branches):
             expository_questions.add(candidate)
     outside_fence = True
+    in_content_list = False
     for original in lines:
         line = original.strip().lstrip("-*#> ")
         if line.startswith("```"):
@@ -1007,6 +1013,13 @@ def assessment_prompt_match(text: str) -> AssessmentMatch | None:
             continue
         if not outside_fence or not line:
             continue
+        # Bullets under a syllabus content label ("Learn:") describe what a lesson covers, not a task posed now.
+        if SYLLABUS_CONTENT_LABEL.fullmatch(line):
+            in_content_list = True
+            continue
+        if in_content_list and original.strip().startswith(("- ", "* ")):
+            continue
+        in_content_list = False
         # Examples and code are evidence supplied by the teacher, not learner tasks.
         line = re.sub(r"`[^`]*`|«[^»]*»|“[^”]*”|\"[^\"]*\"", " ", line).strip()
         if not line:
@@ -1143,7 +1156,8 @@ def deterministic_completeness_check(
             if not stack or stack.pop() != pairs[character]: stack.append("INVALID"); break
     pairs_closed = not stack and not in_double and stripped.count("«") == stripped.count("»") and stripped.count("“") == stripped.count("”")
     final_line = next((line.strip() for line in reversed(stripped.splitlines()) if line.strip()), "")
-    structural_ending = stripped.endswith((".", "!", "?", "؟", "…", "`", "»", "”", '"', "'", ")", "]", "}"))
+    # Closing Markdown emphasis ("...synchronized.**") wraps the final punctuation; judge the text inside it.
+    structural_ending = stripped.rstrip("*_~").endswith((".", "!", "?", "؟", "…", "`", "»", "”", '"', "'", ")", "]", "}"))
     structural_ending = structural_ending or bool(re.search(r"TEACH-ME:v2:[^\s`]+`?$", final_line))
     structural_ending = structural_ending or bool(re.match(r"^(?:[-*]|\d+[.)])\s+\S+", final_line))
     dangling = bool(re.search(r"(?:\b(?:and|or|because|to|the|a|an|with|for|of|in|but|then|that)|(?:من|إلى|في|ثم|لكن|لأن))\s*$", stripped, re.I))
@@ -1210,8 +1224,14 @@ def deterministic_child_onboarding_check(text: str, prompt: str) -> dict[str, An
     }
 
 
+LATIN_ARABIC_FUSION = re.compile(r"[A-Za-z]+[ء-ي]")
+
+
 def deterministic_text_quality_check(text: str) -> dict[str, Any]:
     """Reject malformed Unicode structure without maintaining a vocabulary blacklist."""
+    # A Latin run fused into an Arabic suffix (e.g. "suppliedة") is corrupted output; code, links, and "الـAPI" stay allowed.
+    prose = re.sub(r"```.*?```|`[^`]*`|https?://\S+", " ", text, flags=re.DOTALL)
+    fused_tokens = sorted({match.group(0) for match in LATIN_ARABIC_FUSION.finditer(prose)})
     repeated_matches = list(REPEATED_ARABIC_DIACRITIC.finditer(text))
     repeated_marks = sorted({match.group(0) for match in repeated_matches})
     affected_tokens = sorted(
@@ -1229,13 +1249,14 @@ def deterministic_text_quality_check(text: str) -> dict[str, Any]:
             if unicodedata.category(character) == "Cc" and character not in "\n\r\t"
         }
     )
-    passed = not repeated_marks and not replacement_character and not control_codepoints
+    passed = not repeated_marks and not replacement_character and not control_codepoints and not fused_tokens
     return {
         "passed": passed,
         "reason": (
             "deterministic text-quality check: "
             f"repeated Arabic diacritics {repeated_marks}, affected tokens {affected_tokens}, "
-            f"replacement character {replacement_character}, disallowed controls {control_codepoints}"
+            f"replacement character {replacement_character}, disallowed controls {control_codepoints}, "
+            f"Latin-Arabic fused tokens {fused_tokens}"
         ),
     }
 

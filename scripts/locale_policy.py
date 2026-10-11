@@ -12,8 +12,13 @@ ARABIC_TEXT = re.compile(r"[\u0600-\u06ff]")
 
 
 def unicode_phrase_boundary(pattern: str) -> str:
-    """Wrap a phrase pattern so it cannot match inside a Unicode word."""
-    return rf"(?<!\w)(?:{pattern})(?!\w)"
+    """Wrap a phrase pattern so it cannot match inside a Unicode word.
+
+    Arabic diacritics are combining marks rather than word characters, so a phrase
+    may end with marks ("حلّ") but may not continue into more letters ("حلّلت").
+    """
+    marks = r"\u064B-\u065F\u0670"
+    return rf"(?<![\w{marks}])(?:{pattern})[{marks}]*(?![\w{marks}])"
 
 
 ENGLISH_REQUEST = re.compile(
