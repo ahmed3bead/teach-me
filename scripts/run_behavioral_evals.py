@@ -982,6 +982,15 @@ def assessment_prompt_match(text: str) -> AssessmentMatch | None:
         rhetorical_heading = re.match(r"^(?:لماذا\s+نستخدم\w*|why\s+do\s+we\s+use\b)", candidate, re.I)
         if rhetorical_heading and not option_like and len(following_items) >= 2 and all(item.endswith((".", "!", "؟", "?")) for item in following_items):
             expository_questions.add(candidate)
+        # A decision-tree heading whose branches immediately supply both outcomes
+        # is explanation, not a question addressed to the learner.
+        supplied_branches = {
+            "yes" if re.match(r"^[-*]\s*(?:yes|نعم)\b.*(?:←|->)", item, re.I) else
+            "no" if re.match(r"^[-*]\s*(?:no|لا)\b.*(?:←|->)", item, re.I) else None
+            for item in following_items
+        }
+        if {"yes", "no"}.issubset(supplied_branches):
+            expository_questions.add(candidate)
     outside_fence = True
     for original in lines:
         line = original.strip().lstrip("-*#> ")
