@@ -395,6 +395,15 @@ def test_terminology_structure_and_child_semantics() -> None:
     assert runner.assessment_prompt_match("حلّ المسألة الآتية الآن.") is not None
     assert runner.deterministic_completeness_check("Current action: remember this one-line rule—**an API lets software communicate; replication keeps copies synchronized.**")["passed"]
     assert not runner.deterministic_completeness_check("Current action: remember this one-line rule—**an API lets software communicate and**")["passed"]
+    for text in (
+        "## ماذا يحدث لو عكسنا الترتيب؟\nخذ صندوقًا أزرق وزنه 6 كجم: الترتيب الصحيح يعطي H.",
+        "**1) صندوق أزرق، وزنه 6 كجم**\n- هل 6 أكبر من 4؟ نعم.\n- البوابة H.",
+        "Read a rule left to right:\n- **what** is it called? → `sync`\n- **where** does it apply? → `local`",
+    ):
+        assert runner.assessment_prompt_match(text) is None, text
+    for text in ("هل 6 أكبر من 4؟ لاحظ الوزن جيدًا.", "What is it called?"):
+        assert runner.assessment_prompt_match(text) is not None, text
+    assert runner.deterministic_completeness_check("أمثلة محلولة:\n**1) صندوق أزرق** يذهب إلى H.\n**2) صندوق أصفر** يذهب إلى Y.")["passed"]
     child_prompt = "Explain fractions to a primary school child."
     assert runner.deterministic_child_onboarding_check("We start from zero with fractions. Imagine an apple cut into equal pieces for a clear concrete example.", child_prompt)["passed"]
     assert not runner.deterministic_child_onboarding_check("I have never seen an apple before. Here is a paper circle and a friendly explanation.", child_prompt)["passed"]
