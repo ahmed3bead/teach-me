@@ -2,7 +2,7 @@
 
 This is the complete, video-ready reference for the capabilities of **Teach Me | علّمني**. For Arabic, see [دليل المزايا بالعربية](features.ar.md).
 
-> **Current status:** the first ChatGPT plugin version is under OpenAI marketplace review and is not publicly listed yet. Educator, age-aware, and expanded source-grounded behavior is being validated on a separate beta endpoint for a later update.
+> **Current status:** Teach Me | علّمني has been approved by OpenAI and published in the ChatGPT Plugins Directory ([install](https://chatgpt.com/plugins/plugin_asdk_app_6ab81f50a2b881918abe2865d47fb2a3); listing version **1.0.0**, checked 2026-10-11). The published plugin includes the learner, educator, age-aware, and source-grounded experiences described here. See [release status](release-status.md).
 
 ## One plugin, three experiences
 
@@ -66,7 +66,7 @@ A parent or educator can include the learner's age. Teach Me maps it to a broad 
 - ages 9–12: older primary;
 - ages 13–17: teenager.
 
-Age changes vocabulary, depth, examples, activity length, safety, and independence. It is not treated as proof of ability. If a child-focused request omits age, the current beta uses the teenager band and allows the user to correct it.
+Age changes vocabulary, depth, examples, activity length, safety, and independence. It is not treated as proof of ability. If a child-focused request omits age, the current version uses the teenager band and allows the user to correct it.
 
 Visuals are capability-aware. Teach Me may use a story, analogy, diagram, object demonstration, or generated illustration when it improves understanding. If the host cannot create a real image, it provides an honest text or hands-on alternative.
 
