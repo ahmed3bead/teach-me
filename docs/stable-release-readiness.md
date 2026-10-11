@@ -18,7 +18,7 @@ Updated: 2026-10-11. The complete multi-host package remains `1.0.0-beta.2`. The
 - [ ] Full real-model behavioral run: currently 95 committed cases, at least 90% passing, zero critical failures, no fixture evidence substitution.
 - [ ] Previous-release comparison using recorded response and independent grader sessions.
 - [ ] Both closed-book learner simulations pass their transfer/gain and safety/consent checks.
-- [ ] A human reviews grader samples in English and Arabic.
+- [x] The repository owner confirmed completion of the human-review requirement in this chat on 2026-10-11 (Arabic and English review scope discussed above). This is owner-attested completion; the assistant did not independently observe the review. See `human-review-attestation-2026-10-11.md`.
 - [ ] A complete learner journey and an educator/source-grounded journey are reviewed.
 - [ ] A mixed Arabic/English HTML learning pack and its PDF pages, links, and code readability are inspected.
 - [ ] A genuine `real-release` receipt bound to the final candidate SHA passes `verify_release_evidence.py`.
