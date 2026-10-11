@@ -32,6 +32,15 @@ def run(selected: str, output: Path) -> subprocess.CompletedProcess[str]:
 
 
 def main() -> int:
+    for refusal in ("أفضل أن نواصل الشرح الآن، ولا أريد الفحص القصير بعد.", "فلا أوافق على الاختبار الآن."):
+        assert legacy_assessment_intent(refusal) == "decline"
+        assert validate_assessment_intent(refusal, "decline") == "decline"
+        try:
+            validate_assessment_intent(refusal, "accept")
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("conjunction-prefixed refusal was accepted as consent")
     rejected = {"raw_result": {"utterance": "No check now", "assessment_intent": "accept", "done": False}, "invocation_id": "test-invocation"}
     recorded = runner.adapter_attempt_record(rejected, "dialogue", 2)
     assert recorded["raw_result"] == rejected["raw_result"] and recorded["invocation_id"] == "test-invocation"

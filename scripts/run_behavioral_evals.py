@@ -1438,7 +1438,7 @@ def main() -> int:
     parser.add_argument("--protocol-retries", type=int, default=1)
     parser.add_argument("--candidate-commit", default=None)
     parser.add_argument("--release-evidence", action="store_true")
-    parser.add_argument("--evaluation-transport", choices=["openai-api", "codex-subscription"], default="openai-api")
+    parser.add_argument("--evaluation-transport", choices=["openai-api", "codex-subscription"], default=None)
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--expected-response-model", default="codex/gpt-5.6-sol")
     parser.add_argument("--expected-grader-model", default="codex/gpt-5.6-sol")
@@ -1529,7 +1529,7 @@ def main() -> int:
         "selected_case": args.case, "response_command": safe_adapter_command(args.response_command),
         "grader_command": safe_adapter_command(args.grader_command), "protocol_retries": args.protocol_retries,
         "timeout_seconds": args.timeout, "pass_threshold": args.pass_threshold,
-        "evaluation_transport": args.evaluation_transport,
+        "evaluation_transport": args.evaluation_transport or ("openai-api" if cost_plan else "unspecified"),
         "expected_response_model": args.expected_response_model, "expected_grader_model": args.expected_grader_model,
         "response_credential_env": args.response_api_key_env, "grader_credential_env": args.grader_api_key_env,
         "authorized_cost_usd": args.authorized_cost_usd,

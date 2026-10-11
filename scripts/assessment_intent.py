@@ -25,10 +25,10 @@ _ASSESSMENT_CONTEXT = re.compile(
 _DECLINE = re.compile(
     unicode_phrase_boundary(
         r"(?:"
-        rf"(?:لا|لن|لم){_ARABIC_SEPARATOR}(?:أختار|اختار|أوافق|اوافق|أريد|اريد)|"
-        rf"(?:لا|لن|لم){_ARABIC_SEPARATOR}(?:\w+{_ARABIC_SEPARATOR}){{0,4}}(?:أوافق|اوافق|أختار|اختار|أريد|اريد|جاهز(?:ة|ا)?|مستعد(?:ة|ا)?)|"
+        rf"[وف]?(?:لا|لن|لم){_ARABIC_SEPARATOR}(?:أختار|اختار|أوافق|اوافق|أريد|اريد)|"
+        rf"[وف]?(?:لا|لن|لم){_ARABIC_SEPARATOR}(?:\w+{_ARABIC_SEPARATOR}){{0,4}}(?:أوافق|اوافق|أختار|اختار|أريد|اريد|جاهز(?:ة|ا)?|مستعد(?:ة|ا)?)|"
         rf"(?:غير|لست|مش){_ARABIC_SEPARATOR}(?:جاهز(?:ة|ا)?|مستعد(?:ة|ا)?)|"
-        r"ليس\s+الآن|(?:لا|لن)\s+(?:تختبرني|تسألني)|أفضل\s+(?:متابعة|استكمال)\s+الشرح|"
+        r"ليس\s+الآن|[وف]?(?:لا|لن)\s+(?:تختبرني|تسألني)|أفضل\s+(?:متابعة|استكمال)\s+الشرح|"
         r"(?:i\s+)?(?:do|did|will)\s+not\s+(?:\w+\s+){0,2}(?:choose|agree|accept|want)|"
         r"(?:i\s+)?(?:don['’]t|didn['’]t|won['’]t)\s+(?:\w+\s+){0,2}(?:choose|agree|accept|want)|"
         r"(?:do\s+not|don['’]t|did\s+not|didn['’]t|will\s+not|won['’]t)\s+(?:\w+\s+){0,4}(?:check|quiz|test|questions?|exercises?|ready)|"
