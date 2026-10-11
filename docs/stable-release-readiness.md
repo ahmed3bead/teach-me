@@ -1,6 +1,6 @@
 # Stable v1.0.0 readiness
 
-Updated: 2026-10-11. The complete multi-host package remains `1.0.0-beta.2`. The separately published ChatGPT listing is `1.0.0`; its approval does not authorize a stable multi-host release.
+Updated: 2026-10-11. The `v1.0.0` tag and GitHub release were published at the owner's direction as a version label, without release archives, before the gates below passed. The installable multi-host package remains `1.0.0-beta.2`, and the separately published ChatGPT listing is `1.0.0`. Neither the tag nor the listing approval means these gates passed; they now apply to the next release, `v1.0.1`.
 
 ## Preflight work
 

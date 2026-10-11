@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- Stop the deterministic completeness guard from treating list enumerators such as `1)`, `b)`, or `أ)` as unclosed delimiters. This false positive marked two complete Arabic responses as truncated in the 2026-10-11 behavioral run.
+- Accept grader evidence whose characters match the identified response or learner-visible artifact text exactly except for whitespace placement. Reordered, altered, hidden, or invented text is still rejected. This removes two grader-protocol false failures caused by a dropped space and by spacing around inline HTML elements.
+- Require learner-facing statements of the likely cause when an explanation fails, an explicit verification date and named authority for changing rules, and an honest report of which rendered PDF pages were reviewed.
+- State that the third Luma transfer box has no triangle. The scenario's source material defines no default for an unmentioned symbol, so the honest closed-book learner correctly refused to guess and the critical simulation failed on an ambiguous task rather than on teaching. Thresholds and criteria are unchanged.
+- Correct the limitations and stable-readiness records to describe the published `v1.0.0` label, the 95-case suite, and the open quality gates.
+
+## 1.0.0 - 2026-10-11
+
+Published at the owner's direction as a version label without release archives. The stable behavioral, simulation, and artifact-review gates had not passed; see `docs/release-notes-v1.0.0.md`.
+
 - Prepared the public remote MCP submission path with a disabled-by-default OpenAI domain-verification endpoint backed by an uncommitted Worker secret.
 
 - Add the public-beta Teach Me remote MCP Worker (`teach-me-mcp`): a stateless, read-only Streamable HTTP endpoint at `/mcp` with one `load_teach_me` tool that delegates to the pure runtime adapter, plus a `/` status route. It stores no learner data, calls no model, performs no outbound fetch, and requires no authentication.

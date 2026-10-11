@@ -10,7 +10,7 @@ Use this workflow when the user asks for a detailed explanation of an entire boo
 - If the environment cannot create files, provide the curriculum as structured Markdown in chat and disclose that it was not saved.
 - Do not create both formats unless requested or conversion is inexpensive and clearly useful.
 
-For Arabic PDF, use right-to-left layout, an Arabic-capable font, isolated English runs, and rendered-page review before delivery. Do not treat successful file generation as visual validation.
+For Arabic PDF, use right-to-left layout, an Arabic-capable font, isolated English runs, and rendered-page review before delivery. Do not treat successful file generation as visual validation. In the delivery message, state which rendered pages you reviewed and what you checked, such as direction, isolated English terms, numbers, and page breaks. If you could not view the rendered pages, say so instead of implying a visual review.
 
 ## Artifact-first rule
 
