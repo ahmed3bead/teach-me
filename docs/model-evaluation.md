@@ -44,6 +44,25 @@ Only after both smoke commands pass, remove `--case` to run all static suites an
 
 Local results prove behavior only for the recorded local models. Before claiming compatibility with a hosted provider, run a small representative compatibility sample on that provider. Save a full paid run for the release candidate rather than every commit.
 
+## Codex subscription release evaluation
+
+Use the bundled subscription adapter with the same Python interpreter as the runner. This route sends synthetic evaluation inputs through the existing Codex subscription; it does not use a paid OpenAI API key. It consumes subscription usage and does not claim per-token billing evidence. The response and grader are separate ephemeral sessions.
+
+After a successful smoke run, merge the final candidate to `main` and use a clean checkout whose `HEAD`, `origin/main`, and merge base all match the recorded SHA:
+
+```bash
+python scripts/run_behavioral_evals.py \
+  --response-command "python scripts/codex_subscription_eval_adapter.py --role response" \
+  --grader-command "python scripts/codex_subscription_eval_adapter.py --role grader" \
+  --evaluation-transport codex-subscription \
+  --release-evidence --candidate-commit FULL_FINAL_SHA \
+  --protocol-retries 0 --pass-threshold 0.90 \
+  --output reports/subscription-release-FULL_FINAL_SHA-UNIQUE_UTC.json \
+  --timeout 660
+```
+
+Use the same interpreter path in all three commands when a virtual environment is active. On Windows, run Python with `-X utf8`; native PDF rendering dependencies are still required. Linux with Pango supports the existing renderer. Subscription release mode rejects other adapters, mismatched role/model identities, duplicate or unsupported options, API credential flags, and paid pricing/budget options. It retains the full-case-set, exact-SHA, clean-worktree, threshold, checkpoint, and evidence checks. The API route below retains all of its source-bound pricing and authorization gates.
+
 ## Paid evaluation with the official OpenAI API
 
 > **Blocked for this remediation:** request-shaping sources changed, so the checked-in pricing policy is intentionally stale and release preflight must reject it before dispatch. The command below is a non-runnable template. A separate reviewed change must recalculate the complete source-bound ceiling, update every cost-sensitive hash, and obtain new authorization before any paid request. Do not reuse the previous `$18.912125` authorization.

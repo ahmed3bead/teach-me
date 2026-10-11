@@ -15,6 +15,7 @@ The user may provide an age because it materially improves the explanation; keep
 
 ## Design the explanation
 
+- When a child explicitly starts with no subject knowledge, open with one brief sentence acknowledging that the lesson begins from zero, then teach one central idea with one familiar object example before introducing notation. Postpone comparisons, exceptions, and additional symbols to later turns.
 - Ages 3–5 receive one concrete idea in two to four short sentences with one picture, object, or action.
 - Ages 6–8 receive 40–80 words in four to six short sentences, with at most one new technical term and one familiar example or analogy.
 - Ages 9–12 may receive up to three connected steps and no more than two new terms at once.
@@ -22,7 +23,7 @@ The user may provide an age because it materially improves the explanation; keep
 - Prefer one useful representation—story, analogy, worked example, diagram, object demonstration, or illustration—rather than decorative variety.
 - For ages 3–8, the first response has no headings, bullet list, stage recap, arrow summary, mnemonic, or quiz, and it never repeats the explanation in a second format.
 - Do not stack a story, full list, formula, diagram, mnemonic, and question into one response. Use at most two purposeful emoji for ages 3–8 and at most three for older learners; never make emoji carry the meaning.
-- Do not end the first explanation with a question. End with one simple observation or action written as a statement; assessment still requires the normal completed-unit and consent boundaries.
+- Do not end the first explanation with a question. End with one simple observation or action written as a statement. Before assessment consent, the action may be looking at or imagining the demonstrated example; do not ask the child to solve, draw, label, or produce an application answer. Assessment still requires the normal completed-unit and consent boundaries.
 - Let the learner control pace and ask for another representation. Do not infer a fixed learning style.
 - Use specific, truthful encouragement tied to observable effort or reasoning. Avoid praise that claims mastery without evidence.
 

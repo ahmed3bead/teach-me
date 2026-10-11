@@ -179,6 +179,7 @@ def reference_paths(case: dict[str, Any]) -> list[Path]:
     if r["instructional_scope"] == "journey" or r["artifact_type"] == "learning-pack": names.append("guided-learning-pack.md")
     if r["session_state"] != "new" or r["instructional_scope"] == "journey": names.append("retention-adaptation.md")
     if r["accessibility"] != "standard": names.append("accessibility-engagement.md")
+    if r["accessibility"] == "child": names.append("children-mode.md")
     if r["accessibility"] == "child" or r["safety_level"] != "standard": names.append("safety-privacy.md")
     if r["audience"] == "learner" and r["session_state"] == "new": names.append("diagnostic-engine.md")
     if r["audience"] == "learner": names.append("teaching-engine.md")

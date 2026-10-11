@@ -17,6 +17,7 @@ import sys
 import time
 import unicodedata
 import os
+import shutil
 from datetime import datetime, timezone
 from html.parser import HTMLParser
 from pathlib import Path
@@ -196,12 +197,12 @@ NON_ASSESSMENT_ACTION = re.compile(
 )
 FRACTION_NOTATION = re.compile(r"\b\d+\s*/\s*\d+\b")
 EQUAL_PARTS = re.compile(r"(?:أجزاء|أقسام|قسمان|قسمين|جزآن|جزءان|جزأين|جزءين|قطعتان|قطعتين)\s+متساوي")
-CHILD_CONCRETE_EXAMPLE = re.compile(r"(?:شريط|ورق|دائرة|مربع|تفاحة|رغيف|قلم|مكعب|strip|paper|circle|square|apple|loaf|pencil|cube)", re.IGNORECASE)
+CHILD_CONCRETE_EXAMPLE = re.compile(r"(?:شريط|ورق|دائرة|مربع|تفاحة|رغيف|قلم|مكعب|حلوى|فطيرة|strip|paper|circle|square|apple|loaf|pencil|cube|candy|pie)", re.IGNORECASE)
 SHAMING_LANGUAGE = re.compile(r"\b(?:غبي|فاشل|كسول|ساذج|عيب|يجب أن تعرف|سهل جدًا)\b")
 REPEATED_ARABIC_DIACRITIC = re.compile(r"([\u064b-\u065f])\1+")
 ARABIC_TOKEN = re.compile(r"[\u0600-\u06ff]+")
 SENSITIVE_ARGUMENT = re.compile(r"(?:api[-_]?key|access[-_]?token|password|passwd|private[-_]?key|client[-_]?secret|authorization)", re.I)
-ADAPTER_ENV_ALLOWLIST = frozenset({"PATH", "HOME", "CODEX_HOME", "LANG", "LC_ALL", "LC_CTYPE", "TMPDIR", "TEMP", "TMP"})
+ADAPTER_ENV_ALLOWLIST = frozenset({"PATH", "HOME", "CODEX_HOME", "LANG", "LC_ALL", "LC_CTYPE", "TMPDIR", "TEMP", "TMP", "SystemRoot", "SYSTEMROOT"})
 OPENAI_API_KEY_ENV = "OPENAI_API_KEY"
 
 FAILURE_TAXONOMY = {
@@ -362,6 +363,7 @@ def invoke_once(command: str, payload: dict[str, Any], timeout: int, role: str, 
             shlex.split(command),
             input=json.dumps(payload, ensure_ascii=False),
             text=True,
+            encoding="utf-8",
             capture_output=True,
             timeout=timeout,
             check=False,
@@ -1172,7 +1174,7 @@ def deterministic_child_onboarding_check(text: str, prompt: str) -> dict[str, An
         return {"passed": True, "reason": "deterministic child onboarding check not applicable"}
     topic = r"(?:الكسور?|الكسر|fraction(?:s)?)"
     starts_from_zero = bool(re.search(
-        rf"(?:من الصفر|سنبدأ من (?:البداية|الصفر)|مبتدئ(?:ة)? تمامًا|start(?:ing)? from (?:zero|the beginning))|(?:لا (?:تعرف|يعرف)|لا توجد .*معرفة سابقة|لن أفترض .*معرفة سابقة|لم .* من قبل).{{0,45}}{topic}|(?:no prior knowledge|never studied|know nothing about|new to).{{0,45}}{topic}|{topic}.{{0,45}}(?:from zero|from the beginning|no prior knowledge)",
+        rf"(?:من الصفر|سنبدأ من (?:البداية|الصفر)|مبتدئ(?:ة)? تمامًا|start(?:ing)? from (?:zero|the beginning))|(?:لا (?:تعرف|يعرف)|لا توجد .*معرفة سابقة|لن أفترض .*معرفة سابقة|لم .* من قبل).{{0,45}}{topic}|(?:no prior knowledge|never studied|know nothing about|new to).{{0,45}}{topic}|{topic}.{{0,45}}(?:من البداية|from zero|from the beginning|no prior knowledge)",
         text, flags=re.IGNORECASE))
     concrete = bool(CHILD_CONCRETE_EXAMPLE.search(text))
     shaming = sorted(set(SHAMING_LANGUAGE.findall(text)))
@@ -1395,6 +1397,33 @@ def verify_release_commit(candidate: str, root: Path = ROOT) -> dict[str, Any]:
     return {"verified_sha": candidate, "checks": observed}
 
 
+def validate_subscription_adapter_command(command: str, role: str, expected_model: str) -> None:
+    """Restrict unpriced release runs to this repository's subscription adapter."""
+    from codex_subscription_eval_adapter import DEFAULT_MODEL
+
+    parts = shlex.split(command)
+    if not parts:
+        raise GlobalIntegrityError("subscription adapter command is empty")
+    executable = shutil.which(parts.pop(0))
+    if executable is None or Path(executable).resolve() != Path(sys.executable).resolve():
+        raise GlobalIntegrityError("subscription release adapter must use the runner's Python interpreter")
+    if parts[:2] == ["-X", "utf8"]:
+        parts = parts[2:]
+    if not parts or (ROOT / parts.pop(0)).resolve() != (ROOT / "scripts/codex_subscription_eval_adapter.py").resolve():
+        raise GlobalIntegrityError("subscription release requires the committed Codex adapter")
+    options = {}
+    while parts:
+        if len(parts) < 2 or parts[0] not in {"--role", "--model", "--timeout"} or parts[0] in options:
+            raise GlobalIntegrityError("unsupported or duplicate subscription adapter option")
+        key, value = parts[:2]
+        options[key] = value
+        parts = parts[2:]
+    if options.get("--role") != role or expected_model != "codex/" + options.get("--model", DEFAULT_MODEL):
+        raise GlobalIntegrityError("subscription adapter role or model does not match the recorded run")
+    if "--timeout" in options and (not options["--timeout"].isdigit() or int(options["--timeout"]) < 1):
+        raise GlobalIntegrityError("subscription adapter timeout must be positive")
+
+
 def main() -> int:
     global _ACTIVE_REPORT
     parser = argparse.ArgumentParser(description=__doc__)
@@ -1409,6 +1438,7 @@ def main() -> int:
     parser.add_argument("--protocol-retries", type=int, default=1)
     parser.add_argument("--candidate-commit", default=None)
     parser.add_argument("--release-evidence", action="store_true")
+    parser.add_argument("--evaluation-transport", choices=["openai-api", "codex-subscription"], default="openai-api")
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--expected-response-model", default="codex/gpt-5.6-sol")
     parser.add_argument("--expected-grader-model", default="codex/gpt-5.6-sol")
@@ -1444,7 +1474,13 @@ def main() -> int:
 
     if args.release_evidence and not args.candidate_commit:
         parser.error("--release-evidence requires --candidate-commit")
-    if args.release_evidence and args.pricing_file is None:
+    subscription_release = args.release_evidence and args.evaluation_transport == "codex-subscription"
+    if subscription_release:
+        if any(value is not None for value in (args.response_api_key_env, args.grader_api_key_env, args.pricing_file, args.authorized_cost_usd, args.conservative_max_cost_usd, args.hard_spend_cap_usd)):
+            parser.error("subscription release mode does not accept API credentials or paid cost options")
+        validate_subscription_adapter_command(args.response_command, "response", args.expected_response_model)
+        validate_subscription_adapter_command(args.grader_command, "grader", args.expected_grader_model)
+    if args.release_evidence and not subscription_release and args.pricing_file is None:
         parser.error("--release-evidence requires --pricing-file")
     cost_policy: dict[str, Any] | None = None
     cost_plan: dict[str, Any] | None = None
@@ -1466,7 +1502,7 @@ def main() -> int:
         args.authorized_cost_usd,
         args.conservative_max_cost_usd,
         cost_plan["conservative_cost"]["total_usd"] if cost_plan else None,
-        args.release_evidence,
+        args.release_evidence and not subscription_release,
     )
     validate_hard_spend_cap(args.hard_spend_cap_usd, cost_plan, args.authorized_cost_usd)
     if args.release_evidence and (args.case or case_count < 90 or args.pass_threshold != 0.90):
@@ -1493,6 +1529,7 @@ def main() -> int:
         "selected_case": args.case, "response_command": safe_adapter_command(args.response_command),
         "grader_command": safe_adapter_command(args.grader_command), "protocol_retries": args.protocol_retries,
         "timeout_seconds": args.timeout, "pass_threshold": args.pass_threshold,
+        "evaluation_transport": args.evaluation_transport,
         "expected_response_model": args.expected_response_model, "expected_grader_model": args.expected_grader_model,
         "response_credential_env": args.response_api_key_env, "grader_credential_env": args.grader_api_key_env,
         "authorized_cost_usd": args.authorized_cost_usd,
@@ -1973,9 +2010,10 @@ def main() -> int:
             )
             selected_records = [attempt_log[sequence - 1] for sequence in selected_attempts]
             deterministic_preflight_passed = all(item["accepted"] for item in selected_records)
-            final_passed = deterministic_preflight_passed and all(item["passed"] for item in criteria)
+            deterministic_criteria_passed = all(item["passed"] for item in criteria)
+            final_passed = deterministic_preflight_passed and deterministic_criteria_passed
             final_failure_categories: list[str] = []
-            if not deterministic_preflight_passed:
+            if not deterministic_preflight_passed or (grader_criteria_passed and not deterministic_criteria_passed):
                 final_failure_categories.append("deterministic-guard")
             if not grader_criteria_passed:
                 final_failure_categories.append(
