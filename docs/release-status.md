@@ -22,6 +22,8 @@ The [release record](published-release.json) captures the observed deployment co
 - Tool schema, description, annotations, and complete responses for seven routing cases match the local implementation. The generated bundle is current with its six source assets.
 - Original deployment commit, approval date, and publication date: unknown.
 
+The repository's generated MCP bundle has since changed to the undeployed v1.0.1 candidate digest `sha256:6dc9dc84d1866ea0af904f9d80b5013f8a969eae9befb0142872aa2a7cb0f94e`. Production and beta still serve `efbe6e8a…` until the candidate is deployed to beta, tested, and promoted.
+
 The public listing description and subtitle match `chatgpt-app-submission.json`; listing starter prompts are recorded in `docs/published-release.json`. The local skills-only manifest mirrors this copy but retains its independently versioned package metadata. The full repository also includes Codex/Claude workflows and development tools outside the compact MCP guidance bundle.
 
 The published description includes learner, educator, parent, age-aware, and source-grounded workflows. These checks verify the observable MCP guidance and metadata; they do not prove every internal ChatGPT setting or conversation outcome. Merging changes into `main` does not automatically update the published plugin, production MCP server, or Direct Upload guide.

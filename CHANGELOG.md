@@ -6,6 +6,7 @@
 - Accept grader evidence whose characters match the identified response or learner-visible artifact text exactly except for whitespace placement. Reordered, altered, hidden, or invented text is still rejected. This removes two grader-protocol false failures caused by a dropped space and by spacing around inline HTML elements.
 - Require learner-facing statements of the likely cause when an explanation fails, an explicit verification date and named authority for changing rules, and an honest report of which rendered PDF pages were reviewed.
 - State that the third Luma transfer box has no triangle. The scenario's source material defines no default for an unmentioned symbol, so the honest closed-book learner correctly refused to guess and the critical simulation failed on an ambiguous task rather than on teaching. Thresholds and criteria are unchanged.
+- Carry the same three guidance changes into the ChatGPT MCP runtime (`chatgpt-runtime-core.md`, `chatgpt-runtime-curriculum.md`). The generated runtime bundle digest changes to `sha256:6dc9dc84…`; production and beta are not redeployed by this change.
 - Correct the limitations and stable-readiness records to describe the published `v1.0.0` label, the 95-case suite, and the open quality gates.
 
 ## 1.0.0 - 2026-10-11
