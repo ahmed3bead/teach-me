@@ -13,6 +13,7 @@ from unittest import mock
 import yaml
 from assessment_intent import legacy_assessment_intent, validate_assessment_intent
 import run_agent_simulations as runner
+from codex_subscription_simulation_adapter import packet as subscription_packet
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -31,6 +32,38 @@ def run(selected: str, output: Path) -> subprocess.CompletedProcess[str]:
 
 
 def main() -> int:
+    for refusal in ("أفضل أن نواصل الشرح الآن، ولا أريد الفحص القصير بعد.", "فلا أوافق على الاختبار الآن."):
+        assert legacy_assessment_intent(refusal) == "decline"
+        assert validate_assessment_intent(refusal, "decline") == "decline"
+        try:
+            validate_assessment_intent(refusal, "accept")
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("conjunction-prefixed refusal was accepted as consent")
+    rejected = {"raw_result": {"utterance": "No check now", "assessment_intent": "accept", "done": False}, "invocation_id": "test-invocation"}
+    recorded = runner.adapter_attempt_record(rejected, "dialogue", 2)
+    assert recorded["raw_result"] == rejected["raw_result"] and recorded["invocation_id"] == "test-invocation"
+    baseline = {"type": "baseline", "locale": "en", "learner_persona": "A beginner", "task": "Unknown fictional rules"}
+    prompt, schema = subscription_packet(baseline, "learner")
+    assert schema["required"] == ["answer"]
+    assert "committed contract" not in prompt and "children-mode" not in prompt
+    for forbidden in ("teaching_material", "expected", "skill_root", "criteria"):
+        try:
+            subscription_packet(dict(baseline, **{forbidden: "hidden-test-canary"}), "learner")
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("privileged learner payload was accepted")
+    for role in ("teacher", "grader"):
+        try:
+            subscription_packet(baseline, role)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("simulation role mismatch was accepted")
+    _, dialogue_schema = subscription_packet(dict(baseline, type="dialogue", current_behavior="decline the offered check"), "learner")
+    assert dialogue_schema["required"] == ["utterance", "assessment_intent", "done"]
     lifecycle = [
         ("I need a different explanation.", "none"),
         ("لا أريد الأسئلة الآن.", "decline"),

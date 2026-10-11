@@ -228,6 +228,9 @@ def test_artifact_and_environment_safety() -> None:
     clean = safe_environment(env)
     assert clean == {"PATH":"/bin", "HOME":"/tmp/home", "LANG":"C.UTF-8"} and "canary" not in json.dumps(clean)
     assert runner.adapter_environment(env) == clean
+    windows_env = dict(env, SystemRoot="C:\\Windows")
+    assert safe_environment(windows_env) == dict(clean, SystemRoot="C:\\Windows")
+    assert runner.adapter_environment(windows_env) == dict(clean, SystemRoot="C:\\Windows")
     try: runner.safe_adapter_command("adapter --api-key canary")
     except RuntimeError: pass
     else: raise AssertionError("credential-bearing adapter command was accepted")
@@ -342,6 +345,17 @@ def test_assessment_and_consent() -> None:
 
 
 def test_terminology_structure_and_child_semantics() -> None:
+    child_case = case("child-routing")
+    child_case["routing"]["accessibility"] = "child"
+    assert "children-mode.md" in {path.name for path in reference_paths(child_case)}
+    assert "children-mode.md" not in {path.name for path in reference_paths(case("adult-routing"))}
+    assert runner.deterministic_child_onboarding_check(
+        "هدفنا أن تفهم معنى الكسر من البداية. تخيل قطعة حلوى مقسمة بالتساوي.",
+        "اشرح لطفل مفهوم الكسور",
+    )["passed"]
+    assert not runner.deterministic_child_onboarding_check(
+        "قسّم قطعة حلوى بالتساوي.", "اشرح لطفل مفهوم الكسور",
+    )["passed"]
     forensic = json.loads((ROOT / "fixtures" / "eval-regressions" / "behavioral-forensic.json").read_text(encoding="utf-8"))
     for item in forensic["terminology_false_positives"]: assert runner.deterministic_terminology_check(item["text"], item["prompt"])["passed"], item["case"]
     for item in forensic["terminology_negative_controls"]: assert not runner.deterministic_terminology_check(item["text"], item["prompt"])["passed"]
@@ -918,6 +932,23 @@ def test_full_90_case_protocol_simulation() -> None:
 
 
 def main() -> int:
+    interpreter = f'"{Path(sys.executable).as_posix()}"'
+    valid = f'{interpreter} -X utf8 scripts/codex_subscription_eval_adapter.py --role response'
+    runner.validate_subscription_adapter_command(valid, "response", "codex/gpt-5.6-sol")
+    for command, role, model in (
+        (valid + ' --api-key-env OPENAI_API_KEY', "response", "codex/gpt-5.6-sol"),
+        (valid + ' --role grader', "response", "codex/gpt-5.6-sol"),
+        (valid, "grader", "codex/gpt-5.6-sol"),
+        (valid, "response", "openai/gpt-5.6-sol"),
+        (f'{interpreter} -c print(1)', "response", "codex/gpt-5.6-sol"),
+        (valid.replace('codex_subscription_eval_adapter.py', 'openai_api_eval_adapter.py'), "response", "codex/gpt-5.6-sol"),
+    ):
+        try:
+            runner.validate_subscription_adapter_command(command, role, model)
+        except runner.GlobalIntegrityError:
+            pass
+        else:
+            raise AssertionError("unsafe subscription release command accepted")
     test_registry_and_cases(); test_semantic_fixture_leakage(); test_reference_routing_and_prompt_boundaries()
     test_artifact_and_environment_safety(); test_assessment_and_consent(); test_terminology_structure_and_child_semantics()
     test_grader_evidence(); test_release_git_binding(); test_runner_retry_checkpoint_and_resume()

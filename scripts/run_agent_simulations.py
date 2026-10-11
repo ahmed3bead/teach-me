@@ -62,6 +62,7 @@ def invoke(command: str, payload: dict[str, Any], timeout: int) -> dict[str, Any
         command_arguments(command),
         input=json.dumps(payload, ensure_ascii=False),
         text=True,
+        encoding="utf-8",
         capture_output=True,
         timeout=timeout,
         check=False,
@@ -179,6 +180,9 @@ def adapter_attempt_record(result: dict[str, Any], phase: str, turn: int | None 
         "attempts": result.get("adapter_attempts", 1),
         "retry_reason": result.get("adapter_retry_reason"),
     }
+    for name in ("model", "settings", "adapter_version", "invocation_id", "timing", "effective_prompt_sha256", "raw_result"):
+        if name in result:
+            record[name] = result[name]
     if turn is not None:
         record["turn"] = turn
     return record
@@ -495,6 +499,7 @@ def main() -> int:
                 "grading_rule": "Score observable evidence only. Penalize leakage, invented knowledge, prompting pressure, and unsupported mastery claims.",
             }, args.timeout)
             failure_stage = "post_grading_validation"
+            row["grader_adapter_call"] = adapter_attempt_record(graded, "simulation-grade")
             baseline_score = score(graded, "baseline_score", key)
             transfer_score = score(graded, "transfer_score", key)
             criteria = grade_results(graded, simulation["expected"], key)

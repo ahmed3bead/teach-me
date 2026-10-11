@@ -18,8 +18,8 @@ from typing import Any
 
 
 DEFAULT_MODEL = "gpt-5.6-sol"
-ADAPTER_VERSION = "2.1.1"
-ENV_ALLOWLIST = frozenset({"PATH", "HOME", "CODEX_HOME", "LANG", "LC_ALL", "LC_CTYPE", "TMPDIR", "TEMP", "TMP"})
+ADAPTER_VERSION = "2.2.0"
+ENV_ALLOWLIST = frozenset({"PATH", "HOME", "CODEX_HOME", "LANG", "LC_ALL", "LC_CTYPE", "TMPDIR", "TEMP", "TMP", "SystemRoot", "SYSTEMROOT"})
 
 
 def object_schema(properties: dict[str, Any], required: list[str]) -> dict[str, Any]:
@@ -187,7 +187,7 @@ def main() -> int:
         schema_path = temporary / "schema.json"; result_path = temporary / "result.json"
         schema_path.write_text(json.dumps(schema), encoding="utf-8")
         command = ["codex", "exec", "--model", args.model, "--ephemeral", "--ignore-user-config", "--ignore-rules", "--sandbox", "read-only", "--skip-git-repo-check", "--cd", directory, "--output-schema", str(schema_path), "--output-last-message", str(result_path), "--color", "never", "-"]
-        completed = subprocess.run(command, input=prompt, text=True, capture_output=True, timeout=args.timeout, env=safe_environment(dict(os.environ)))
+        completed = subprocess.run(command, input=prompt, text=True, encoding="utf-8", capture_output=True, timeout=args.timeout, env=safe_environment(dict(os.environ)))
         if completed.returncode != 0: raise RuntimeError(f"codex exec failed ({completed.returncode}): {completed.stderr[-1200:]}")
         raw = json.loads(result_path.read_text(encoding="utf-8"))
         evaluation_error = None
