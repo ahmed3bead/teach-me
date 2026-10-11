@@ -22,7 +22,7 @@ The [release record](published-release.json) captures the observed deployment co
 - Tool schema, description, annotations, and complete responses for seven routing cases match the local implementation. The generated bundle is current with its six source assets.
 - Original deployment commit, approval date, and publication date: unknown.
 
-The repository's generated MCP bundle has since changed to the undeployed v1.0.1 candidate digest `sha256:6dc9dc84d1866ea0af904f9d80b5013f8a969eae9befb0142872aa2a7cb0f94e`. Production and beta still serve `efbe6e8a…` until the candidate is deployed to beta, tested, and promoted.
+The repository's generated MCP bundle has since changed to the undeployed v1.0.1 candidate digest `sha256:6dc9dc84d1866ea0af904f9d80b5013f8a969eae9befb0142872aa2a7cb0f94e`. Beta was redeployed with this candidate on 2026-10-11 from commit `cc03b22` (Cloudflare version `5ffbbe58-9363-47f2-b205-8200edcea1e7`). Beta `GET /` reports the candidate digest; production still reports `efbe6e8a…` and has not been redeployed. Automated checks against beta passed for `initialize`, `tools/list`, security headers, and `load_teach_me` calls in English, `ar-MSA`, legacy `ar-EG`, educator, child, and source-grounded book, course, and curriculum routes; the new guidance is present where routed. Manual ChatGPT acceptance on the beta connection is still pending.
 
 The public listing description and subtitle match `chatgpt-app-submission.json`; listing starter prompts are recorded in `docs/published-release.json`. The local skills-only manifest mirrors this copy but retains its independently versioned package metadata. The full repository also includes Codex/Claude workflows and development tools outside the compact MCP guidance bundle.
 
