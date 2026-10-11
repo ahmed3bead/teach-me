@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Stop leaking future learner consent to the response model: case routing `assessment_state` (for example `accepted` at a later turn) was included in every turn's prompt packet, so models wrote "since you opted into a check" in turn 1. It now only selects references (prompt packet 1.2.0). Also make the completed-unit invitation explicit in `SKILL.md` and `chatgpt-runtime-core.md`.
 - Stop the assessment guard from flagging Markdown headings phrased as questions, and questions the teacher answers on the same line ("هل 6 أكبر من 4؟ نعم.", "what is it called? → sync"); treat emphasis-wrapped enumerators such as `**1)` as list labels. Found by a diagnostic Claude simulation run (Opus teacher, Haiku learner, Sonnet grader) on `5652e51`, where both simulations reached full learning gain.
 - Fix four more evaluator false failures found in the 2026-10-11 run on `34b9ea2`: Arabic phrase boundaries now treat diacritics as part of a word (so «حلّلت» no longer matches the imperative «حلّ»); bullets under syllabus content labels such as "Learn:" are not treated as assessment prompts; a closing Markdown emphasis marker after final punctuation no longer counts as truncation; and grader evidence may cite any recorded version of a revised artifact path.
 - Ask graders for the shortest decisive quote (normally under 300 characters) after a long quote was miscopied at the 800-character limit.
