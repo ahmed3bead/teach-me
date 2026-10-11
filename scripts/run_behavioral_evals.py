@@ -69,6 +69,8 @@ ASSESSMENT_IMPERATIVE = re.compile(
     ),
     flags=re.IGNORECASE,
 )
+# A teacher's own answer right after a question ("هل 6 أكبر من 4؟ نعم.") makes it a worked step, not a task.
+SELF_ANSWER = re.compile(r"(?:\*\*)?(?:→|←|->|(?:yes|no|نعم|لا)(?![\w\u064B-\u065F]))", re.IGNORECASE)
 SYLLABUS_CONTENT_LABEL = re.compile(
     r"(?:\*\*)?(?:learn|you will learn|topics|covers|content|ستتعلم|ستتعلّم|تتعلم|المحتوى|الموضوعات)(?:\*\*)?\s*[:：](?:\*\*)?",
     flags=re.IGNORECASE,
@@ -1020,13 +1022,19 @@ def assessment_prompt_match(text: str) -> AssessmentMatch | None:
         if in_content_list and original.strip().startswith(("- ", "* ")):
             continue
         in_content_list = False
+        if original.strip().startswith("#") and line.endswith(("?", "؟")):
+            continue
         # Examples and code are evidence supplied by the teacher, not learner tasks.
         line = re.sub(r"`[^`]*`|«[^»]*»|“[^”]*”|\"[^\"]*\"", " ", line).strip()
         if not line:
             continue
-        for candidate in re.split(r"(?<=[.!؛;؟?])\s+", line):
+        parts = re.split(r"(?<=[.!؛;؟?])\s+", line)
+        for index, candidate in enumerate(parts):
             candidate = candidate.strip()
             if not candidate: continue
+            following = parts[index + 1].strip() if index + 1 < len(parts) else ""
+            if candidate.endswith(("?", "؟")) and SELF_ANSWER.match(following):
+                continue
             if re.search(r"(?:answer|أجب|جاوب)\s+(?:these|the following|هذه|الآتية)?\s*(?:\w+\s+)?questions|read .*answer|اقرأ .*أجب", candidate, re.I):
                 if navigation_questionnaire: continue
                 return AssessmentMatch(candidate)
@@ -1147,7 +1155,7 @@ def deterministic_completeness_check(
     stack: list[str] = []; pairs = {")": "(", "]": "[", "}": "{"}; in_double = False
     unfenced = stripped.replace("```", "")
     # An unopened ")" after a short list label such as "1)", "b)", or "أ)" is an enumerator, not a broken pair.
-    enumerators = {match.end() - 1 for match in re.finditer(r"(?:^|(?<=[\s،,؛;:]))(?:\d{1,3}|[A-Za-z]|[ء-ي])\)", unfenced, re.M)}
+    enumerators = {match.end() - 1 for match in re.finditer(r"(?:^|(?<=[\s،,؛;:*_]))(?:\d{1,3}|[A-Za-z]|[ء-ي])\)", unfenced, re.M)}
     for index, character in enumerate(unfenced):
         if character == '"': in_double = not in_double
         elif not in_double and character in "([{": stack.append(character)
