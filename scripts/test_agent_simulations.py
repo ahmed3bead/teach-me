@@ -32,6 +32,9 @@ def run(selected: str, output: Path) -> subprocess.CompletedProcess[str]:
 
 
 def main() -> int:
+    rejected = {"raw_result": {"utterance": "No check now", "assessment_intent": "accept", "done": False}, "invocation_id": "test-invocation"}
+    recorded = runner.adapter_attempt_record(rejected, "dialogue", 2)
+    assert recorded["raw_result"] == rejected["raw_result"] and recorded["invocation_id"] == "test-invocation"
     baseline = {"type": "baseline", "locale": "en", "learner_persona": "A beginner", "task": "Unknown fictional rules"}
     prompt, schema = subscription_packet(baseline, "learner")
     assert schema["required"] == ["answer"]
