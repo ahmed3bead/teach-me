@@ -12,7 +12,21 @@ Teach Me | علّمني has been approved by OpenAI and published in the ChatGPT
 - Verification date: **2026-10-11**. This is the date the public page was checked, not a claim about the original approval or publication date.
 - The listing was accessible without signing in and displayed **Install plugin**; installation requires signing in to ChatGPT. Installation from a separate learner account has not been verified in this check.
 
-The published description includes learner, educator, parent, age-aware, and source-grounded workflows. The listing does not establish which Git commit or Worker build is deployed. Merging changes into `main` does not automatically update the published plugin or production MCP server.
+## Runtime evidence
+
+The [release record](published-release.json) captures the observed deployment comparison:
+
+- Runtime and repository package version: **1.0.0-beta.2**; listing version: **1.0.0**.
+- Production and beta bundle digest: `sha256:efbe6e8a20891fddcafbf9eb5a5ff9469779e8df12f2b3d3f23df2a9d367d2f4`.
+- Comparison repository commit: `b54b0a4f9f1ca0311508712a0d52b512f30b0a44` (approval documentation merge); this is not a claim about the original deployment commit.
+- Tool schema, description, annotations, and complete responses for seven routing cases match the local implementation. The generated bundle is current with its six source assets.
+- Original deployment commit, approval date, and publication date: unknown.
+
+The public listing description and subtitle match `chatgpt-app-submission.json`; listing starter prompts are recorded in `docs/published-release.json`. The local skills-only manifest mirrors this copy but retains its independently versioned package metadata. The full repository also includes Codex/Claude workflows and development tools outside the compact MCP guidance bundle.
+
+The published description includes learner, educator, parent, age-aware, and source-grounded workflows. These checks verify the observable MCP guidance and metadata; they do not prove every internal ChatGPT setting or conversation outcome. Merging changes into `main` does not automatically update the published plugin, production MCP server, or Direct Upload guide.
+
+See [user-link verification](user-link-verification-2026-10-11.md) for the installation, guide, policy, terms, and support checks.
 
 ## Future updates
 

@@ -19,8 +19,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Teach Me | علّمني",
-    "shortDescription": "Learn, prepare a lesson, or teach a child.",
-    "longDescription": "One Teach Me plugin for direct adaptive learning, compact teacher briefs, and safe age-appropriate explanations with meaningful visuals when useful. It supports English and simplified Modern Standard Arabic and can work from authorized sources.",
+    "shortDescription": "Learn step by step",
+    "longDescription": "Teach Me turns ChatGPT into a patient, adaptive teacher for learners, educators, and parents. It teaches topics step by step, prepares classroom-ready lesson briefs, adapts explanations when an age is supplied, and supports source-grounded learning from files, PDFs, books, webpages, videos, playlists, courses, recordings, curricula, and mixed sources that ChatGPT can inspect. It clearly states source-access limits, supports English and simplified Modern Standard Arabic, and asks permission before routine assessments. Teach Me creates no account, stores no learner state, and its read-only connector receives no learner messages or source contents.",
     "developerName": "Ahmed Ebead",
     "category": "Education",
     "capabilities": [
@@ -31,9 +31,9 @@
     "privacyPolicyURL": "https://github.com/ahmed3bead/teach-me/blob/main/docs/privacy-policy.md",
     "termsOfServiceURL": "https://github.com/ahmed3bead/teach-me/blob/main/docs/terms-of-use.md",
     "defaultPrompt": [
-      "Teach me a new topic from zero.",
-      "/teacher Prepare a one-page lesson brief for this topic.",
-      "/kids Explain this topic simply to a child with one useful visual."
+      "Teach me how compound interest works from zero, using a practical example.",
+      "حضّر لي درسًا مدته 20 دقيقة عن التمثيل الضوئي لطلاب عمرهم 12 سنة، وافصل ملاحظات المدرس عن الكلام الذي أقوله للطلاب.",
+      "Teach me from the PDF I attach. First tell me what you can inspect, then start with the first useful idea."
     ],
     "brandColor": "#0F766E",
     "composerIcon": "./assets/teach-me-icon.svg",
