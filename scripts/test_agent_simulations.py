@@ -13,6 +13,7 @@ from unittest import mock
 import yaml
 from assessment_intent import legacy_assessment_intent, validate_assessment_intent
 import run_agent_simulations as runner
+from codex_subscription_simulation_adapter import packet as subscription_packet
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -31,6 +32,26 @@ def run(selected: str, output: Path) -> subprocess.CompletedProcess[str]:
 
 
 def main() -> int:
+    baseline = {"type": "baseline", "locale": "en", "learner_persona": "A beginner", "task": "Unknown fictional rules"}
+    prompt, schema = subscription_packet(baseline, "learner")
+    assert schema["required"] == ["answer"]
+    assert "committed contract" not in prompt and "children-mode" not in prompt
+    for forbidden in ("teaching_material", "expected", "skill_root", "criteria"):
+        try:
+            subscription_packet(dict(baseline, **{forbidden: "hidden-test-canary"}), "learner")
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("privileged learner payload was accepted")
+    for role in ("teacher", "grader"):
+        try:
+            subscription_packet(baseline, role)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("simulation role mismatch was accepted")
+    _, dialogue_schema = subscription_packet(dict(baseline, type="dialogue", current_behavior="decline the offered check"), "learner")
+    assert dialogue_schema["required"] == ["utterance", "assessment_intent", "done"]
     lifecycle = [
         ("I need a different explanation.", "none"),
         ("لا أريد الأسئلة الآن.", "decline"),

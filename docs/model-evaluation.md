@@ -63,6 +63,18 @@ python scripts/run_behavioral_evals.py \
 
 Use the same interpreter path in all three commands when a virtual environment is active. On Windows, run Python with `-X utf8`; native PDF rendering dependencies are still required. Linux with Pango supports the existing renderer. Subscription release mode rejects other adapters, mismatched role/model identities, duplicate or unsupported options, API credential flags, and paid pricing/budget options. It retains the full-case-set, exact-SHA, clean-worktree, threshold, checkpoint, and evidence checks. The API route below retains all of its source-bound pricing and authorization gates.
 
+The subscription simulation adapter supports the same closed-book teacher/learner/grader protocol:
+
+```bash
+python scripts/run_agent_simulations.py \
+  --teacher-command "python scripts/codex_subscription_simulation_adapter.py --role teacher" \
+  --learner-command "python scripts/codex_subscription_simulation_adapter.py --role learner" \
+  --grader-command "python scripts/codex_subscription_simulation_adapter.py --role grader" \
+  --output reports/subscription-simulations-UNIQUE_UTC.json --timeout 660
+```
+
+Each role uses a fresh session. The learner adapter rejects teaching material, expected criteria, and skill-root fields; it receives only the persona, authorized conversation, current behavior, and task. Only the teacher reads committed teaching instructions. Run from the recorded clean candidate checkout and retain its SHA alongside the simulation report; the simulation runner itself does not claim release-SHA binding. These real model runs remain subject to the unchanged gain, transfer, consent, language, and critical-failure gates.
+
 ## Paid evaluation with the official OpenAI API
 
 > **Blocked for this remediation:** request-shaping sources changed, so the checked-in pricing policy is intentionally stale and release preflight must reject it before dispatch. The command below is a non-runnable template. A separate reviewed change must recalculate the complete source-bound ceiling, update every cost-sensitive hash, and obtain new authorization before any paid request. Do not reuse the previous `$18.912125` authorization.
